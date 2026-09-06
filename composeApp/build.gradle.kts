@@ -258,7 +258,7 @@ compose.desktop {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
             packageVersion = "1.5.0"
-            description = "Raix - Mensageiro Efêmero e Criptografado (Zero-Trace)"
+            description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"
             windows {

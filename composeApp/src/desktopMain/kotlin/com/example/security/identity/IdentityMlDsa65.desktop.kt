@@ -27,7 +27,7 @@ actual object IdentityMlDsa65 {
         val keyPair = generator.generateKeyPair()
         val pubParams = keyPair.public as MLDSAPublicKeyParameters
         return MlDsaKeyPair(
-            privateKey = seed32,
+            privateKey = seed32.copyOf(),
             publicKey = pubParams.encoded
         )
     }

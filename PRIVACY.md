@@ -30,8 +30,8 @@ O Raix foi projetado sob o princípio da **minimização extrema de dados** (*Pr
    - `currentAuthUid`: UID anônimo da sessão ativa associada ao fingerprint para entrega técnica de mensagens.
    - `revoked`: Flag booleano de moderação indicando se a rota técnica foi revogada por violação grave dos Termos de Uso.
 3. **Registros de Conexão à Aplicação (MCI Art. 15 — Base Legal Art. 7º, II da LGPD)**:
-   - Registrados na coleção segregada e isolada `accessLogs`: **registros de conexão (IP, porta, timestamp UTC e nome do endpoint) retidos por até 180 dias em datastore isolado, sem associação com identidade, payload ou chave pública Ed25519**.
-   - **Regra Absoluta de Isolamento**: Estes registros destinam-se exclusivamente ao cumprimento de obrigação legal de segurança da informação (Art. 15 do Marco Civil da Internet). Retidos pelo prazo estrito de 180 dias com expurgo automático via política TTL e purga horária ativa.
+   - Registrados na coleção segregada e isolada `accessLogs`: **registros de conexão (IP pseudonimizado via HMAC-SHA256 com salt rotativo temporal mensal, sem armazenamento de porta de conexão, timestamp UTC e nome do endpoint) retidos por até 180 dias em datastore isolado, sem associação com identidade, payload ou chave pública Ed25519**.
+   - **Regra Absoluta de Isolamento e Minimização**: Estes registros destinam-se exclusivamente ao cumprimento de obrigação legal de segurança da informação (Art. 15 do Marco Civil da Internet). O IP bruto e a porta são descartados imediatamente no ato da requisição, mantendo-se apenas o hash HMAC pseudonimizado pelo prazo estrito de 180 dias com expurgo automático via política TTL e purga ativa.
 4. **Ciphertext Efêmero da Mensagem**:
    - Texto cifrado através de **AES-256-GCM**. O servidor **não possui** a chave necessária para decifrar este conteúdo, tratando-o unicamente como sequência opaca de bytes.
 5. **Metadados Técnicos de Roteamento (`senderId` e `recipientId`)**:
@@ -48,7 +48,7 @@ O Raix foi projetado sob o princípio da **minimização extrema de dados** (*Pr
 
 ## 3. Dados que NUNCA são Coletados ou Tratados pelo Servidor
 
-Em razão da arquitetura **Zero-Knowledge** e **Zero-Trace** do Raix, o servidor **NUNCA** tem acesso aos seguintes dados no fluxo regular:
+Em razão da arquitetura **Zero-Knowledge** e da política de **Privacidade Forte por Design com Retenção Estritamente Limitada de Metadados** do Raix, o servidor **NUNCA** tem acesso aos seguintes dados no fluxo regular:
 
 - ❌ **Conteúdo Legível de Conversas**: O texto decifrado existe unicamente na memória volátil dos aparelhos interlocutores durante o prazo do temporizador efêmero.
 - ❌ **Livro de Contatos e Grafos Sociais**: Seus contatos, nomes locais e notas são salvos **exclusivamente no armazenamento local cifrado do seu dispositivo**.

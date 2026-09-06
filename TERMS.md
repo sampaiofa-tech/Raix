@@ -30,7 +30,7 @@ O Raix é um software de comunicação efêmera e privativa, fornecido **"NO EST
 
 ### 2.1. Timeout Estrito de Não-Entrega (≤ 24h) como Funcionalidade de Privacidade
 - **Destinatário Offline por Mais de 24 Horas:** Caso o destinatário permaneça desconectado ou inacessível por período superior a 24 (vinte e quatro) horas a contar do envio, a mensagem retida em fila no servidor é **definitiva e irreversivelmente incinerada** pela rotina automatizada (`scheduledMessageShredder`).
-- **Feature Deliberada de Privacidade:** Essa perda de mensagens não entregues dentro do intervalo de 24 horas não constitui falha ou interrupção de serviço, mas sim uma **funcionalidade deliberada de privacidade radical e minimização de dados** (*Zero-Trace Privacy Feature*), garantindo que dados criptografados jamais permaneçam estacionados indefinidamente em servidores de trânsito.
+- **Feature Deliberada de Privacidade:** Essa perda de mensagens não entregues dentro do intervalo de 24 horas não constitui falha ou interrupção de serviço, mas sim uma **funcionalidade deliberada de privacidade forte por design e minimização de dados**, garantindo que dados criptografados jamais permaneçam estacionados indefinidamente em servidores de trânsito.
 
 ---
 

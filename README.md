@@ -1,13 +1,13 @@
 <div align="center">
-  <h1>🔒 Raix - Zero-Trace Ephemeral Secure Messaging</h1>
-  <p><strong>Aplicativo Android & Desktop de Mensagens Ultrasseguras com Autodestruição em 24h, Criptografia AES-256-GCM em Hardware e Zero Rastro.</strong></p>
+  <h1>🔒 Raix - Ephemeral Secure Messaging (Privacidade Forte por Design)</h1>
+  <p><strong>Aplicativo Multiplataforma de Mensagens Efêmeras com Autodestruição em até 24h, Criptografia Pós-Quântica Híbrida e Minimização Estrita de Metadados.</strong></p>
 </div>
 
 ---
 
 ## 🌟 Visão Geral
 
-O **Raix** foi desenvolvido com um objetivo claro: **garantir privacidade absoluta e zero rastros** no dispositivo e em trânsito.
+O **Raix** foi desenvolvido com um objetivo claro: **garantir privacidade forte por design, efemeridade radical e minimização rigorosa de metadados** no dispositivo e em trânsito.
 
 ### 🛡️ Pilares de Segurança
 
@@ -41,7 +41,7 @@ O **Raix** foi desenvolvido com um objetivo claro: **garantir privacidade absolu
 
 ---
 
-## 🌪️ Arquitetura Zero-Trace Server-Side (Expiração Autoritativa & Crypto-Shredding)
+## 🌪️ Arquitetura Server-Side de Efemeridade (Expiração Autoritativa & Crypto-Shredding)
 
 Para mitigar ameaças em que clientes modificados ou offline tentam burlar o TTL local, o **Pmsg** implementa exclusão e destruição criptográfica autoritativa no servidor:
 
@@ -87,8 +87,8 @@ sequenceDiagram
    - Chamadas dos clientes Desktop e Web para geração de notas efêmeras são autenticadas criptograficamente por Firebase ID Token (`verifyIdToken`) e intermediadas por Cloud Function HTTPS.
    - **Rate Limiting por Usuário**: Implementado via transação atômica no Firestore (`userRateLimits/{uid}`) com janela deslizante de 1 minuto (limite padrão: 5 requisições/minuto), retornando HTTP 429 em caso de abuso.
    - A chave `GEMINI_API_KEY` reside exclusivamente no Google Cloud Secret Manager, eliminando qualquer risco de extração em binários ou tráfego de rede do cliente.
-7. **Identidade Anônima por Dispositivo (Zero-Trace Device Auth)**:
-   - Em conformidade com o princípio de rastreabilidade zero, o Pmsg **não solicita PII** (sem cadastro de e-mail, telefone ou dados pessoais).
+7. **Identidade Anônima por Dispositivo (Device-Bound Anonymous Auth)**:
+   - Em conformidade com o princípio de privacidade forte por design, o Raix **não solicita PII** (sem cadastro de e-mail, telefone ou dados pessoais).
    - O cliente Desktop autentica-se diretamente via REST API do Firebase Auth (Google Identity Toolkit), estabelecendo uma identidade criptográfica anônima (`localId`).
    - As credenciais de sessão (`idToken`, `refreshToken`) são persistidas localmente protegidas por **Windows DPAPI** (`Crypt32Util.cryptProtectData`).
    - O `localId` é assumido como o `senderId` das mensagens: isso garante que na chamada à função `storeMessageKey`, a validação de segurança `request.auth.uid == data.senderId` seja satisfeita sem expor a identidade real do operador.
@@ -224,7 +224,7 @@ A versão v1.2 do **Pmsg** implementa o encapsulamento criptográfico ponta-a-po
   - Bob obtém `{ ephemeralPubKey, wrappedDek }` via `getMessageKey`.
   - $\text{sharedSecret} = \text{X25519}(\text{recipientPrivKey}, \text{ephemeralPub})$
   - Deriva exatamente a mesma $\text{KEK}$ via HKDF-SHA256 e decifra a $\text{DEK}$ via AES-256-GCM em memória volátil.
-- **🛡️ GARANTIA DEFINITIVA EVOLUÍDA (Zero-Trace / Zero-Knowledge)**:
+- **🛡️ GARANTIA DEFINITIVA EVOLUÍDA (Privacidade Forte por Design / Zero-Knowledge)**:
   - **Comprometimento TOTAL do Servidor**: Mesmo na hipótese de comprometimento absoluto do Firestore, Cloud Functions, logs e tráfego de rede, um invasor obtém apenas **ciphertexts + DEKs envelopadas**. O conteúdo é **MATEMATICAMENTE IRRECUPERÁVEL** sem as chaves privadas dos dispositivos participantes.
   - **Histórico Local de Mensagens Enviadas**: A cópia da DEK de Alice é cifrada localmente em seu cofre de hardware (KeyVault). A perda física do dispositivo implica na perda do histórico de enviados — característica inerente ao modelo de privacidade máxima.
 
@@ -236,7 +236,7 @@ A versão v1.2 do **Pmsg** implementa o encapsulamento criptográfico ponta-a-po
   - Disponível na aba **"Meu Código"** (Modelo A) com toggle intuitivo *QR Code ↔ String URI* e no **Convite Remoto** (Modelo C).
   - **Desktop interoperável**: O PC desktop exibe o QR Code em tela cheia para que dispositivos móveis escaneiem sem necessidade de webcam no computador.
 - **Leitura via Câmera (Scanner Offline)**:
-  - **Android**: `CameraX` + `ML Kit Barcode Scanning` operando **100% offline no dispositivo** (nenhuma imagem ou frame sai do aparelho, em estrita fidelidade ao princípio zero-trace). Permissão `CAMERA` com fallback transparente.
+  - **Android**: `CameraX` + `ML Kit Barcode Scanning` operando **100% offline no dispositivo** (nenhuma imagem ou frame sai do aparelho, em estrita fidelidade ao princípio de privacidade por design). Permissão `CAMERA` com fallback transparente.
   - **iOS**: Pipeline nativo via `AVFoundation` (`AVCaptureMetadataOutput` tipo `.qr`) com preview acelerado por hardware via `UIKitView`.
   - **Desktop / Web**: Fallback claro e orientado para inserção de string URI via área de transferência (desktops raramente possuem câmera frontal conveniente).
   - **Pipeline Unificado de Parsing**: O payload decodificado do QR entra exatamente no mesmo analisador e validador (`IdentityManager.parseContactUri`), aplicando a checagem criptográfica $\text{fingerprint} == \text{SHA-256}(\text{pubKey})$ e cálculo do Número de Segurança de 60 dígitos.

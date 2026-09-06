@@ -143,6 +143,13 @@ object IdentityCryptoManager {
         val hybridFingerprintHex = Sha256Digest.digestHex(classicalComponents + pqComponents)
         val hybridSafetyNumber = formatSafetyNumber(hybridCombined)
 
+        // P1.2: RAM Zeroization - wipe all intermediate derivation buffers immediately
+        MemorySanitizer.zeroize(entropy)
+        MemorySanitizer.zeroize(seed)
+        MemorySanitizer.zeroize(rawPriv)
+        MemorySanitizer.zeroize(rawMlDsaSeed)
+        MemorySanitizer.zeroize(rawMlKemSeed)
+
         return IdentityKeyPair(
             privateKey = clampedPriv,
             publicKey = pubKey,

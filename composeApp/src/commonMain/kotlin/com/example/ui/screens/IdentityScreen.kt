@@ -501,9 +501,13 @@ fun IdentityScreen(
         AlertDialog(
             onDismissRequest = { showMnemonicWarningDialog = false },
             icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFFFB300)) },
-            title = { Text("Aviso de Segurança") },
+            title = { Text("⚠️ Aviso de Alto Risco — Backup") },
             text = {
-                Text("ATENÇÃO: Os servidores do Raix NÃO possuem cópia do seu mnemônico (arquitetura Zero-Knowledge). A perda dessas palavras é irreversível e definitiva. Certifique-se de que está em um local privativo e que ninguém está observando sua tela.")
+                Text("ATENÇÃO CRÍTICA DE SEGURANÇA:\n\n" +
+                     "1. Os servidores do Raix NÃO possuem cópia das suas palavras (arquitetura Zero-Knowledge). A perda é definitiva e irreversível.\n" +
+                     "2. NUNCA tire capturas de tela (screenshots) nem salve este mnemônico em e-mails, notas ou nuvens públicas desprotegidas.\n" +
+                     "3. RECOMENDAÇÃO FORMAL: Anote em local físico protegido ou armazene em um gerenciador de senhas criptografado confiável ou cofre físico/hardware wallet.\n\n" +
+                     "Certifique-se de que está em um local privativo antes de exibir.")
             },
             confirmButton = {
                 Button(

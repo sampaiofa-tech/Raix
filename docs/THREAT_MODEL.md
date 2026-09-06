@@ -1,8 +1,8 @@
 # Modelo de Ameaça e Postura de Segurança Pós-Quântica — Raix
 
-**Versão:** 1.2 (P0.4 — Supply-Chain & Integridade de Cliente)  
+**Versão:** 1.3 (P1 — Minimização de Metadados, Zeroização e Detecção de Anomalias)  
 **Data:** 06 de setembro de 2026  
-**Status:** Implementado, Atestado em CI (SLSA 2+) e Coberto por Testes Automatizados  
+**Status:** Implementado, Verificado em CI/CD e Coberto por Testes Automatizados  
 
 ---
 
@@ -141,3 +141,61 @@ No entanto, sob a análise adversarial formal da Emenda B.1:
      - **Android:** Detecta binários de root (`su`), injeção dinâmica de frameworks de hooking (Frida em portas 27042 e `/proc/self/maps`, Xposed) e anexação de depuradores.
      - **Web/Wasm:** Alerta sobre a execução em contexto de navegador sem garantias de isolamento de memória contra DevTools.
 
+---
+
+## 7. Matriz Exaustiva de Metadados: "Quem Vê o Quê, por Quanto Tempo e Sob Quais Condições" (P1.1)
+
+Em conformidade com a substituição de alegações de "zero-trace absoluto" por **"privacidade forte por design, com retenção estritamente limitada de metadados"**, a matriz a seguir especifica os limites matemáticos e operacionais de exposição de dados e metadados no sistema:
+
+| Ator | O Que Vê (Metadados / Dados Visíveis) | O Que NÃO Vê (Garantia Matemática / Criptográfica) | Tempo de Retenção | Condições de Acesso / Hipótese |
+| :--- | :--- | :--- | :--- | :--- |
+| **Google Cloud Platform** (Provedor de Infraestrutura) | • Endereço IP e porta de transporte nos Load Balancers / Cloud NAT.<br/>• Timestamps de requisição HTTP/2 / QUIC.<br/>• Volume de tráfego e tamanho dos pacotes TLS.<br/>• Certificado TLS do servidor.<br/>• Envelopes cifrados transitórios em `identities/*/inbox/*`.<br/>• Ciphertexts de DEK em `messageKeys/*`. | • Conteúdo em claro de mensagens.<br/>• Chaves privadas de identidade (X25519, Ed25519, ML-KEM-768, ML-DSA-65).<br/>• Sementes e mnemônicos BIP-39.<br/>• DEK em claro (protegida por Sealed-Box híbrido).<br/>• Correlação estática de pares (emenda B.3). | • Logs de borda GCP: até 30 dias (padrão Cloud Logging).<br/>• Firestore: $\le 24$h (ou incinerado imediatamente no *Vanish-After-Read*). | Comprometimento administrativo de infraestrutura do GCP ou ordem judicial expedida sob jurisdição norte-americana / FISA / CLOUD Act. |
+| **Operador do Raix** (Cat Tech / Administrador) | • Registro de conexão sob o MCI Art. 15: timestamp UTC e endpoint acessado (`/storeMessageKey`, `/getMessageKey`).<br/>• Hash HMAC-SHA256 pseudonimizado do IP (com salt rotativo mensal).<br/>• Fingerprint de roteamento da caixa postal.<br/>• Métricas agregadas de anomalias (`securityAnomalies`). | • Endereço IP bruto em repouso (descartado no ato da requisição).<br/>• Porta de conexão efêmera do usuário (não armazenada).<br/>• Identificador de hardware ou fingerprinting de dispositivo.<br/>• Conteúdo legível de conversas (*Zero-Knowledge*).<br/>• Chaves privadas ou sementes mnemônicas.<br/>• Grafo de interlocução remetente↔destinatário. | • `accessLogs` (MCI Art. 15): estritamente 180 dias com expurgo automático.<br/>• Envelopes efêmeros: $\le 24$h (ou destruição imediata no *Vanish*).<br/>• Anomalias: 30 dias. | Ordem judicial brasileira individualizada e fundamentada expedida por autoridade judiciária competente (MCI Art. 15, § 1º). |
+| **Atacante de Rede Passivo / MitM** (Operador de ISP, Roteador Wi-Fi, Grampo de Tráfego) | • IPs de origem e destino da sessão TLS.<br/>• Porta de conexão e volume de bytes transmitidos.<br/>• SNI e domínio de conexão (`firebaseio.com`, `raixtech.com`).<br/>• Padrões temporais de atividade online. | • URLs exatas dos endpoints REST / Cloud Functions.<br/>• Conteúdo dos envelopes HTTP/2.<br/>• Chaves efêmeras e ciphertexts de mensagens.<br/>• Fingerprints de roteamento e identidades.<br/>• Conteúdo decifrado de qualquer natureza. | Ilimitado (caso o atacante grave tráfego passivo para cenário HNDL). | Interceptação física de cabos submarinos, roteadores ou redes locais. O KEM Híbrido PQC (ML-KEM-768 + X25519) garante que o conteúdo permanece indecifrável mesmo para atacantes quânticos com gravação perene. |
+| **Atacante de Servidor Comprometido** (Invasor com Acesso ao Firestore / Admin SDK) | • Envelopes transitórios ativos não lidos (`payloadEncrypted` em AES-256-GCM).<br/>• Metadados de envelope: `createdAt`, `expiresAt`, `ephemeralPublicKey`.<br/>• Ciphertexts de `wrappedDek` cifrados com KEK híbrida.<br/>• Logs de conexão pseudonimizados com salt mensal (`accessLogs`). | • Texto plano de qualquer mensagem.<br/>• Chaves de identidade e decapsulação KEM (isoladas nos endpoints).<br/>• Chaves DEK em claro.<br/>• Histórico de mensagens antigas já incineradas pelo Shredder.<br/>• Associação de pares de conversa (inexistência de `senderHash` + `recipientHash` associados no mesmo doc). | Enquanto o documento não for purgado pelo Shredder ($\le 24$h). | Exfiltração de credenciais de serviço ou bypass de autenticação do backend. |
+| **Destinatário Autorizado** (Interlocutor na Conversa) | • Conteúdo legível da mensagem decifrada.<br/>• Timestamp de emissão informado pelo remetente.<br/>• Mídias e anexos efêmeros decifrados.<br/>• Fingerprint e Safety Number dual de 60 dígitos do remetente. | • Frase mnemônica BIP-39 do remetente.<br/>• Chaves privadas do remetente.<br/>• IP ou porta do remetente.<br/>• Outras conversas ou caixas postais do remetente. | Controlado pela política de efemeridade local: até a leitura (*Vanish-After-Read*), expiração do temporizador local ($\le 24$h) ou acionamento voluntário do *Shake-to-Clear* / *Panic Wipe*. | Posse legítima do par de chaves privadas no dispositivo e autorização biométrica / PIN no client. |
+
+---
+
+## 8. Custódia em Keystore Nativa e Zeroização de Memória RAM Anti-DSE (P1.2)
+
+### 8.1 Zeroização de Memória com Barreira Volátil Anti-Dead-Store Elimination
+Compiladores JIT modernos (HotSpot JVM, Android ART, GraalVM) realizam análises de código morto agressivas (*Dead-Store Elimination - DSE*): rotinas como `Arrays.fill(buffer, 0)` são rotineiramente descartadas se a variável não for lida novamente antes de sua coleta pelo Garbage Collector.
+
+Para mitigar dumps de memória em Windows Desktop e Android:
+1. **Módulo `MemorySanitizer`:** Implementa uma barreira de memória via `@Volatile private var volatileSink: Int`.
+2. **Ciclo de Zeroização:**
+   - Preenche o array com zeros determinísticos (`0.toByte()` ou `' '`).
+   - Executa uma leitura cumulativa XOR através do buffer e força a atribuição ao campo volátil:
+     $$\text{volatileSink} = \sum_{i=0}^{N-1} (\text{buffer}[i] \oplus i)$$
+   - A dependência de leitura do campo volátil quebra o grafo de análise de código morto do compilador, garantindo que a sobrescrita física na memória RAM seja executada.
+3. **Buffers Intermediários Sanitizados:** Sementes intermediárias de derivação (`entropy`, `seed`, `rawPriv`, `rawMlDsaSeed`, `rawMlKemSeed`) são sanitizadas imediatamente após o uso.
+
+### 8.2 Custódia em Keystore Nativa de Hardware
+- **Android:** Utiliza `AndroidKeyStore` com suporte StrongBox / TEE. Chaves de criptografia e envelopes de identidade não residem desprotegidos no sistema de arquivos.
+- **Desktop (Windows):** Cifragem via Windows Data Protection API (DPAPI / `Crypt32Util`), vinculando os dados cifrados à credencial física da conta de usuário do sistema operacional.
+- **Apple (macOS / iOS):** Proteção delegada à Apple Keychain integrada com Secure Enclave.
+- **Web (Wasm):** Alerta claro ao usuário sobre a ausência de keystore nativa de hardware, mantendo dados estritamente em memória volátil de sessão.
+
+### 8.3 UX de Backup com Alerta de Alto Risco
+A restauração da identidade criptográfica é de **responsabilidade exclusiva do usuário**. A interface do usuário (`IdentityScreen`):
+- Exibe o mnemônico de 12 palavras exclusivamente sob demanda consciente.
+- Apresenta aviso de alto risco enfatizando que a perda do mnemônico acarreta na perda permanente e irreversível da identidade e dos contatos.
+- Recomenda expressamente o armazenamento em **gerenciador de senhas confiável offline, cofre físico ou hardware wallet**, desaconselhando screenshots e anotações digitais desprotegidas.
+
+---
+
+## 9. Detecção Proativa de Anomalias de Acesso e Força Bruta (P1.3)
+
+O módulo `functions/src/anomalyDetector.ts` introduz telemetria de contenção proativa no backend Cloud Functions, correlacionando eventos anômalos sem expor PII:
+
+1. **Alerta de Leitura Anômala de Inbox por Identidade:**
+   - Limiar configurável: **> 20 leituras por minuto** associadas ao mesmo `identityHash`.
+   - Sinaliza potencial script malicioso ou enumeração automatizada de caixas postais.
+   - Registrado como evento estruturado `ANOMALOUS_INBOX_READ_FREQUENCY` na coleção restrita `securityAnomalies`.
+2. **Alerta de Tentativas Repetidas de Permission-Denied / Força Bruta:**
+   - Limiar configurável: **> 5 rejeições por minuto** associadas à mesma origem (IP pseudonimizado).
+   - Sinaliza sondagem não autorizada, tentativa de colheita de envelopes ou força bruta em rotas protegidas.
+   - Registrado como evento estruturado `REPEATED_PERMISSION_DENIED` com correlação temporal.
+3. **Isolamento de Segurança:**
+   - A coleção `securityAnomalies` é protegida com `allow read, write: if false;` em `firestore.rules`, sendo manipulável exclusivamente pelo Firebase Admin SDK.
