@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:5199a990-f213-4b63-aff4-d74c8c73be88",
+  "serialNumber": "urn:uuid:5a080776-af13-59f3-9fa7-823bdca6ae01",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-09-06T16:05:46.729Z",
+    "timestamp": "2026-09-06T18:00:00.000Z",
     "tools": [
       {
         "vendor": "Raix Security Engineering",
@@ -355,6 +355,13 @@
       "name": "firebase-bom",
       "version": "34.17.0",
       "purl": "pkg:maven/com.google.firebase/firebase-bom@34.17.0"
+    },
+    {
+      "type": "library",
+      "group": "com.google.firebase",
+      "name": "firebase-messaging",
+      "version": "unknown",
+      "purl": "pkg:maven/com.google.firebase/firebase-messaging@unknown"
     },
     {
       "type": "library",

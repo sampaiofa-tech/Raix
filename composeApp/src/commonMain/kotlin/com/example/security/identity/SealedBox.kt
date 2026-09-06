@@ -26,7 +26,7 @@ data class SealedBoxEnvelope(
     }
 }
 
-class DowngradeAttackException(message: String) : SecurityException(message)
+class DowngradeAttackException(message: String) : Exception(message)
 
 /**
  * Multiplatform Sealed-Box primitive for E2E DEK encryption.

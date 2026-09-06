@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:56666233-1860-4d79-bbfc-0ba644b852c8",
+  "serialNumber": "urn:uuid:a48a284c-4e69-5c3e-b147-38e5c861e188",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-09-06T16:05:46.726Z",
+    "timestamp": "2026-09-06T18:00:00.000Z",
     "tools": [
       {
         "vendor": "Raix Security Engineering",

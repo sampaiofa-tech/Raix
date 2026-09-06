@@ -13,15 +13,31 @@ if (!fs.existsSync(SBOM_DIR)) {
   fs.mkdirSync(SBOM_DIR, { recursive: true });
 }
 
+// Deterministic timestamp for reproducible builds / CI diffs
+const DETERMINISTIC_TIMESTAMP = process.env.SOURCE_DATE_EPOCH
+  ? new Date(parseInt(process.env.SOURCE_DATE_EPOCH, 10) * 1000).toISOString()
+  : "2026-09-06T18:00:00.000Z";
+
+function generateDeterministicUuid(seed) {
+  const hash = crypto.createHash("sha256").update(seed).digest("hex");
+  const p1 = hash.substring(0, 8);
+  const p2 = hash.substring(8, 12);
+  const p3 = "5" + hash.substring(13, 16); // UUID version 5
+  const b = (parseInt(hash.substring(16, 18), 16) & 0x3f) | 0x80; // RFC 4122 variant
+  const p4 = b.toString(16).padStart(2, "0") + hash.substring(18, 20);
+  const p5 = hash.substring(20, 32);
+  return `${p1}-${p2}-${p3}-${p4}-${p5}`;
+}
+
 function generateCycloneDxHeader(componentName, version, description) {
-  const serialNumber = "urn:uuid:" + crypto.randomUUID();
+  const serialNumber = "urn:uuid:" + generateDeterministicUuid(`raix-cyclonedx-sbom-${componentName}`);
   return {
     bomFormat: "CycloneDX",
     specVersion: "1.5",
     serialNumber,
     version: 1,
     metadata: {
-      timestamp: new Date().toISOString(),
+      timestamp: DETERMINISTIC_TIMESTAMP,
       tools: [
         {
           vendor: "Raix Security Engineering",

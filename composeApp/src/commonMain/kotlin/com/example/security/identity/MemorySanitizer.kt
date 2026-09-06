@@ -1,5 +1,7 @@
 package com.example.security.identity
 
+import kotlin.concurrent.Volatile
+
 /**
  * Memory Sanitizer with Dead-Store Elimination mitigation (P1.2).
  *
