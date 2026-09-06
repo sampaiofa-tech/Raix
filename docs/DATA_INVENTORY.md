@@ -79,6 +79,28 @@ git grep -i -E "analytics|crashlytics|admob|facebook|appsflyer|adjust|mixpanel|a
 
 ---
 
-## 5. Conclusão e Certificação Técnica
+## 5. Modelagem e Dimensionamento de Overhead Pós-Quântico Híbrido (Emenda Guru A.6)
 
-O ecossistema **Raix** opera sob estrita consonância com os princípios de **Finalidade**, **Adequação**, **Necessidade** e **Segurança** dispostos no art. 6º da Lei Geral de Proteção de Dados (Lei nº 13.709/2018), tratando unicamente os elementos técnicos indispensáveis para viabilizar a entrega de mensagens efêmeras com criptografia ponta-a-ponta de chaves.
+Com a introdução da migração pós-quântica híbrida (NIST FIPS 203 ML-KEM-768 e NIST FIPS 204 ML-DSA-65), foi realizado o dimensionamento técnico formal do overhead criptográfico gerado no armazenamento e transporte:
+
+| Primitiva Criptográfica | Algoritmo | Chave Pública | Chave Privada (Semente/Expandida) | Ciphertext / Assinatura |
+| :--- | :--- | :--- | :--- | :--- |
+| **Autenticação Clássica** | Ed25519 (RFC 8032) | 32 bytes | 32 bytes | 64 bytes |
+| **Autenticação Pós-Quântica** | ML-DSA-65 (FIPS 204) | 1.952 bytes | 32 bytes (semente FIPS) | 3.309 bytes |
+| **Assinatura Híbrida Composta** | Ed25519 + ML-DSA-65 | 1.988 bytes (inc. header) | 36 bytes (inc. header) | 3.377 bytes (inc. header) |
+| **KEM Clássico (ECDH)** | X25519 (RFC 7748) | 32 bytes | 32 bytes | 32 bytes (chave efêmera) |
+| **KEM Pós-Quântico** | ML-KEM-768 (FIPS 203) | 1.184 bytes | 64 bytes (semente d, z) | 1.088 bytes |
+| **Envelope Híbrido KEM** | X25519 + ML-KEM-768 | 1.216 bytes | 96 bytes | 1.120 bytes |
+
+### Impacto na Cota e Limites Operacionais do Cloud Firestore
+- **Limite por documento no Cloud Firestore:** 1.048.576 bytes (1 MiB).
+- **Tamanho total do Envelope Híbrido Completo (Chaves + Assinatura + Ciphertext KEM + DEK cifrada):** ~6.485 bytes (~6,48 KB).
+- **Consumo de capacidade:** **~0,62% do limite de 1 MiB** por documento de envelope/mensagem.
+- **Conclusão de Viabilidade:** O overhead pós-quântico é perfeitamente suportado pela infraestrutura sem necessidade de particionamento de documentos, mantendo a performance de leitura/escrita e respeitando o limite de faturamento/banda do Firestore.
+
+---
+
+## 6. Conclusão e Certificação Técnica
+
+O ecossistema **Raix** opera sob estrita consonância com os princípios de **Finalidade**, **Adequação**, **Necessidade** e **Segurança** dispostos no art. 6º da Lei Geral de Proteção de Dados (Lei nº 13.709/2018), tratando unicamente os elementos técnicos indispensáveis para viabilizar a entrega de mensagens efêmeras com criptografia ponta-a-ponta de chaves pós-quântica híbrida.
+

@@ -9,7 +9,13 @@ data class IdentityKeyPair(
     val fingerprintHex: String,
     val safetyNumber: String, // 60 decimal digits (12 blocks of 5)
     val signingPrivateKey: ByteArray = ByteArray(0),
-    val signingPublicKey: ByteArray = ByteArray(0)
+    val signingPublicKey: ByteArray = ByteArray(0),
+    val mlKemPrivateKey: ByteArray = ByteArray(0),
+    val mlKemPublicKey: ByteArray = ByteArray(0),
+    val mlDsaPrivateKey: ByteArray = ByteArray(0),
+    val mlDsaPublicKey: ByteArray = ByteArray(0),
+    val hybridFingerprintHex: String = "",
+    val hybridSafetyNumber: String = ""
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -19,7 +25,13 @@ data class IdentityKeyPair(
                 fingerprintHex == other.fingerprintHex &&
                 safetyNumber == other.safetyNumber &&
                 signingPrivateKey.contentEquals(other.signingPrivateKey) &&
-                signingPublicKey.contentEquals(other.signingPublicKey)
+                signingPublicKey.contentEquals(other.signingPublicKey) &&
+                mlKemPrivateKey.contentEquals(other.mlKemPrivateKey) &&
+                mlKemPublicKey.contentEquals(other.mlKemPublicKey) &&
+                mlDsaPrivateKey.contentEquals(other.mlDsaPrivateKey) &&
+                mlDsaPublicKey.contentEquals(other.mlDsaPublicKey) &&
+                hybridFingerprintHex == other.hybridFingerprintHex &&
+                hybridSafetyNumber == other.hybridSafetyNumber
     }
 
     override fun hashCode(): Int {
@@ -29,6 +41,12 @@ data class IdentityKeyPair(
         result = 31 * result + safetyNumber.hashCode()
         result = 31 * result + signingPrivateKey.contentHashCode()
         result = 31 * result + signingPublicKey.contentHashCode()
+        result = 31 * result + mlKemPrivateKey.contentHashCode()
+        result = 31 * result + mlKemPublicKey.contentHashCode()
+        result = 31 * result + mlDsaPrivateKey.contentHashCode()
+        result = 31 * result + mlDsaPublicKey.contentHashCode()
+        result = 31 * result + hybridFingerprintHex.hashCode()
+        result = 31 * result + hybridSafetyNumber.hashCode()
         return result
     }
 }
@@ -55,21 +73,26 @@ data class ProvisionedIdentity(
 }
 
 /**
- * Core cryptographic engine for Pmsg Identity (v1.1).
+ * Core cryptographic engine for Raix Identity (v2.0 PQC Hybrid).
  *
  * Implements:
  * 1. Deterministic BIP-39 PT-BR 128-bit entropy -> 12-word mnemonic.
- * 2. Argon2id key derivation -> 256-bit X25519 keypair (salt: "pmsg-v1-identity-seed").
- * 3. Deterministic Ed25519 signing keypair derivation (salt: "pmsg-v1-identity-signing").
- * 4. Fingerprint computation: SHA-256(pubKey) as 12 blocks of 5 digits (60 digits total).
- * 5. Pair Safety Number computation: SHA-256(min(pkA, pkB) + max(pkA, pkB)) as 60 digits.
- * 6. Proof-of-possession signing for technical identity routing updates.
- * 7. Envelope encryption of private keys and seed using KeyVault hardware keys.
+ * 2. Dual-derivation from the same BIP-39 seed:
+ *    - Classical: 256-bit X25519 keypair + Ed25519 signing keypair (preserves legacy recovery).
+ *    - Post-Quantum: ML-KEM-768 (FIPS 203) keypair + ML-DSA-65 (FIPS 204) signing keypair.
+ * 3. Signal-compatible Dual Safety Number: covers both classical and post-quantum public keys.
+ * 4. Hybrid proof-of-possession with Anti-Downgrade capability negotiation.
+ * 5. Envelope encryption of private keys and seed using KeyVault hardware keys.
  */
 object IdentityCryptoManager {
 
     private val SALT = "pmsg-v1-identity-seed".encodeToByteArray()
     private val SIGNING_SALT = "pmsg-v1-identity-signing".encodeToByteArray()
+    private val MLDSA_SALT = "raix-v2-identity-mldsa-seed".encodeToByteArray()
+    private val MLKEM_SALT = "raix-v2-identity-mlkem-seed".encodeToByteArray()
+
+    const val MIN_SECURITY_LEVEL_HYBRID = "HYBRID_PQC"
+    const val SUITE_HYBRID = "hybrid-v1"
 
     fun generateNewIdentity(providedEntropy: ByteArray? = null): ProvisionedIdentity {
         val entropy = providedEntropy ?: ByteArray(16).also { Random.nextBytes(it) }
@@ -88,7 +111,7 @@ object IdentityCryptoManager {
         val entropy = Bip39Portuguese.mnemonicToEntropy(mnemonic).getOrThrow()
         val seed = Sha256Digest.digest(entropy)
 
-        // 1. X25519 Encryption KeyPair
+        // 1. Classical X25519 Encryption KeyPair
         val rawPriv = Argon2Kmp.deriveKey(seed = seed, salt = SALT, iterations = 3, memoryKiB = 32768, parallelism = 1, outputLength = 32)
 
         // RFC 7748 Clamping
@@ -101,9 +124,24 @@ object IdentityCryptoManager {
         val fingerprintHex = Sha256Digest.digestHex(pubKey)
         val safetyNumber = formatSafetyNumber(Sha256Digest.digest(pubKey))
 
-        // 2. Ed25519 Signing KeyPair (F0: Proof-of-Possession)
+        // 2. Classical Ed25519 Signing KeyPair (F0: Proof-of-Possession)
         val rawSigningPriv = Argon2Kmp.deriveKey(seed = seed, salt = SIGNING_SALT, iterations = 3, memoryKiB = 32768, parallelism = 1, outputLength = 32)
         val signingPubKey = IdentityEd25519.generatePublicKey(rawSigningPriv)
+
+        // 3. Post-Quantum ML-DSA-65 Signing KeyPair (NIST FIPS 204 Level 3)
+        val rawMlDsaSeed = Argon2Kmp.deriveKey(seed = seed, salt = MLDSA_SALT, iterations = 3, memoryKiB = 32768, parallelism = 1, outputLength = 32)
+        val mlDsaKeyPair = IdentityMlDsa65.generateKeyPair(rawMlDsaSeed)
+
+        // 4. Post-Quantum ML-KEM-768 Key Encapsulation KeyPair (NIST FIPS 203 Level 3)
+        val rawMlKemSeed = Argon2Kmp.deriveKey(seed = seed, salt = MLKEM_SALT, iterations = 3, memoryKiB = 32768, parallelism = 1, outputLength = 32)
+        val mlKemKeyPair = IdentityMlKem768.generateKeyPair(rawMlKemSeed)
+
+        // 5. Hybrid Combined Fingerprint and Signal-Compatible Hybrid Safety Number (Guru Amendment A.2 & A.5)
+        val classicalComponents = Sha256Digest.digest(pubKey + signingPubKey)
+        val pqComponents = Sha256Digest.digest(mlKemKeyPair.publicKey + mlDsaKeyPair.publicKey)
+        val hybridCombined = Sha256Digest.digest(classicalComponents + pqComponents)
+        val hybridFingerprintHex = Sha256Digest.digestHex(classicalComponents + pqComponents)
+        val hybridSafetyNumber = formatSafetyNumber(hybridCombined)
 
         return IdentityKeyPair(
             privateKey = clampedPriv,
@@ -111,22 +149,82 @@ object IdentityCryptoManager {
             fingerprintHex = fingerprintHex,
             safetyNumber = safetyNumber,
             signingPrivateKey = rawSigningPriv,
-            signingPublicKey = signingPubKey
+            signingPublicKey = signingPubKey,
+            mlKemPrivateKey = mlKemKeyPair.privateKey,
+            mlKemPublicKey = mlKemKeyPair.publicKey,
+            mlDsaPrivateKey = mlDsaKeyPair.privateKey,
+            mlDsaPublicKey = mlDsaKeyPair.publicKey,
+            hybridFingerprintHex = hybridFingerprintHex,
+            hybridSafetyNumber = hybridSafetyNumber
         )
     }
 
-    fun buildRoutingSignaturePayload(fingerprint: String, newAuthUid: String, timestamp: Long): String {
+    /**
+     * Anti-Downgrade Handshake Payload (Guru Amendment A.2).
+     * Binds minimum security level and supported suites directly into the authenticated payload.
+     */
+    fun buildRoutingSignaturePayload(
+        fingerprint: String,
+        newAuthUid: String,
+        timestamp: Long,
+        minSecurityLevel: String = MIN_SECURITY_LEVEL_HYBRID,
+        supportedSuites: String = SUITE_HYBRID
+    ): String {
+        return "pmsg-routing-v2|$fingerprint|$newAuthUid|$timestamp|$minSecurityLevel|$supportedSuites"
+    }
+
+    /**
+     * Backwards-compatible v1 routing payload builder.
+     */
+    fun buildRoutingSignaturePayloadV1(fingerprint: String, newAuthUid: String, timestamp: Long): String {
         return "pmsg-routing-v1|$fingerprint|$newAuthUid|$timestamp"
     }
 
     fun signRoutingUpdate(signingPrivKeySeed: ByteArray, fingerprint: String, newAuthUid: String, timestamp: Long): ByteArray {
-        val payload = buildRoutingSignaturePayload(fingerprint, newAuthUid, timestamp).encodeToByteArray()
+        val payload = buildRoutingSignaturePayloadV1(fingerprint, newAuthUid, timestamp).encodeToByteArray()
         return IdentityEd25519.sign(signingPrivKeySeed, payload)
     }
 
     fun verifyRoutingUpdate(signingPubKey: ByteArray, fingerprint: String, newAuthUid: String, timestamp: Long, signature: ByteArray): Boolean {
-        val payload = buildRoutingSignaturePayload(fingerprint, newAuthUid, timestamp).encodeToByteArray()
+        val payload = buildRoutingSignaturePayloadV1(fingerprint, newAuthUid, timestamp).encodeToByteArray()
         return IdentityEd25519.verify(signingPubKey, payload, signature)
+    }
+
+    /**
+     * Hybrid Proof-of-Possession Signing (Ed25519 + ML-DSA-65).
+     */
+    fun signRoutingUpdateHybrid(
+        edSigningPriv: ByteArray,
+        mlDsaPriv: ByteArray,
+        fingerprint: String,
+        newAuthUid: String,
+        timestamp: Long,
+        minSecurityLevel: String = MIN_SECURITY_LEVEL_HYBRID,
+        supportedSuites: String = SUITE_HYBRID
+    ): ByteArray {
+        val payload = buildRoutingSignaturePayload(fingerprint, newAuthUid, timestamp, minSecurityLevel, supportedSuites).encodeToByteArray()
+        val compositePriv = HybridEd25519MlDsa65SignatureScheme.encodeCompositeKey(edSigningPriv, mlDsaPriv)
+        val scheme = HybridEd25519MlDsa65SignatureScheme()
+        return scheme.sign(compositePriv, payload)
+    }
+
+    /**
+     * Hybrid Proof-of-Possession Verification (Ed25519 + ML-DSA-65).
+     */
+    fun verifyRoutingUpdateHybrid(
+        edSigningPub: ByteArray,
+        mlDsaPub: ByteArray,
+        fingerprint: String,
+        newAuthUid: String,
+        timestamp: Long,
+        signature: ByteArray,
+        minSecurityLevel: String = MIN_SECURITY_LEVEL_HYBRID,
+        supportedSuites: String = SUITE_HYBRID
+    ): Boolean {
+        val payload = buildRoutingSignaturePayload(fingerprint, newAuthUid, timestamp, minSecurityLevel, supportedSuites).encodeToByteArray()
+        val compositePub = HybridEd25519MlDsa65SignatureScheme.encodeCompositeKey(edSigningPub, mlDsaPub)
+        val scheme = HybridEd25519MlDsa65SignatureScheme()
+        return scheme.verify(compositePub, payload, signature)
     }
 
     fun restoreFromMnemonic(mnemonic: List<String>): Result<IdentityKeyPair> {
@@ -146,7 +244,6 @@ object IdentityCryptoManager {
      * Exactly 12 blocks of 5 decimal digits (60 digits total).
      */
     fun formatSafetyNumber(hash: ByteArray): String {
-        // Expand 32 bytes into 48 bytes (12 * 4 bytes)
         val part1 = Sha256Digest.digest(hash + byteArrayOf(0x01))
         val part2 = Sha256Digest.digest(hash + byteArrayOf(0x02))
         val stream = part1 + part2
@@ -165,8 +262,35 @@ object IdentityCryptoManager {
     }
 
     /**
-     * Computes the shared Pair Safety Number between two parties (Alice and Bob).
+     * Computes the shared Pair Safety Number between two parties (Alice and Bob)
+     * covering both Classical (X25519) and Post-Quantum (ML-KEM-768) public keys.
      * Symmetrical: order of keys does not matter. Both parties derive the exact same 60 digits.
+     */
+    fun computeHybridPairSafetyNumber(
+        myClassicalPub: ByteArray,
+        myMlKemPub: ByteArray,
+        peerClassicalPub: ByteArray,
+        peerMlKemPub: ByteArray
+    ): String {
+        require(myClassicalPub.size == 32) { "myClassicalPub must be 32 bytes" }
+        require(peerClassicalPub.size == 32) { "peerClassicalPub must be 32 bytes" }
+
+        val myMaterial = myClassicalPub + myMlKemPub
+        val peerMaterial = peerClassicalPub + peerMlKemPub
+
+        val (first, second) = if (compareBytes(myMaterial, peerMaterial) <= 0) {
+            myMaterial to peerMaterial
+        } else {
+            peerMaterial to myMaterial
+        }
+
+        val combined = first + second
+        val hash = Sha256Digest.digest(combined)
+        return formatSafetyNumber(hash)
+    }
+
+    /**
+     * Legacy classical pair safety number computation.
      */
     fun computePairSafetyNumber(myPubKey: ByteArray, peerPubKey: ByteArray): String {
         require(myPubKey.size == 32) { "myPubKey must be 32 bytes" }
@@ -195,9 +319,6 @@ object IdentityCryptoManager {
         return a.size.compareTo(b.size)
     }
 
-    /**
-     * Envelope encryption: encrypts the raw X25519 private key using the hardware KeyVault.
-     */
     fun envelopeEncrypt(data: ByteArray): String {
         val hexChars = "0123456789ABCDEF"
         val hex = StringBuilder(data.size * 2)
@@ -209,9 +330,6 @@ object IdentityCryptoManager {
         return KeyVault.encrypt(hex.toString())
     }
 
-    /**
-     * Envelope decryption: decrypts the ciphertext using KeyVault to recover raw bytes in RAM.
-     */
     fun envelopeDecrypt(cipherText: String): ByteArray {
         val hex = KeyVault.decrypt(cipherText)
         if (hex.startsWith("🔒") || hex.length % 2 != 0) {
