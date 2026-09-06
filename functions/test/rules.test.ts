@@ -386,6 +386,23 @@ describe("P0.2 — Firestore Security Rules Adversarial Verification Suite", () 
       );
     });
 
+    it("MUST FAIL when creating an envelope with expiresAt exceeding 24 hours (P0.3 strict upper bound)", async () => {
+      const aliceDb = testEnv.authenticatedContext("alice_uid").firestore();
+      const tooFarDate = new Date(Date.now() + 25 * 60 * 60 * 1000); // 25 hours ahead (> 24h)
+
+      await assertFails(
+        aliceDb
+          .collection("identities")
+          .doc(BOB_IDENTITY_HASH)
+          .collection("inbox")
+          .doc("env_pqc_too_long")
+          .set({
+            ciphertext: "data",
+            expiresAt: tooFarDate,
+          })
+      );
+    });
+
     it("MUST FAIL when anyone attempts to modify an existing envelope (strict immutability)", async () => {
       await testEnv.withSecurityRulesDisabled(async (context) => {
         await context.firestore().collection("identities").doc(BOB_IDENTITY_HASH).set({

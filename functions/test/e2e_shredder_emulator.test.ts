@@ -4,7 +4,7 @@ import { executeCryptoShredding } from "../src/shredder";
 
 jest.setTimeout(30000);
 
-describe("E2E Real Firestore Emulator - Authoritative Crypto-Shredder", () => {
+describe("E2E Real Firestore Emulator - Authoritative Crypto-Shredder (P0.3)", () => {
   let db: admin.firestore.Firestore;
 
   beforeAll(() => {
@@ -17,7 +17,7 @@ describe("E2E Real Firestore Emulator - Authoritative Crypto-Shredder", () => {
     db = admin.firestore();
   });
 
-  it("CRITICAL E2E: should hard-delete both messageKeys and messages documents when expired", async () => {
+  it("CRITICAL E2E: should hard-delete messageKeys, messages, and inbox envelopes when expired", async () => {
     const nowMillis = Date.now();
     const pastTimestamp = Timestamp.fromMillis(nowMillis - 60 * 1000); // Expired 1 min ago
     const futureTimestamp = Timestamp.fromMillis(nowMillis + 3600 * 1000); // 1h in future
@@ -38,7 +38,29 @@ describe("E2E Real Firestore Emulator - Authoritative Crypto-Shredder", () => {
       expiresAt: pastTimestamp,
     });
 
-    // 2. Seed Active (Unexpired) Message and Key
+    // 2. Seed Expired Identity Inbox Envelope (P0.2/P0.3)
+    const testIdentityHash = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+    await db
+      .collection("identities")
+      .doc(testIdentityHash)
+      .collection("inbox")
+      .doc("e2e_inbox_expired")
+      .set({
+        ciphertext: "expired_inbox_envelope",
+        expiresAt: pastTimestamp,
+      });
+
+    await db
+      .collection("identities")
+      .doc(testIdentityHash)
+      .collection("inbox")
+      .doc("e2e_inbox_active")
+      .set({
+        ciphertext: "active_inbox_envelope",
+        expiresAt: futureTimestamp,
+      });
+
+    // 3. Seed Active (Unexpired) Message and Key
     await db.collection("messages").doc("e2e_msg_active").set({
       senderId: "alice",
       recipientId: "bob",
@@ -54,49 +76,42 @@ describe("E2E Real Firestore Emulator - Authoritative Crypto-Shredder", () => {
       expiresAt: futureTimestamp,
     });
 
-    // 3. Seed Expired and Active Connection Logs (Marco Civil Art. 15 Retenção 180d)
-    await db.collection("connectionLogs").doc("e2e_log_expired").set({
-      ip: "192.168.1.100",
-      porta: 54321,
-      functionName: "storeMessageKey",
-      expiresAt: pastTimestamp,
-    });
-    await db.collection("connectionLogs").doc("e2e_log_active").set({
-      ip: "192.168.1.100",
-      porta: 54321,
-      functionName: "storeMessageKey",
-      expiresAt: futureTimestamp,
-    });
-
-    // Verify initial existence
-    const beforeKeyDoc = await db.collection("messageKeys").doc("e2e_msg_expired").get();
-    const beforeMsgDoc = await db.collection("messages").doc("e2e_msg_expired").get();
-    const beforeLogDoc = await db.collection("connectionLogs").doc("e2e_log_expired").get();
-    expect(beforeKeyDoc.exists).toBe(true);
-    expect(beforeMsgDoc.exists).toBe(true);
-    expect(beforeLogDoc.exists).toBe(true);
-
     // 4. Run real executeCryptoShredding against Emulator
     const shredResult = await executeCryptoShredding(db, Timestamp.now());
     expect(shredResult.shreddedKeysCount).toBeGreaterThanOrEqual(1);
     expect(shredResult.deletedMessagesCount).toBeGreaterThanOrEqual(1);
-    expect(shredResult.deletedLogsCount).toBeGreaterThanOrEqual(1);
+    expect(shredResult.deletedInboxEnvelopesCount).toBeGreaterThanOrEqual(1);
 
     // 5. Verify post-shredder state: Expired docs are completely deleted!
     const afterKeyDoc = await db.collection("messageKeys").doc("e2e_msg_expired").get();
     const afterMsgDoc = await db.collection("messages").doc("e2e_msg_expired").get();
-    const afterLogDoc = await db.collection("connectionLogs").doc("e2e_log_expired").get();
+    const afterInboxDoc = await db
+      .collection("identities")
+      .doc(testIdentityHash)
+      .collection("inbox")
+      .doc("e2e_inbox_expired")
+      .get();
     expect(afterKeyDoc.exists).toBe(false);
     expect(afterMsgDoc.exists).toBe(false);
-    expect(afterLogDoc.exists).toBe(false);
+    expect(afterInboxDoc.exists).toBe(false);
 
     // Verify Active docs are preserved
     const activeKeyDoc = await db.collection("messageKeys").doc("e2e_msg_active").get();
     const activeMsgDoc = await db.collection("messages").doc("e2e_msg_active").get();
-    const activeLogDoc = await db.collection("connectionLogs").doc("e2e_log_active").get();
+    const activeInboxDoc = await db
+      .collection("identities")
+      .doc(testIdentityHash)
+      .collection("inbox")
+      .doc("e2e_inbox_active")
+      .get();
     expect(activeKeyDoc.exists).toBe(true);
     expect(activeMsgDoc.exists).toBe(true);
-    expect(activeLogDoc.exists).toBe(true);
+    expect(activeInboxDoc.exists).toBe(true);
+
+    // 6. Idempotency Test in Real Emulator: second run produces zero deletions and zero errors
+    const secondRun = await executeCryptoShredding(db, Timestamp.now());
+    expect(secondRun.shreddedKeysCount).toBe(0);
+    expect(secondRun.deletedInboxEnvelopesCount).toBe(0);
   });
 
   it("CRITICAL E2E: getMessageKey delivers DEK to authorized recipient and rejects unauthorized or shredded keys", async () => {
@@ -143,4 +158,3 @@ describe("E2E Real Firestore Emulator - Authoritative Crypto-Shredder", () => {
     );
   });
 });
-

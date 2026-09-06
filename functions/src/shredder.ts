@@ -3,22 +3,40 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onDocumentDeleted } from "firebase-functions/v2/firestore";
 import { logger } from "firebase-functions";
 
+export interface CryptoShreddingResult {
+  shreddedKeysCount: number;
+  deletedMessagesCount: number;
+  deletedInboxEnvelopesCount: number;
+  deletedLogsCount: number;
+  maxDelayMs: number;
+  escalationAlertsCount: number;
+}
+
+const MAX_SAFE_SURVIVAL_DELAY_MS = 60 * 60 * 1000; // 60 minutes
+const SEVERE_SURVIVAL_DELAY_MS = 3 * 60 * 60 * 1000; // 3 hours
+
 /**
- * Core Crypto-Shredding logic for authoritative server-side message expiration.
+ * Authoritative Server-Side Crypto-Shredder (P0.3).
  *
- * Threat Model:
- * Client-side purge can be circumvented by offline or compromised devices.
- * Firestore native TTL is best-effort (~24-72 hours latency).
- * By physically destroying the DEK (Data Encryption Key) in `messageKeys`
- * immediately upon expiration, the ciphertext in `messages` becomes permanently
- * and cryptographically irrecuperable even before physical TTL purge.
+ * Runs every 15 minutes (4x/hour) via Cloud Scheduler.
+ *
+ * Idempotency:
+ * Processes deletion in transactional batches. Multiple concurrent or sequential
+ * invocations targeting the same expired documents produce zero side effects.
+ *
+ * Expiration Latency Monitoring & Escalation:
+ * Calculates `delayMs = currentTime - expiresAt` for every expired artifact.
+ * Logs the `ttl_expiration_to_deletion_delays` metric.
+ * Dispatches escalation alerts if any artifact survives past maxLife + 60 min.
  */
 export async function executeCryptoShredding(
   db: admin.firestore.Firestore,
   currentTime: admin.firestore.Timestamp
-): Promise<{ shreddedKeysCount: number; deletedMessagesCount: number; deletedLogsCount: number }> {
+): Promise<CryptoShreddingResult> {
   const batch = db.batch();
   let hasDeletions = false;
+  let maxDelayMs = 0;
+  let escalationAlertsCount = 0;
 
   // 1. Mensagens expiradas: Hard-delete DEK em messageKeys + Hard-delete ciphertext em messages
   const expiredKeysQuery = db
@@ -34,10 +52,39 @@ export async function executeCryptoShredding(
       const data = doc.data();
       const messageId = data.messageId || doc.id;
 
+      if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
+        const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
+        if (delayMs > maxDelayMs) maxDelayMs = delayMs;
+
+        logger.info("ttl_expiration_to_deletion_delays", {
+          metric: "ttl_expiration_to_deletion_delays",
+          collection: "messageKeys",
+          docId: doc.id,
+          delayMs,
+        });
+
+        if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
+          escalationAlertsCount++;
+          if (delayMs > SEVERE_SURVIVAL_DELAY_MS) {
+            logger.error("[ALERT_ESCALATION_LEVEL_2] CRITICAL: Envelope key survived > 3 hours past expiration!", {
+              docId: doc.id,
+              delayMs,
+              threshold: "180m",
+            });
+          } else {
+            logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Envelope key survived > 60 min past expiration!", {
+              docId: doc.id,
+              delayMs,
+              threshold: "60m",
+            });
+          }
+        }
+      }
+
       // 1. Hard-delete DEK (Irreversible Crypto-Shredding)
       batch.delete(doc.ref);
 
-      // 2. Hard-delete matching ciphertext message document
+      // 2. Hard-delete matching ciphertext message document (if exists)
       const messageRef = db.collection("messages").doc(messageId);
       batch.delete(messageRef);
 
@@ -46,7 +93,44 @@ export async function executeCryptoShredding(
     hasDeletions = true;
   }
 
-  // 2. Logs de conexão expirados (Marco Civil Art. 15 - Retenção de 180 dias):
+  // 2. Envelopes efêmeros em caixas de entrada por identidade (P0.2/P0.3): identities/{identityHash}/inbox/{envelopeId}
+  let inboxCount = 0;
+  const expiredInboxQuery = db
+    .collectionGroup("inbox")
+    .where("expiresAt", "<=", currentTime)
+    .limit(500);
+
+  const inboxSnapshot = await expiredInboxQuery.get();
+  if (!inboxSnapshot.empty) {
+    for (const doc of inboxSnapshot.docs) {
+      const data = doc.data();
+      if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
+        const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
+        if (delayMs > maxDelayMs) maxDelayMs = delayMs;
+
+        logger.info("ttl_expiration_to_deletion_delays", {
+          metric: "ttl_expiration_to_deletion_delays",
+          collection: "inbox",
+          docId: doc.id,
+          delayMs,
+        });
+
+        if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
+          escalationAlertsCount++;
+          logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Inbox envelope survived > 60 min past expiration!", {
+            docId: doc.id,
+            delayMs,
+          });
+        }
+      }
+
+      batch.delete(doc.ref);
+      inboxCount++;
+    }
+    hasDeletions = true;
+  }
+
+  // 3. Logs de conexão expirados (Marco Civil Art. 15 - Retenção de 180 dias):
   // Expurgo ativo das coleções connectionLogs e accessLogs
   let logsCount = 0;
 
@@ -82,28 +166,31 @@ export async function executeCryptoShredding(
     await batch.commit();
   }
 
-  if (messageCount === 0 && logsCount === 0) {
-    logger.info("Crypto-Shredder: No expired message keys or connection logs found.");
+  if (messageCount === 0 && inboxCount === 0 && logsCount === 0) {
+    logger.info("Crypto-Shredder: No expired message keys, inbox envelopes or connection logs found.");
   } else {
     logger.info(
-      `Crypto-Shredder: Successfully shredded ${messageCount} keys/messages and ${logsCount} connection logs.`
+      `Crypto-Shredder: Successfully shredded ${messageCount} keys/messages, ${inboxCount} inbox envelopes and ${logsCount} connection logs. Max delay: ${maxDelayMs}ms.`
     );
   }
 
   return {
     shreddedKeysCount: messageCount,
     deletedMessagesCount: messageCount,
+    deletedInboxEnvelopesCount: inboxCount,
     deletedLogsCount: logsCount,
+    maxDelayMs,
+    escalationAlertsCount,
   };
 }
 
 /**
- * Hourly scheduled task running on Cloud Scheduler.
- * Hard-deletes expired DEK keys and messages in batch.
+ * Scheduled task running on Cloud Scheduler every 15 minutes (4x/hour).
+ * Hard-deletes expired DEK keys, messages and inbox envelopes in batch.
  */
 export const scheduledMessageShredder = onSchedule(
   {
-    schedule: "every 1 hours",
+    schedule: "*/15 * * * *",
     timeZone: "UTC",
     retryCount: 3,
   },

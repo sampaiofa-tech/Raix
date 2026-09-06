@@ -88,5 +88,31 @@ O armazenamento de metadados de roteamento e envelopes efêmeros no Cloud Firest
 
 - **Plataformas com Modo Híbrido Total:** Desktop (JVM/Windows/Linux/macOS) e Android (via Bouncy Castle 1.79 nativo FIPS 203/204).
 - **Plataforma Web (Wasm):** A WebCrypto nativa dos navegadores atuais não suporta primitivas pós-quânticas. O cliente Web opera com suporte clássico Ed25519/X25519 e modo degradado controlado, explicitamente indicado na interface do usuário, até a incorporação dos binários Wasm compilados de referência (C pq-crystals).
-- **Metadados Transitórios:** Metadados de roteamento existem no Firestore estritamente pelo tempo de vida da mensagem transitória ($\le 24$h), sendo incinerados no momento da leitura (*Vanish*) ou pelo Shredder automatizado.
+- **Metadados Transitórios:** Metadados de roteamento existem no Firestore estritamente pelo tempo de vida da mensagem transitória ($\le 24$h), sendo incinerados no momento da leitura (*Vanish*) ou pelo Shredder automatizado a cada 15 minutos.
+- **Réplicas de Infraestrutura e Snapshots Físicos:** Deleção de software no Firestore não purga instantaneamente mídias de armazenamento físicas de baixo nível do Google Cloud Platform (Colossus/Spanner). A segurança depende da destruição irreversível da DEK e do segredo compartilhado KEM (*Crypto-Shredding*).
+
+---
+
+## 5. Tratamento do Gap de Destruição e Ciclo de Vida do Envelope (P0.3)
+
+O ciclo de destruição de dados efêmeros aborda as três camadas críticas de retenção residual:
+
+### 5.1 Frequência e Idempotência do Shredder Ativo
+- **Cloud Scheduler (15 minutos):** O job agendado opera em cadência de `*/15 * * * *` (4x por hora), executando batch-deletes atômicos no Firestore.
+- **Idempotência Estrita:** Operações de deleção sobre documentos já removidos ou processados concorrentemente são não-bloqueantes e idempotentes, garantindo consistência sem corrupção de estado.
+- **TTL Nativo como Fail-Safe:** O recurso de TTL nativo do Cloud Firestore atua exclusivamente como salvaguarda passiva de último recurso; a destruição tempestiva depende do Shredder ativo e do gatilho reativo `onDeleteMessage` acionado no momento da leitura (*Vanish-After-Read*).
+
+### 5.2 Alinhamento Estrito do Lifecycle e Regras de Segurança
+- As regras de segurança do Firestore (`firestore.rules`) rejeitam no ato da escrita qualquer envelope cuja propriedade `expiresAt` seja nula, ausente, retroativa ou superior ao tempo atual acrescido de 24 horas (`request.time + duration.value(24, 'h')`), neutralizando o risco de injeção de documentos persistentes não-expiráveis por clientes adulterados.
+
+### 5.3 Point-in-Time Recovery (PITR) e Snapshots do Provedor
+- **Política de PITR:** O Point-in-Time Recovery (PITR) mantém um log contínuo de alterações por até 7 dias no Firestore. Para dados efêmeros de mensageria (`identities/*/inbox`, `messages`, `messageKeys`), o PITR deve permanecer **DESABILITADO** no banco operacional.
+- **Transparência sobre Backups de Nuvem:** O sistema documenta expressamente que chamadas do Admin SDK e o TTL nativo destroem registros no nível do banco de dados, mas **NÃO expurgam réplicas em repouso de baixo nível nem backups gerenciados do provedor** até a expiração da política de retenção global da nuvem. O compromisso de segurança baseia-se na **inviabilização criptográfica definitiva**: destruída a DEK, qualquer cópia física remanescente no provedor torna-se permanentemente indecifrável.
+
+### 5.4 Monitoramento Contínuo e Escalonamento Operacional
+- **Métrica de Latência de Destruição:** Cada execução do Shredder calcula a diferença temporal $\text{delayMs} = T_{\text{current}} - T_{\text{expiresAt}}$ e exporta a métrica `ttl_expiration_to_deletion_delays`.
+- **Gatilhos de Alerta com Escalonamento:**
+  - **Alerta Nível 1 (Warning):** Disparado quando qualquer documento sobrevive $\ge 60$ minutos além de sua expiração programada.
+  - **Alerta Nível 2 (Crítico):** Disparado e escalado quando o atraso de sobrevivência atinge $\ge 180$ minutos (3 horas), sinalizando potencial anomalia no Cloud Scheduler ou degradação na API do Firestore.
+  - **Janela Residual Máxima (Fail-Safe):** Caso tanto o Shredder quanto o gatilho reativo falhem simultaneamente, a janela residual pode atingir de 24h a 48h (limite do processador de TTL assíncrono do Firestore). O limiar de 60 minutos é um gatilho de monitoramento e alarme, e **não** uma garantia de expurgo físico total em 1 hora.
 

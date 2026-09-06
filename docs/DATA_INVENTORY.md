@@ -56,15 +56,16 @@ Em cumprimento ao Art. 15 da Lei nº 12.965/2014 (Marco Civil da Internet) e às
 
 ---
 
-## 3. Evidência do Timeout de Mensagens Transitórias ≤ 24h (Parecer C2)
+## 3. Evidência do Timeout de Mensagens Transitórias ≤ 24h e Shredder de 15 min (P0.3)
 
 Fica atestado que o Raix cumpre estritamente a exigência de ciclo de vida transitório com expiração máxima em 24 horas:
 
-1. **Definição de TTL:** As chamadas `storeMessageKey` e a gravação de mensagens impõem limite máximo de `expiresAtMillis <= now + 86.400.000 ms` (24 horas). Qualquer tentativa de gravação com prazo superior é recusada pelo backend com erro `invalid-argument`.
-2. **Crypto-Shredder Horário:** A Cloud Function agendada `hourlyCryptoShredder` é executada automaticamente a cada hora para expurgar chaves e mensagens expiradas remanescentes que não tenham sido consumidas pelo destinatário.
-3. **Vanish Imediato:** Quando o destinatário lê a mensagem, o documento transitório é apagado atomicamente do Firestore no mesmo instante (*Vanish-After-Read*).
-4. **Ausência de Fila Indefinida:** Não existe qualquer fila ou buffer persistente secundário sem política de expiração ativa.
-5. **Expurgo Irreversível de Metadados de Roteamento:** Os identificadores técnicos de roteamento (`senderId` e `recipientId`) existem exclusivamente como atributos transitórios atrelados aos documentos de `messages` e `messageKeys`. No momento da destruição do envelope (seja via leitura, expiração ou shredder), estes metadados — reconhecidos como a informação técnica mais sensível temporariamente retida pelo servidor — são incinerados de forma irreversível.
+1. **Definição de TTL e Bloqueio em Regras de Segurança:** As chamadas `storeMessageKey`, a coleção `inbox` e a gravação de mensagens impõem limite máximo estrito de `expiresAt <= request.time + duration.value(24, 'h')`. Qualquer tentativa de gravação sem `expiresAt`, com valor no passado ou excedendo 24 horas é recusada no próprio motor de regras do Firestore (`permission-denied`), impedindo desativação acidental ou maliciosa do TTL.
+2. **Crypto-Shredder Ativo a Cada 15 Minutos:** A Cloud Function agendada `scheduledMessageShredder` é executada automaticamente a cada 15 minutos (`*/15 * * * *`, 4x por hora) para expurgar chaves DEK (`messageKeys`), mensagens legadas (`messages`), envelopes efêmeros (`collectionGroup('inbox')`) e registros de conexão expirados. O processo é estritamente idempotente.
+3. **TTL Nativo como Fail-Safe:** O TTL nativo gerenciado do Cloud Firestore é considerado mecanismo de último recurso (fail-safe). A destruição primária e tempestiva é realizada pelo Shredder ativo e pelo gatilho reativo `onDeleteMessage`.
+4. **Vanish-After-Read Imediato:** Quando o destinatário lê a mensagem, o documento transitório é apagado atomicamente do Firestore no mesmo instante (*Vanish-After-Read*), disparando imediatamente a destruição reativa da DEK em `messageKeys`.
+5. **Ausência de Fila Indefinida:** Não existe qualquer fila ou buffer persistente secundário sem política de expiração ativa.
+6. **Expurgo Irreversível de Metadados de Roteamento:** Os identificadores técnicos de roteamento (`senderId` e `recipientId`) e envelopes transitórios são incinerados de forma irreversível na expiração ou leitura.
 
 ---
 
@@ -100,7 +101,27 @@ Com a introdução da migração pós-quântica híbrida (NIST FIPS 203 ML-KEM-7
 
 ---
 
-## 6. Conclusão e Certificação Técnica
+## 7. Tratamento do Gap de Destruição: PITR, Backups e Telemetria de Latência (P0.3)
 
-O ecossistema **Raix** opera sob estrita consonância com os princípios de **Finalidade**, **Adequação**, **Necessidade** e **Segurança** dispostos no art. 6º da Lei Geral de Proteção de Dados (Lei nº 13.709/2018), tratando unicamente os elementos técnicos indispensáveis para viabilizar a entrega de mensagens efêmeras com criptografia ponta-a-ponta de chaves pós-quântica híbrida.
+### 7.1 Point-in-Time Recovery (PITR) e Snapshots do Firestore
+- **Configuração de PITR para Coleções Efêmeras:** O Point-in-Time Recovery (PITR) do Cloud Firestore permite a recuperação de dados históricos em uma janela de até 7 dias quando ativado no banco de dados. Para preservar a garantia de efemeridade estrita das mensagens e envelopes, o PITR deve permanecer **DESABILITADO** na instância de banco de dados efêmero ou configurado com janela mínima de retenção.
+- **Processo de Expurgo e Snapshots:** Caso snapshots periódicos ou backups gerenciados sejam configurados em nível de projeto no Google Cloud Storage (GCS), o processo de expurgo automatizado estende-se via políticas de ciclo de vida de objetos (*GCS Lifecycle Rules* com `Age = 1 dia` para buckets efêmeros).
+
+### 7.2 Limitação Física do Provedor de Nuvem (Sem Alegação de "Purga Física Absoluta Instantânea")
+- **Transparência Técnica Mandatória:** A deleção lógica no Firestore realizada pelo Firebase Admin SDK ou pelo Shredder atômico remove imediatamente a acessibilidade dos nós e destrói as referências aos documentos. No entanto, o Raix **NÃO ALEGA** "purga definitiva atômica instantânea das réplicas físicas em repouso e mídias magnéticas/flash do Google Cloud Platform", uma vez que sistemas de arquivos distribuídos globais (Colossus/Spanner) possuem latências intrínsecas de compactação e coleta de lixo (*garbage collection*) em nível de hardware.
+- **Garantia Efetiva via Cripto-Incineração (Crypto-Shredding):** A garantia de inviolabilidade dos dados efêmeros repousa na destruição imediata da Chave de Criptografia de Dados (DEK) e das sementes efêmeras KEM. Sem a chave privada de encapsulamento e sem a DEK destruída, mesmo que um snapshot remanescente de baixo nível seja extraído em repouso do hardware do provedor, ele conterá exclusivamente ciphertext indistinguível de ruído aleatório.
+
+### 7.3 Monitoramento de Destruição e Alertas com Escalonamento
+Para detectar e mitigar qualquer anomalia operacional no ciclo de expurgo:
+- **Métrica Ativa:** `ttl_expiration_to_deletion_delays` emite a latência $T_{\text{delay}} = T_{\text{current}} - T_{\text{expiresAt}}$ para cada artefato processado.
+- **Escalonamento Operacional:**
+  - **Nível 1 (Aviso - Threshold 60 min):** Se algum envelope ou chave sobreviver além de $\text{maxLife} + 60\text{ min}$, um alerta operacional `[ALERT_ESCALATION_LEVEL_1]` é disparado para notificar a equipe de suporte.
+  - **Nível 2 (Crítico - Threshold 180 min):** Se o atraso ultrapassar 3 horas sem resolução, o alerta é escalado para `[ALERT_ESCALATION_LEVEL_2]` com severidade crítica.
+  - **Janela Residual Extrema (Fail-safe):** Caso ocorra falha simultânea catastrófica no Cloud Scheduler e no Cloud Functions, a janela residual máxima pode atingir até 24h a 48h (limite de garantia operacional do TTL nativo do Firestore). O limiar de 60 minutos é estritamente uma métrica de monitoramento e escalonamento, e **NUNCA** uma garantia matemática de destruição física em 1 hora.
+
+---
+
+## 8. Conclusão e Certificação Técnica
+
+O ecossistema **Raix** opera sob estrita consonância com os princípios de **Finalidade**, **Adequação**, **Necessidade** e **Segurança** dispostos no art. 6º da Lei Geral de Proteção de Dados (Lei nº 13.709/2018), tratando unicamente os elementos técnicos indispensáveis para viabilizar a entrega de mensagens efêmeras com criptografia ponta-a-ponta de chaves pós-quântica híbrida, governadas por ciclo de vida auditável e transparente.
 
