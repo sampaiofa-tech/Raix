@@ -16,8 +16,8 @@ O **Raix** é projetado sob a premissa de **privacidade forte por design com ret
 | :--- | :--- | :--- |
 | **Atacante HNDL (*Harvest-Now-Decrypt-Later*)** | Gravação passiva em massa do tráfego de rede e dados de envelopes para decifragem futura quando um computador quântico criptograficamente relevante (CRQC) estiver disponível. | **KEM Híbrido NIST FIPS 203 (ML-KEM-768) + X25519**, assegurado pelo combiner NIST SP 800-227 / RFC 9180 HPKE. Conteúdo permanece indecifrável mesmo contra adversários quânticos. **Prioridade Crítica Permanente (P-C1 e P-C2)**: TLS-PQ na camada de transporte e evolução para Double Ratchet PQ pós-quântico. |
 | **Atacante Ativo MitM (*Man-in-the-Middle*)** | Interceptação de tráfego, injeção de pacotes e tentativa de coerção de downgrade para protocolos clássicos (forçando apenas curvas elípticas Ed25519/X25519). | **Proteção Anti-Downgrade no Handshake (Emenda A.2)**: `minSecurityLevel` e suítes suportadas embutidas criptograficamente no payload autenticado (`pmsg-routing-v2`). Qualquer sessão abaixo do nível acordado é terminada com `DowngradeAttackException`. |
-| **Adversário com Análise de Tráfego por IA (Track 2 — Ameaça Ativa)** | Correlação estatística avançada em tempo real de fluxos de rede via modelos de IA/ML, inferindo interlocutores por padrões temporais, volume, rajadas (*bursts*) de pacotes e grafos sociais, mesmo sob túneis cifrados ou onion routing simples. | **Defesa Ativa contra Análise de Tráfego por IA (Track 2)**: *Packet padding* determinístico para normalização uniforme do tamanho de envelopes, injeção periódica de tráfego de cobertura (*cover traffic*) para mascarar presença e ofuscação de temporização (*timing obfuscation* / jitter estocástico) combinados com Onion Routing multi-hop e Mixnet. |
-| **Adversário Quântico via Algoritmo de Grover (Track 1 — Hashing Quântico-Seguro)** | Redução quadrática da segurança de funções hash ($2^{n/2}$) por computador quântico (CRQC), rebaixando hashes de 256 bits para ~128 bits de entropia efetiva contra busca exaustiva. | **Hashing Quântico-Seguro $\ge 384$ bits (SHA-384 / SHA-512)**: Especificação no roadmap para derivação de identidade BIP-39, sementes e compromissos criptográficos duradouros, mantendo margem $\ge 192$ bits de segurança pós-quântica. |
+| **Adversário com Análise de Tráfego por IA (Track 2 — Ameaça Ativa)** | Correlação estatística avançada em tempo real de fluxos de rede via modelos de IA/ML, inferindo interlocutores por padrões temporais, volume, rajadas (*bursts*) de pacotes e grafos sociais, mesmo sob túneis cifrados ou onion routing simples. | **Defesa Ativa contra Análise de Tráfego por IA (Track 2)**: Mitigação em 3 fases progressivas calibradas no piloto: **Fase 1** (obrigatória/barata: padding a buckets 512B/1KB/2KB sem impactar latência + delivery delay estocástico ajustável); **Fase 2** (custo médio: cover traffic de mensagens-dummy com custo de banda + padding adaptativo); **Fase 3** (mixnet com batching). |
+| **Adversário Quântico via Algoritmo de Grover (Track 1 — Hashing Quântico-Seguro)** | Redução quadrática da segurança de funções hash ($2^{n/2}$) por computador quântico (CRQC), rebaixando hashes de 256 bits para ~128 bits de entropia efetiva contra busca exaustiva. | **Hashing Quântico-Seguro (Track 1)**: Regra de ouro: nenhum hash de 256 bits para compromissos de longa duração. Derivação mnemônico$\to$seed mantida em PBKDF2-HMAC-SHA512 (preservando recovery BIP-39). Adoção de SHA-384 para `identityHash`, IDs de documentos e compromissos duradouros (192 bits de segurança quântica, anti length-extension, saída de 48 bytes). ML-DSA mantido com SHAKE256 nativamente PQ-safe. |
 | **Engenharia Social Automatizada por IA (P-H1 — Hardening do Mnemônico)** | Campanhas adaptativas de phishing hiperpersonalizado, vishing, clones de voz e agentes de IA simulando suporte técnico para induzir o usuário a entregar a frase mnemônica BIP-39 (12 palavras). | **Hardware-Backed Keys (P-H1)**: Isolamento das chaves em silício seguro de hardware (StrongBox/TEE no Android, Secure Enclave no Apple, DPAPI/TPM no Windows) e **UX de Segurança Anti-Phishing**: alerta ostensivo de que o mnemônico NUNCA é solicitado por humanos ou por IA sob hipótese alguma. |
 | **Comprometimento de Supply Chain por Código Gerado por IA (P0.4 Reforço)** | Introdução sutil de dependências alucinadas (*package hallucination*), backdoors lógicos ou enfraquecimento de invariantes criptográficas por assistentes de IA (Executores). | **Governança Estrita de Código por IA (P0.4)**: Revisão humana cética e minuciosa obrigatória de 100% do código gerado por IA, testes adversariais automatizados em CI e geração determinística de SBOM CycloneDX v1.5 com atestado SLSA Nível 2+ a cada release. |
 | **Operador de Nuvem / Servidor Comprometido** | Acesso ao banco de dados Firestore, snapshots ou memória do backend Cloud Functions. | Criptografia ponta-a-ponta (E2E) em nível de aplicação com envelopes selados (*SealedBox*). O servidor armazena apenas ciphertexts opacos da DEK e do conteúdo. Zero posse de chaves privadas. |
@@ -63,18 +63,31 @@ A emenda A.2 estipula que dispositivos híbridos não podem ser rebaixados silen
 ### 2.5 Hashing Quântico-Seguro e Resistência ao Algoritmo de Grover (Track 1)
 - **Impacto do Algoritmo de Grover sobre Funções Hash**:
   O algoritmo quântico de Grover acelera buscas não estruturadas com ganho quadrático, reduzindo a complexidade de busca de pré-imagem de $2^n$ para $2^{n/2}$. Como consequência, funções hash de 256 bits (ex.: SHA-256) oferecem ~128 bits de entropia efetiva contra um computador quântico criptograficamente relevante (CRQC).
-- **Diretriz de Hashes $\ge 384$ bits para Longa Duração**:
-  Enquanto 128 bits de segurança quântica permanecem adequados para identificadores transitórios de curto ciclo de vida (envelopes efêmeros $\le 24$h), dados e compromissos de longa duração exigem margem conservadora ampliada.
-  - Para **derivação de identidade mestre a partir do BIP-39**, **impressões digitais perenes de identidade** e **compromissos criptográficos de longa duração**, o sistema estabelece a transição para **SHA-384 / SHA-512** ($\ge 384$ bits), garantindo $\ge 192$ bits de segurança pós-quântica efetiva sob ataque quântico.
-  - Registro formal no roadmap da Track 1: revisão das rotinas de derivação em `IdentityCryptoManager` e schemas de compromisso para hashes $\ge 384$ bits.
+- **Regra de Ouro Arquitetural**:
+  > **Nenhum hash de 256 bits para compromissos de longa duração.**  
+  > Qualquer identificador, raiz de identidade, documento canônico ou compromisso persistente deve empregar primitivas com $\ge 384$ bits de comprimento de saída.
+- **Decisões Estruturais por Componente**:
+  1. **Derivação Mnemônico $\to$ Seed**: **MANTER PBKDF2-HMAC-SHA512**.
+     - *Justificativa*: A derivação clássica BIP-39 já emprega SHA-512 (512 bits), fornecendo 256 bits de segurança quântica efetiva sob Grover ($2^{256}$). **Não alterar essa derivação**, pois qualquer modificação quebraria a interoperabilidade e a capacidade do usuário de restaurar sua identidade a partir das 12 palavras originais (*wallet recovery*).
+  2. **`identityHash`, IDs de Documentos e Compromissos Criptográficos**: **ADOTAR SHA-384**.
+     - Fornece **192 bits de segurança quântica de colisão** sob Grover ($2^{384/2} = 2^{192}$), excedendo com folga a margem de segurança do NIST.
+     - Naturalmente **resistente a ataques de extensão de comprimento** (*length-extension attacks*), visto que o SHA-384 utiliza o bloco de 64 bits do SHA-512 com truncamento e valores iniciais próprios (IVs distintos).
+     - Gera saída compacta e balanceada de **48 bytes** (vs. 64 bytes do SHA-512), otimizando o overhead em identificadores de roteamento e chaves de documentos Firestore.
+  3. **Assinaturas Pós-Quânticas ML-DSA (FIPS 204)**: **MANTER SHAKE256 Interno**.
+     - O esquema de assinatura ML-DSA utiliza internamente a função esponja extensível SHAKE256 (Keccak), que é nativamente resistente a ataques quânticos e plenamente alinhada ao FIPS 204.
 
-### 2.6 Reforço de Prioridades Criptográficas: P-C1, P-C2 e Criptoagilidade Contínua
-- **P-C1 (TLS Pós-Quântico)** e **P-C2 (Double Ratchet Pós-Quântico)**:
-  Permanecem categorizadas como prioridades críticas inegociáveis do Raix. Constituem a muralha fundamental contra ataques HNDL (*Harvest-Now-Decrypt-Later*):
-  - **P-C1**: Blinda o tráfego de transporte no handshake HTTP/2/QUIC com X25519MLKEM768 nos clientes nativos.
-  - **P-C2**: Garante *Break-in Recovery* e *Forward Secrecy* contínua por mensagem na camada E2E, assegurando que o comprometimento de uma chave efêmera não exponha mensagens passadas ou futuras.
-- **Criptoagilidade como Princípio Contínuo de Engenharia**:
-  A crypto-agility não é uma funcionalidade estática entregue em marco único, mas um processo contínuo de governança de código. As interfaces `SignatureScheme`, `KeyExchangeScheme` e o envelope versionado `pmsg-routing-v2` asseguram que qualquer algoritmo (inclusive FIPS 203/204) possa ser rotacionado sem reescrever o protocolo de mensageria caso surjam novos vetores de criptoanálise.
+### 2.6 Duas Frentes Pós-Quânticas Separadas: TLS-PQ (P-C1) e Double Ratchet PQ (P-C2)
+A consolidação estratégica pós-rodada divide a frente pós-quântica em duas entregas sequenciadas, ambas **reusando diretamente as primitivas implementadas no P0.1 (ML-KEM-768 + X25519)**, sem necessidade de re-aprendizado criptográfico:
+
+1. **Frente 1 — TLS Pós-Quântico (P-C1) [PRIMEIRO — ~1 a 2 semanas]**:
+   - **Escopo**: Integração e configuração na camada de transporte HTTP/2 e QUIC dos clientes nativos (Android/Desktop), ativando o grupo híbrido `X25519MLKEM768` via BoringSSL / Conscrypt / JVM JSSE.
+   - **Execução**: Alocada imediatamente como primeira entrega de transporte pós-rodada, blindando o canal de trânsito contra coleta passiva em massa (*Harvest-Now-Decrypt-Later*).
+   - **Teto Técnico na Web (Wasm)**: Formalmente documentado como limitação da plataforma web — os navegadores comerciais não expõem a seleção de grupos TLS-PQ às páginas web (WebCrypto / `fetch` / `WebSocket`), mantendo a versão Web como cliente de menor garantia técnica de transporte.
+2. **Frente 2 — Double Ratchet Pós-Quântico (P-C2) [DEPOIS — ~4 a 8 semanas]**:
+   - **Escopo**: Continuação e evolução da camada criptográfica do P0.1 (`SealedBox` e envelopes efêmeros) para um protocolo *stateful* de Double Ratchet com KEM híbrido (PQXDH / Signal-style ratchet).
+   - **Execução**: Alocada na sequência do TLS-PQ, demandando baterias rigorosas de testes de máquina de estados, sessões concorrentes, perda/reordenação de mensagens e validação de *Break-in Recovery* e *Forward Secrecy* contínua pós-quântica por mensagem.
+3. **Criptoagilidade Contínua**:
+   - Princípio arquitetural permanente através das interfaces `SignatureScheme`, `KeyExchangeScheme` e versionamento `pmsg-routing-v2`, garantindo substituição rápida de algoritmos caso surjam novas recomendações do NIST.
 
 ---
 
@@ -112,6 +125,25 @@ O armazenamento de metadados de roteamento e envelopes efêmeros no Cloud Firest
   - **Ausência de Keystore e Isolamento de Memória:** Sem suporte a hardware seguro (TEE/StrongBox/DPAPI) e sujeita à inspeção de memória por extensões ou Developer Tools do navegador.
 - **Metadados Transitórios:** Metadados de roteamento existem no Firestore estritamente pelo tempo de vida da mensagem transitória ($\le 24$h), sendo incinerados no momento da leitura (*Vanish*) ou pelo Shredder automatizado a cada 15 minutos.
 - **Réplicas de Infraestrutura e Snapshots Físicos:** Deleção de software no Firestore não purga instantaneamente mídias de armazenamento físicas de baixo nível do Google Cloud Platform (Colossus/Spanner). A segurança depende da destruição irreversível da DEK e do segredo compartilhado KEM (*Crypto-Shredding*).
+
+### 4.1 Arquitetura de Anonimato e Defesa contra Análise de Tráfego por IA (Track 2 — Fases e Métricas de Piloto)
+O modelo de ameaça trata a análise de tráfego via inteligência artificial / machine learning como uma **Ameaça Ativa**. Adversários com visibilidade de rede (ISPs, operadores de trânsito ou nós intermediários) utilizam modelos neurais treinados em correlação temporal, tamanho de rajadas (*bursts* de pacotes) e grafos sociais para correlacionar remetente e destinatário, superando defesas tradicionais de túneis cifrados e onion routing estático.
+
+A mitigação é estruturada em **três fases progressivas**, condicionadas e calibradas com base em métricas coletadas no piloto de produção:
+
+1. **Fase 1 (Obrigatória, Baixo Custo Operacional)**:
+   - **Packet Padding a Buckets Discretos**: Normalização de todos os payloads cifrados para tamanhos discretos padronizados (**512 B, 1 KB e 2 KB**). Envelopes menores são preenchidos determinísticamente até o próximo bucket, impedindo que o tamanho exato da mensagem revele metadados de conteúdo.
+   - **Atraso Aleatório de Entrega (*Delivery Delay*)**: Injeção de atrasos estocásticos calculados para quebrar a correlação direta de causa-efeito temporal entre envio e recepção.
+   - **Trade-offs Documentados**:
+     - O *padding* **NÃO compromete latência**, impactando unicamente o consumo de banda (overhead residual de bytes por envelope).
+     - O *delay* de entrega é **ajustável** e será estritamente calibrado com base nas métricas de latência aceitável do piloto de produção, evitando degradação na fluidez da mensageria instantânea.
+2. **Fase 2 (Custo Médio)**:
+   - **Cover Traffic (Tráfego de Cobertura)**: Injeção periódica de mensagens-dummy indistinguíveis de payloads reais entre o cliente e o backend, mascarando períodos de atividade, inatividade e rajadas de digitação.
+   - **Padding Adaptativo entre Relays**: Preenchimento dinâmico de tráfego entre nós de retransmissão intermediários.
+   - **Trade-offs Documentados**:
+     - O *cover traffic* **custa banda adicional** e consumo computacional em dispositivos móveis (impacto de bateria mitigado por agendamentos oportunistas de rádio).
+3. **Fase 3 (Opcional, Custo Elevado)**:
+   - **Mixnet com Batching Estocástico**: Camada de mixagem com reordenação de envelopes em lotes temporais aleatórios para casos de uso corporativos ou ambientes de vigilância estatal total, implementada sob demanda volumétrica comprovada.
 
 ---
 

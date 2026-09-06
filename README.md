@@ -524,40 +524,49 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
 ### 3. Alocação de Recursos Pós-Rodada (Decisões de Governança & Trilhas Estratégicas)
 
 - 🔒 **P2.1 — Auditoria Externa Independente de Criptografia (PRIMEIRA Entrega Pós-Rodada)**:
-  - Contratação prioritária e imediata de auditoria externa de segurança e criptoanálise independente por consultoria especializada de primeira linha logo após o aporte de capital da rodada (alocada no início do ciclo pós-rodada, e não no fim da fila).
-  - Escopo: Auditoria do acordo de chaves KEM híbrido (ML-KEM-768 + X25519), assinaturas ML-DSA-65, isolamento do Firestore e zeroização de memória.
+  - **Dotação Orçamentária no One-Pager**: Mantida como **linha única de R$ 50.000,00 (R$ 50k)** nos custos da rodada seed pós-captação.
+  - **Alocação Imediata**: Primeira entrega contratada após o fechamento da captação (alocada no início do ciclo pós-rodada, e não postergada para o fim da fila).
+  - **Nota Interna de Engenharia & Governança**: *Redefinir e fatiar cirurgicamente o escopo técnico antes da contratação formal* — uma auditoria irrestrita de ponta a ponta (KEM híbrido, ML-DSA, isolamento Firestore, zeroização e transporte) pode exceder a linha orçamentária de R$ 50k, exigindo priorização focada nos componentes de maior criticidade de criptoanálise.
 
 - ⚛️ **Track 1 — Criptografia Pós-Quântica (PQC) & Resiliência Algorítmica**:
-  - **Reforço de Prioridades Críticas (P-C1 e P-C2 contra HNDL)**:
-    - **P-C1 (TLS-PQ)**: Implementação de TLS pós-quântico híbrido (X25519MLKEM768) na camada de transporte HTTP/2/QUIC para clientes nativos (Android/Desktop), blindando tráfego contra *Harvest-Now-Decrypt-Later*.
-    - **P-C2 (Double Ratchet PQ)**: Evolução do protocolo de envelopes efêmeros para um Double Ratchet pós-quântico contínuo (PQXDH), assegurando *Break-in Recovery* e *Forward Secrecy* pós-quântica por mensagem.
-  - **Hashing Quântico-Seguro ($\ge 384$ bits)**:
-    - O algoritmo de Grover reduz a busca exaustiva de funções hash pela metade ($2^{n/2}$), reduzindo hashes de 256 bits a ~128 bits de entropia efetiva quântica.
-    - Revisão formal no roadmap: transição da derivação de identidade BIP-39 (`IdentityCryptoManager`), chaves-mestras e compromissos criptográficos duradouros para **SHA-384 / SHA-512** ($\ge 384$ bits), garantindo $\ge 192$ bits de segurança quântica efetiva.
+  - **Duas Frentes Pós-Quânticas Separadas (Reuso Direto do P0.1)**:
+    - Ambas as frentes reusam estritamente as primitivas pós-quânticas já implementadas e validadas no P0.1 (`ML-KEM-768` + `X25519`), **sem re-aprendizado criptográfico**.
+    - **Frente 1 — TLS Pós-Quântico (P-C1) [~1 a 2 semanas — PRIMEIRO]**:
+      - Integração e configuração na camada de transporte HTTP/2 e QUIC dos clientes nativos (Android/Desktop), habilitando o grupo híbrido `X25519MLKEM768`.
+      - *Teto Técnico na Plataforma Web (Wasm)*: Documentado como limitação inerente — navegadores não expõem grupos TLS nem controle de handshake a aplicações Web/Wasm.
+    - **Frente 2 — Double Ratchet Pós-Quântico (P-C2) [~4 a 8 semanas — DEPOIS]**:
+      - Continuação do P0.1 evoluindo os envelopes efêmeros para um protocolo *stateful* de Double Ratchet pós-quântico contínuo (PQXDH / Signal-style).
+      - Demanda testes extensivos de máquina de estados, sessões concorrentes, perda/reordenação de mensagens e garantia de *Break-in Recovery* e *Forward Secrecy* contínua por mensagem.
+  - **Hashing Quântico-Seguro & Regra de Ouro**:
+    - **Regra de Ouro**: *Nenhum hash de 256 bits para compromissos de longa duração.* O algoritmo de Grover reduz pela metade ($2^{n/2}$) a segurança quântica de pré-imagem/colisão.
+    - **Derivação Mnemônico $\to$ Seed**: **MANTER PBKDF2-HMAC-SHA512** (estritamente inalterada — não mudar, sob risco de quebrar irreversivelmente o recovery das 12 palavras do usuário e a interoperabilidade de sementes).
+    - **`identityHash`, IDs de Documentos e Compromissos**: **ADOTAR SHA-384** (garante 192 bits de segurança quântica de colisão sob Grover $2^{192}$, imune a ataques de extensão de comprimento por ser SHA-512 truncado, com saída compacta de 48 bytes).
+    - **Assinaturas ML-DSA**: **MANTER** (utiliza `SHAKE256` interno conforme FIPS 204, nativamente pós-quântico / PQ-safe).
   - **Criptoagilidade Contínua**:
-    - A agilidade criptográfica é mantida como processo institucional contínuo (`SignatureScheme`, `KeyExchangeScheme`), e não como entrega única, assegurando substituição rápida de primitivas diante de novos avanços de criptoanálise.
+    - A agilidade criptográfica é mantida como processo institucional contínuo (`SignatureScheme`, `KeyExchangeScheme`), assegurando substituição rápida de primitivas diante de novos avanços de criptoanálise.
 
-- 🧅 **Track 2 — Anonimato, Defesa de Metadados & Anti-Análise de Tráfego por IA**:
-  - **Defesa Ativa contra Análise de Tráfego por IA (Ameaça Ativa)**:
-    - Reconhecimento formal de que modelos de Inteligência Artificial / Machine Learning correlacionam fluxos de rede em tempo real por padrões temporais, volume, rajadas (*bursts*) e grafos sociais, mesmo sob túneis cifrados ou roteamento multi-hop.
-  - **Arquitetura de Mitigação Integrada**:
-    - **Packet Padding**: Preenchimento e normalização determinística para que todos os envelopes possuam tamanhos de bloco fixos e padronizados, eliminando correlação por volume.
-    - **Cover Traffic**: Injeção periódica de tráfego de cobertura falso/dummy indistinguível de mensagens reais, ofuscando estados de presença, atividade e inatividade.
-    - **Timing Obfuscation**: Introdução de jitter estocástico e atrasos aleatórios calculados para desestruturar a correlação temporal por modelos de aprendizado de máquina.
-    - **Onion Routing (Fase P2)**: Roteamento multi-hop em cebola para ofuscação de nós de transporte, desvinculando trânsito de endereços IP de origem.
-    - **Mixnet (Mixagem com Atraso Aleatório)**: Camada de reordenação estatística com atraso estocástico, avaliada sob demanda volumétrica.
+- 🧅 **Track 2 — Anonimato & Defesa contra Análise de Tráfego por IA (Aguardando Métricas de Piloto)**:
+  - **Tratada como Ameaça Ativa**: Modelos de IA/ML conseguem correlacionar tráfego em tempo real por padrões temporais, volume, rajadas (*bursts*) e grafos sociais, mesmo sob túneis cifrados ou roteamento multi-hop.
+  - **Mitigação Estruturada em 3 Fases**:
+    - **Fase 1 (Obrigatória, Baixo Custo)**:
+      - *Packet Padding*: Normalização para buckets discretos padronizados (**512 B, 1 KB e 2 KB**). **NÃO compromete latência**, impactando unicamente o consumo de banda.
+      - *Delivery Delay*: Atraso aleatório de entrega estocástico. É **ajustável** e será calibrado empiricamente com base nas métricas de latência coletadas no piloto de produção.
+    - **Fase 2 (Custo Médio)**:
+      - *Cover Traffic*: Injeção de mensagens-dummy periódicas para mascarar padrões de atividade e inatividade. **Custa consumo adicional de banda de rede**.
+      - *Padding Adaptativo*: Ajuste dinâmico entre nós de retransmissão intermediários.
+    - **Fase 3 (Opcional, Custo Elevado)**:
+      - *Mixnet*: Reordenação estocástica de pacotes com batching em lotes temporais, ativada sob demanda volumétrica comprovada.
 
 - 🛡️ **Track 3 (P-H1 Reforço) — Segurança de Hardware & UX Anti-Engenharia Social por IA**:
   - **Elevação de Prioridade de Hardware-Backed Keys (P-H1)**:
-    - Elevação no roadmap para prioridade **P-H1**: custódia física de sementes e chaves em silício dedicado (**StrongBox / TEE** no Android, **Secure Enclave** no Apple, **TPM / DPAPI** no Windows).
-    - Justificativa técnica: Barreira definitiva contra exfiltração de chaves em memória e proteção de longo prazo caso o usuário seja alvo de persuasão ou o software do host seja comprometido.
+    - Custódia física de sementes e chaves em silício dedicado (**StrongBox / TEE** no Android, **Secure Enclave** no Apple, **TPM / DPAPI** no Windows) para mitigar extração de chaves em memória mesmo sob comprometimento do sistema operacional.
   - **UX de Segurança Anti-Phishing contra IA**:
     - Interface de segurança com aviso ostensivo e mandatório na UI: o mnemônico de 12 palavras **NUNCA é solicitado por nenhum desenvolvedor, funcionário, suporte técnico, sistema automatizado ou Inteligência Artificial sob hipótese alguma**.
 
 - 🔍 **Track 4 (P0.4 Reforço) — Cadeia de Suprimentos & Governança de Código por IA**:
   - **IA no Desenvolvimento como Risco Contínuo de Supply Chain**:
-    - Código assistido ou gerado por IA (Executores) é tratado como vetor permanente de risco de cadeia de suprimentos (alucinação de pacotes, enfraquecimento sutil de invariantes e falhas lógicas).
-  - **Controles Obrigatórios Institucionalizados**:
+    - Código assistido ou gerado por IA (Executores) é tratado como vetor permanente de risco de supply chain (alucinação de pacotes, enfraquecimento sutil de invariantes e falhas lógicas).
+  - **Controles Obrigatórios Institucionalizados (Aplicar desde já)**:
     - Revisão humana rigorosa e cética de segurança para 100% das alterações de código antes de merge.
     - Baterias de testes adversariais automatizados mandatórios em CI/CD.
     - Software Bill of Materials (SBOM) CycloneDX v1.5 e atestado criptográfico SLSA 2+ determinísticos a cada release.
