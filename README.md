@@ -536,11 +536,16 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
       - *Teto Técnico na Plataforma Web (Wasm)*: Documentado como limitação inerente — navegadores não expõem grupos TLS nem controle de handshake a aplicações Web/Wasm.
     - **Frente 2 — Double Ratchet Pós-Quântico (P-C2) [~4 a 8 semanas — DEPOIS]**:
       - Continuação do P0.1 evoluindo os envelopes efêmeros para um protocolo *stateful* de Double Ratchet pós-quântico contínuo (PQXDH / Signal-style).
+      - **KDF do Ratchet PQ**: Adoção de **HKDF-SHA512** na evolução da chave-raiz e chaves de cadeia do ratchet (garantindo margem pós-quântica conservadora; enquanto SHA-256 é aceitável para envelopes efêmeros pontuais, SHA-512 é a escolha segura para o estado encadeado).
       - Demanda testes extensivos de máquina de estados, sessões concorrentes, perda/reordenação de mensagens e garantia de *Break-in Recovery* e *Forward Secrecy* contínua por mensagem.
-  - **Hashing Quântico-Seguro & Regra de Ouro**:
-    - **Regra de Ouro**: *Nenhum hash de 256 bits para compromissos de longa duração.* O algoritmo de Grover reduz pela metade ($2^{n/2}$) a segurança quântica de pré-imagem/colisão.
+  - **Hashing Quântico-Seguro & Nuances da Regra de Ouro**:
+    - **Nuances da Regra de Ouro (Evitar Aplicação Excessiva)**:
+      - $\ge 384$ bits é **OBRIGATÓRIO** para compromissos de longa duração: `identityHash`, IDs de documentos, compromissos criptográficos perenes e pseudonimização legal de IP (`HMAC-SHA-384` para retenção de 180 dias do MCI).
+      - 256 bits é **ACEITÁVEL** para usos puramente efêmeros: KDF de chave de envelope pontual (`SealedBox` KEK), chaves transitórias de sessão ($\le 24$h) e checksum do BIP-39 (estritamente detecção de erro de digitação na UI).
+      - **NÃO alterar hashing efêmero desnecessariamente**: Proibição de alterar o checksum do BIP-39 — quebraria a compatibilidade de recovery sem nenhum ganho real de segurança.
     - **Derivação Mnemônico $\to$ Seed**: **MANTER PBKDF2-HMAC-SHA512** (estritamente inalterada — não mudar, sob risco de quebrar irreversivelmente o recovery das 12 palavras do usuário e a interoperabilidade de sementes).
     - **`identityHash`, IDs de Documentos e Compromissos**: **ADOTAR SHA-384** (garante 192 bits de segurança quântica de colisão sob Grover $2^{192}$, imune a ataques de extensão de comprimento por ser SHA-512 truncado, com saída compacta de 48 bytes).
+    - **Pseudonimização de IP nos Logs de Conexão (P1.1 / MCI Art. 15)**: **ADOTAR HMAC-SHA-384** (consistência com a Regra de Ouro para logs mantidos por 180 dias).
     - **Assinaturas ML-DSA**: **MANTER** (utiliza `SHAKE256` interno conforme FIPS 204, nativamente pós-quântico / PQ-safe).
   - **Criptoagilidade Contínua**:
     - A agilidade criptográfica é mantida como processo institucional contínuo (`SignatureScheme`, `KeyExchangeScheme`), assegurando substituição rápida de primitivas diante de novos avanços de criptoanálise.
@@ -557,9 +562,11 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
     - **Fase 3 (Opcional, Custo Elevado)**:
       - *Mixnet*: Reordenação estocástica de pacotes com batching em lotes temporais, ativada sob demanda volumétrica comprovada.
 
-- 🛡️ **Track 3 (P-H1 Reforço) — Segurança de Hardware & UX Anti-Engenharia Social por IA**:
+- 🛡️ **Track 3 (P-H1 Reforço) — Segurança de Hardware, KDF de Backup & UX Anti-Engenharia Social**:
   - **Elevação de Prioridade de Hardware-Backed Keys (P-H1)**:
     - Custódia física de sementes e chaves em silício dedicado (**StrongBox / TEE** no Android, **Secure Enclave** no Apple, **TPM / DPAPI** no Windows) para mitigar extração de chaves em memória mesmo sob comprometimento do sistema operacional.
+  - **Argon2id como KDF de Backup Local e Proteção de Passphrase**:
+    - Criptografia local por passphrase (backup E2E e proteção do mnemônico em software em plataformas sem keystore de hardware): uso mandatório de **Argon2id** (RFC 9106, *memory-hard*, imune à aceleração por GPU/ASIC vs. PBKDF2 vulnerável). Baixo esforço reaproveitando o motor `Argon2Kmp`.
   - **UX de Segurança Anti-Phishing contra IA**:
     - Interface de segurança com aviso ostensivo e mandatório na UI: o mnemônico de 12 palavras **NUNCA é solicitado por nenhum desenvolvedor, funcionário, suporte técnico, sistema automatizado ou Inteligência Artificial sob hipótese alguma**.
 
