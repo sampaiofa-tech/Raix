@@ -521,9 +521,21 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
 - 🚀 **Push Notifications Zero-Knowledge**: Notificações em segundo plano para Android (FCM), Windows Desktop (Toast local) e iOS (stubs APNs), respeitando estritamente o TTL $\le 24$h e sem tráfego de conteúdo de mensagens.
 - 🚀 **Prontidão de Distribuição**: Atestado de Rebuild Legal v3.0, geração de Android App Bundle (AAB) assinado para a Play Store e assets de listagem institucional.
 
-### 3. Alocação de Recursos Pós-Rodada (Pós-Aporte Seed)
-- 🔒 **P2.1 — Auditoria Externa Independente de Criptografia**: Contratação de auditoria externa de segurança e criptoanálise independente por firma especializada de primeira linha (alocação prioritária dos recursos da rodada de captação).
-- 🌐 **v1.7 — Web Push (VAPID) & Chamadas Efêmeras**: Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
+### 3. Alocação de Recursos Pós-Rodada (Decisões de Governança & Pós-Aporte Seed)
+- 🔒 **P2.1 — Auditoria Externa Independente de Criptografia (PRIMEIRA Entrega Pós-Rodada)**:
+  - Contratação prioritária e imediata de auditoria externa de segurança e criptoanálise independente por consultoria especializada de primeira linha logo após o aporte de capital da rodada (alocada no início do ciclo pós-rodada, e não no fim da fila).
+  - Escopo: Auditoria do acordo de chaves KEM híbrido (ML-KEM-768 + X25519), assinaturas ML-DSA-65, isolamento do Firestore e zeroização de memória.
+- 🧅 **Fase P2 — Roteamento em Cebola (Onion Routing)**:
+  - Implementação de roteamento multi-hop em cebola para ofuscação de metadados de rede, desvinculando trânsito de endereços IP de origem.
+- 🔀 **Mixnet (Mixagem com Atraso Aleatório)**:
+  - Fase posterior e opcional, avaliada sob demanda volumétrica de tráfego contra adversários de vigilância estatística global.
+- 🌐 **Arquitetura Multi-Região — ADIADO**:
+  - Decisão formal: **ADIADO**. Não será realizada replicação geográfica ou redundância cega de dados e envelopes efêmeros, evitando propagação residual em repouso e preservando o expurgo tempestivo. Caso haja expansão de escala, replicações serão estritamente operacionais (controle de rate-limiting).
+- ⚖️ **Impacto Econômico do Overhead ML-DSA / PQXDH**:
+  - O overhead criptográfico de envelopes híbridos (~6,48 KB) é integralmente absorvido no free tier atual do Google Cloud / Firestore, sem custo adicional no momento.
+  - Serve como fundamentação técnica de custo para a oferta comercial corporativa (**Plano Escritório / Private**), justificando precificação diferenciada para tráfego empresarial de alta escala e instâncias dedicadas.
+- 📱 **v1.7 — Web Push (VAPID) & Distribuição iOS**:
+  - Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
 
 ---
 
