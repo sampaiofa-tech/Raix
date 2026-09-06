@@ -443,4 +443,51 @@ describe("P0.2 — Firestore Security Rules Adversarial Verification Suite", () 
       );
     });
   });
+
+  // =========================================================================
+  // CASO 7: Coleções Protegidas de Backend (devicePushTokens & securityAnomalies)
+  // =========================================================================
+  describe("Caso 7: Proteção Estrita de Coleções de Backend -> DENIED para Clients", () => {
+    it("MUST DENY direct read and write on devicePushTokens by any client (authenticated or unauthenticated)", async () => {
+      const aliceDb = testEnv.authenticatedContext("alice_uid").firestore();
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+
+      // Escrita direta por cliente autenticado -> DENIED
+      await assertFails(
+        aliceDb.collection("devicePushTokens").doc("alice_uid").set({
+          token: "fcm_token_sample",
+        })
+      );
+
+      // Leitura direta por cliente autenticado -> DENIED
+      await assertFails(aliceDb.collection("devicePushTokens").doc("alice_uid").get());
+
+      // Leitura/Escrita por cliente não autenticado -> DENIED
+      await assertFails(
+        unauthDb.collection("devicePushTokens").doc("alice_uid").set({
+          token: "fcm_token_sample",
+        })
+      );
+      await assertFails(unauthDb.collection("devicePushTokens").doc("alice_uid").get());
+    });
+
+    it("MUST DENY direct read and write on securityAnomalies by any client (authenticated or unauthenticated)", async () => {
+      const aliceDb = testEnv.authenticatedContext("alice_uid").firestore();
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+
+      // Escrita direta por cliente autenticado -> DENIED
+      await assertFails(
+        aliceDb.collection("securityAnomalies").doc("anomaly_123").set({
+          type: "INJECTED_ANOMALY",
+        })
+      );
+
+      // Leitura direta por cliente autenticado -> DENIED
+      await assertFails(aliceDb.collection("securityAnomalies").doc("anomaly_123").get());
+
+      // Leitura/Escrita por não autenticado -> DENIED
+      await assertFails(unauthDb.collection("securityAnomalies").doc("anomaly_123").get());
+    });
+  });
 });
+
