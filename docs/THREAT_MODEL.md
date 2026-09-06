@@ -1,8 +1,8 @@
 # Modelo de Ameaça e Postura de Segurança Pós-Quântica — Raix
 
-**Versão:** 1.0 (P0.1 — Pós-Quântica Híbrida)  
+**Versão:** 1.2 (P0.4 — Supply-Chain & Integridade de Cliente)  
 **Data:** 06 de setembro de 2026  
-**Status:** Implementado e Coberto por Testes Automatizados  
+**Status:** Implementado, Atestado em CI (SLSA 2+) e Coberto por Testes Automatizados  
 
 ---
 
@@ -115,4 +115,29 @@ O ciclo de destruição de dados efêmeros aborda as três camadas críticas de 
   - **Alerta Nível 1 (Warning):** Disparado quando qualquer documento sobrevive $\ge 60$ minutos além de sua expiração programada.
   - **Alerta Nível 2 (Crítico):** Disparado e escalado quando o atraso de sobrevivência atinge $\ge 180$ minutos (3 horas), sinalizando potencial anomalia no Cloud Scheduler ou degradação na API do Firestore.
   - **Janela Residual Máxima (Fail-Safe):** Caso tanto o Shredder quanto o gatilho reativo falhem simultaneamente, a janela residual pode atingir de 24h a 48h (limite do processador de TTL assíncrono do Firestore). O limiar de 60 minutos é um gatilho de monitoramento e alarme, e **não** uma garantia de expurgo físico total em 1 hora.
+
+---
+
+## 6. Integridade de Cliente e Cadeia de Suprimentos (P0.4 & Emenda Guru B.1)
+
+### 6.1 O Axioma de Confiança e o Limite do Servidor
+A alegação central de segurança do Raix afirma que:
+$$\text{Comprometimento Total do Servidor} \implies \text{Adversário obtém unicamente Ciphertext}$$
+No entanto, sob a análise adversarial formal da Emenda B.1:
+> **Sem integridade de cliente verificável, essa garantia desmorona.**  
+> Se o cliente for adulterado ou a cadeia de suprimentos for envenenada, as chaves privadas e o texto em claro podem ser exfiltrados diretamente da memória do endpoint, contornando a criptografia pós-quântica híbrida.
+
+### 6.2 Camadas de Defesa de Supply Chain Implementadas
+1. **Fixação Estrita de Versões e Hashes Criptográficos:**
+   - Gradle Dependency Verification (`gradle/verification-metadata.xml`) bloqueia builds se qualquer dependência (como Bouncy Castle FIPS 203/204) sofrer alteração em seu hash SHA-256 oficial.
+   - Cloud Functions opera sob `functions/package-lock.json` com validação de hashes SHA-512 e `npm ci --ignore-scripts`.
+2. **Software Bill of Materials (SBOM) Versionado:**
+   - Inventário transparente gerado no formato padrão CycloneDX 1.5 JSON para o cliente Multiplatform (`docs/sbom/sbom-composeApp.json`) e para o backend (`docs/sbom/sbom-functions.json`).
+3. **Builds Reproduzíveis e Atestado SLSA Nível 2+:**
+   - Esteira de integração contínua ([`.github/workflows/supply-chain-attestation.yml`](file:///c:/Dev/Pmsg/.github/workflows/supply-chain-attestation.yml)) gera atestados criptográficos de proveniência assinados via Sigstore/Fulcio (`actions/attest-build-provenance`).
+4. **Detecção de Tampering no Runtime (`RuntimeIntegrityVerifier`):**
+   - O aplicativo audita seu próprio ambiente em tempo de execução:
+     - **Desktop:** Detecta agentes de instrumentação Java (`-javaagent`), protocolos de depuração JDWP (`-agentlib:jdwp`) e manipulações de ClassLoader.
+     - **Android:** Detecta binários de root (`su`), injeção dinâmica de frameworks de hooking (Frida em portas 27042 e `/proc/self/maps`, Xposed) e anexação de depuradores.
+     - **Web/Wasm:** Alerta sobre a execução em contexto de navegador sem garantias de isolamento de memória contra DevTools.
 

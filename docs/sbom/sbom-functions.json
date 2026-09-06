@@ -1,0 +1,148 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:56666233-1860-4d79-bbfc-0ba644b852c8",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-06T16:05:46.726Z",
+    "tools": [
+      {
+        "vendor": "Raix Security Engineering",
+        "name": "raix-sbom-generator",
+        "version": "1.0.0"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "name": "raix-cloud-functions",
+      "version": "1.4.0",
+      "description": "Raix Cloud Functions Backend & Security Services",
+      "licenses": [
+        {
+          "license": {
+            "id": "AGPL-3.0-or-later"
+          }
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "firebase-admin",
+      "version": "13.2.0",
+      "purl": "pkg:npm/firebase-admin@13.2.0",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "qQBTKo0QWCDaWwISry989pr8YfZSSk00rNCKaucjOgltEm3cCYzEe4rODqBd1uUwma+Iu5jtAzg89Nfsjr3fGg=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "firebase-functions",
+      "version": "7.3.2",
+      "purl": "pkg:npm/firebase-functions@7.3.2",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "DTa5CtCNxFE1gPjkjlhl5uh8AcNWXLKORAMRenfkecP8zGstbje+r2TaNh4Ehdxp0qTPvTUe/sS23VESW32Gbg=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@firebase/rules-unit-testing",
+      "version": "5.0.2",
+      "purl": "pkg:npm/@firebase/rules-unit-testing@5.0.2",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "g053AaFcuf4gpAQbwRK/GIIGfPHhpomW3qkIYLi4xnaTUrf65yGP+0TPdojoXfB/ejrfevkXmMs5qXOTSwdN6A=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@types/jest",
+      "version": "29.5.14",
+      "purl": "pkg:npm/@types/jest@29.5.14",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "ZN+4sdnLUbo8EVvVc2ao0GFW6oVrQRPn4K2lglySj7APvSrgzxHiNNK99us4WDMi57xxA2yggblIAMNhXOotLQ=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@types/node",
+      "version": "22.0.0",
+      "purl": "pkg:npm/@types/node@22.0.0",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "VT7KSYudcPOzP5Q0wfbowyNLaVR8QWUdw+088uFWwfvpY6uCWaXpqV6ieLAu9WBcnTa7H4Z5RLK8I5t2FuOcqw=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "firebase-functions-test",
+      "version": "3.5.0",
+      "purl": "pkg:npm/firebase-functions-test@3.5.0",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "Jg+f9GeWkWpgYRY9s+Oxst/b9kEnOJ6pU/XNFthOFYs2Ax2fU2Zxc7ckfTozYKEH/mzptSDxV5JYiPTvR+RhKA=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jest",
+      "version": "29.7.0",
+      "purl": "pkg:npm/jest@29.7.0",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "NIy3oAFp9shda19hy4HK0HRTWKtPJmGdnvywu01nOqNC2vZg+Z+fvJDxpMQA88eb2I9EcafcdjYgsDthnYTvGw=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ts-jest",
+      "version": "29.4.12",
+      "purl": "pkg:npm/ts-jest@29.4.12",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "Ov6ClY53Fflh6BGAnY2DlTq1hYDrTycz2PVTXBWFW2CU+9zrEqAp9fWdGXl42EXO5RLSFAcAZ2JFKbP+zBTFfw=="
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typescript",
+      "version": "5.9.3",
+      "purl": "pkg:npm/typescript@5.9.3",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="
+        }
+      ]
+    }
+  ]
+}
