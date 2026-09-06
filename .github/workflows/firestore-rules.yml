@@ -32,11 +32,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: functions/package-lock.json
 
-      - name: Setup Java 17 (Required for Firestore Emulator)
+      - name: Setup Java 21 (Required for Firestore Emulator)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install Functions Dependencies
         run: |
