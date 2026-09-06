@@ -1,0 +1,10 @@
+# Configuração de Pre-commit Hook para Detecção Automatizada de Segredos
+# Documentação oficial: https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
+
+repos:
+  - repo: https://github.com/GitGuardian/ggshield
+    rev: v1.36.0
+    hooks:
+      - id: ggshield
+        language_version: python3
+        stages: [pre-commit]

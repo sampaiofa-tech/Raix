@@ -458,6 +458,50 @@ O ciclo **v1.3** implementa os requisitos técnicos mandatórios da Google Play 
 
 ---
 
+## 🤝 Contribuição e Segurança no Desenvolvimento
+
+Toda contribuição ao **Raix** deve aderir às diretrizes de código aberto e prevenção estrita de vazamento de credenciais:
+
+### 1. Acordo de Contribuição Individual (CLA)
+- Todas as contribuições externas ao repositório são regidas pelo Acordo de Contribuição Individual — consulte [`CLA.md`](CLA.md).
+
+### 2. Barreira Obrigatória de Segredos (GitGuardian & Pre-commit Hook)
+O repositório é público e conta com monitoramento automatizado e contínuo com **GitGuardian**:
+
+- **Obrigatoriedade em PRs**: Toda Pull Request submetida dispara a esteira de CI/CD do GitHub Actions (`.github/workflows/gitguardian.yml`). Qualquer detecção de segredos (chaves de API, tokens do GitHub, credenciais de serviço, frases mnemônicas BIP-39 ou chaves privadas) quebra imediatamente o build e impede o merge.
+- **Configuração do Hook Local (Obrigatório para Contribuidores)**:
+  Para evitar que segredos sejam gravados em commits locais, configure o `ggshield`:
+  
+  ```bash
+  # 1. Instalar o ggshield via pip
+  pip install ggshield
+
+  # 2. Autenticar com o GitGuardian (ou definir GITGUARDIAN_API_KEY no ambiente)
+  ggshield auth login
+
+  # 3. Opção A: Instalar diretamente como hook local no repositório Git
+  ggshield install --mode=local
+
+  # 3. Opção B: Se você utiliza o framework pre-commit (.pre-commit-config.yaml)
+  pip install pre-commit
+  pre-commit install
+  ```
+
+- **Varredura Manual Pré-Push**:
+  Antes de abrir uma Pull Request ou realizar push, valide seu diff local:
+  ```bash
+  # Varredura do commit com ggshield
+  ggshield secret scan pre-commit
+
+  # Validação de assinaturas com script interno do projeto
+  node scripts/verify_secrets.cjs
+  ```
+
+### 3. Resposta a Incidentes de Credenciais
+Em caso de detecção de segredos reais, consulte e siga rigorosamente o [Runbook de Resposta a Incidentes](docs/INCIDENT_RESPONSE.md) e as regras do [`AGENTS.md`](AGENTS.md). Canal oficial de notificação: `contato@raixtech.com`.
+
+---
+
 ## 📄 Licença
 
 Este projeto é disponibilizado sob o modelo de **duplo licenciamento**:
@@ -469,7 +513,7 @@ Este projeto é disponibilizado sob o modelo de **duplo licenciamento**:
    - Licenciamento proprietário voltado a empresas e escritórios que demandam isenção das obrigações da AGPL-3.0, customizações de governança corporativa, implantação on-premises / nuvem privada e suporte técnico com SLA.
    - Para detalhes e solicitação de propostas comerciais, consulte [`LICENSE-COMMERCIAL.md`](LICENSE-COMMERCIAL.md).
 3. **Contribuições de Código**:
-   - Todas as contribuições externas ao repositório são regidas pelo Acordo de Contribuição Individual — consulte [`CLA.md`](CLA.md).
+   - Todas as contribuições externas ao repositório são regidas pelo Acordo de Contribuição Individual — consulte [`CLA.md`](CLA.md) e as diretrizes da seção [Contribuição e Segurança no Desenvolvimento](#-contribuição-e-segurança-no-desenvolvimento).
 
 > [!IMPORTANT]
 > **Registro de Marca e Denominação Comercial**: O depósito de marca nominativa para **RAIX** está agendado para 08/09/2026 perante o Instituto Nacional da Propriedade Industrial (INPI) — guia/protocolo preparatório nº **945109300** (Classes 09 e 42). Todos os direitos reservados. Canal oficial: [raixtech.com](https://raixtech.com).
