@@ -1,24 +1,28 @@
 # Modelo de Ameaça e Postura de Segurança Pós-Quântica — Raix
 
-**Versão:** 1.3 (P1 — Minimização de Metadados, Zeroização e Detecção de Anomalias)  
+**Versão:** 1.4 (P1+ — Governança Pós-Quântica, Defesa contra Análise de Tráfego por IA, Hashing ≥384 bits e Hardening Anti-Engenharia Social)  
 **Data:** 06 de setembro de 2026  
-**Status:** Implementado, Verificado em CI/CD e Coberto por Testes Automatizados  
+**Status:** Implementado, Verificado em CI/CD e Governança Pós-Quântica Atualizada  
 
 ---
 
 ## 1. Visão Geral e Vetores de Ameaça
 
-O **Raix** é projetado sob a premissa de **privacidade forte por design com retenção estritamente limitada de metadados**. O modelo de ameaça assume um adversário com capacidades estendidas em ambiente de rede e infraestrutura compartilhada:
+O **Raix** é projetado sob a premissa de **privacidade forte por design com retenção estritamente limitada de metadados**. O modelo de ameaça assume um adversário com capacidades estendidas em ambiente de rede, infraestrutura compartilhada e ferramentas avançadas de aprendizado de máquina / inteligência artificial:
 
 ### Atores e Vetores de Ameaça
 
 | Ator / Ameaça | Capacidades e Motivação | Mitigação Implementada |
 | :--- | :--- | :--- |
-| **Atacante HNDL (*Harvest-Now-Decrypt-Later*)** | Gravação passiva em massa do tráfego de rede e dados de envelopes para decifragem futura quando um computador quântico criptograficamente relevante (CRQC) estiver disponível. | **KEM Híbrido NIST FIPS 203 (ML-KEM-768) + X25519**, assegurado pelo combiner NIST SP 800-227 / RFC 9180 HPKE. Conteúdo permanece indecifrável mesmo contra adversários quânticos. |
+| **Atacante HNDL (*Harvest-Now-Decrypt-Later*)** | Gravação passiva em massa do tráfego de rede e dados de envelopes para decifragem futura quando um computador quântico criptograficamente relevante (CRQC) estiver disponível. | **KEM Híbrido NIST FIPS 203 (ML-KEM-768) + X25519**, assegurado pelo combiner NIST SP 800-227 / RFC 9180 HPKE. Conteúdo permanece indecifrável mesmo contra adversários quânticos. **Prioridade Crítica Permanente (P-C1 e P-C2)**: TLS-PQ na camada de transporte e evolução para Double Ratchet PQ pós-quântico. |
 | **Atacante Ativo MitM (*Man-in-the-Middle*)** | Interceptação de tráfego, injeção de pacotes e tentativa de coerção de downgrade para protocolos clássicos (forçando apenas curvas elípticas Ed25519/X25519). | **Proteção Anti-Downgrade no Handshake (Emenda A.2)**: `minSecurityLevel` e suítes suportadas embutidas criptograficamente no payload autenticado (`pmsg-routing-v2`). Qualquer sessão abaixo do nível acordado é terminada com `DowngradeAttackException`. |
+| **Adversário com Análise de Tráfego por IA (Track 2 — Ameaça Ativa)** | Correlação estatística avançada em tempo real de fluxos de rede via modelos de IA/ML, inferindo interlocutores por padrões temporais, volume, rajadas (*bursts*) de pacotes e grafos sociais, mesmo sob túneis cifrados ou onion routing simples. | **Defesa Ativa contra Análise de Tráfego por IA (Track 2)**: *Packet padding* determinístico para normalização uniforme do tamanho de envelopes, injeção periódica de tráfego de cobertura (*cover traffic*) para mascarar presença e ofuscação de temporização (*timing obfuscation* / jitter estocástico) combinados com Onion Routing multi-hop e Mixnet. |
+| **Adversário Quântico via Algoritmo de Grover (Track 1 — Hashing Quântico-Seguro)** | Redução quadrática da segurança de funções hash ($2^{n/2}$) por computador quântico (CRQC), rebaixando hashes de 256 bits para ~128 bits de entropia efetiva contra busca exaustiva. | **Hashing Quântico-Seguro $\ge 384$ bits (SHA-384 / SHA-512)**: Especificação no roadmap para derivação de identidade BIP-39, sementes e compromissos criptográficos duradouros, mantendo margem $\ge 192$ bits de segurança pós-quântica. |
+| **Engenharia Social Automatizada por IA (P-H1 — Hardening do Mnemônico)** | Campanhas adaptativas de phishing hiperpersonalizado, vishing, clones de voz e agentes de IA simulando suporte técnico para induzir o usuário a entregar a frase mnemônica BIP-39 (12 palavras). | **Hardware-Backed Keys (P-H1)**: Isolamento das chaves em silício seguro de hardware (StrongBox/TEE no Android, Secure Enclave no Apple, DPAPI/TPM no Windows) e **UX de Segurança Anti-Phishing**: alerta ostensivo de que o mnemônico NUNCA é solicitado por humanos ou por IA sob hipótese alguma. |
+| **Comprometimento de Supply Chain por Código Gerado por IA (P0.4 Reforço)** | Introdução sutil de dependências alucinadas (*package hallucination*), backdoors lógicos ou enfraquecimento de invariantes criptográficas por assistentes de IA (Executores). | **Governança Estrita de Código por IA (P0.4)**: Revisão humana cética e minuciosa obrigatória de 100% do código gerado por IA, testes adversariais automatizados em CI e geração determinística de SBOM CycloneDX v1.5 com atestado SLSA Nível 2+ a cada release. |
 | **Operador de Nuvem / Servidor Comprometido** | Acesso ao banco de dados Firestore, snapshots ou memória do backend Cloud Functions. | Criptografia ponta-a-ponta (E2E) em nível de aplicação com envelopes selados (*SealedBox*). O servidor armazena apenas ciphertexts opacos da DEK e do conteúdo. Zero posse de chaves privadas. |
-| **Adversário de Trânsito de Metadados** | Interceptação de cabeçalhos de transporte HTTP/2 e conexões QUIC para correlação de tráfego. | **TLS Pós-Quântico Híbrido (X25519MLKEM768 - Emenda A.4)**: Planejado para clientes nativos (Android/Desktop), com ativação quando suportado pelos runtimes (BoringSSL/Conscrypt/JVM) e infraestrutura GCP. **Limitação da Plataforma Web (Wasm)**: A versão Web não pode entregar ou garantir TLS pós-quântico, visto que navegadores não expõem a seleção de grupos TLS-PQ às páginas web (Web = cliente de menor garantia técnica). O conteúdo e as chaves contam com proteção pós-quântica E2E na camada de aplicação nos clientes suportados. |
-| **Comprometimento de Chave de Longa Duração** | Exfiltração de chaves de identidade de longo prazo em momento futuro. | **Forward Secrecy Preservada (Emenda A.3)**: A DEK de cada mensagem é encapsulada via par de chaves X25519 efêmero e seed efêmera ML-KEM-768. O comprometimento das chaves de identidade não compromete mensagens passadas. |
+| **Adversário de Trânsito de Metadados** | Interceptação de cabeçalhos de transporte HTTP/2 e conexões QUIC para correlação de tráfego. | **TLS Pós-Quântico Híbrido (X25519MLKEM768 - Emenda A.4 / P-C1)**: Planejado para clientes nativos (Android/Desktop), com ativação quando suportado pelos runtimes (BoringSSL/Conscrypt/JVM) e infraestrutura GCP. **Limitação da Plataforma Web (Wasm)**: A versão Web não pode entregar ou garantir TLS pós-quântico, visto que navegadores não expõem a seleção de grupos TLS-PQ às páginas web (Web = cliente de menor garantia técnica). O conteúdo e as chaves contam com proteção pós-quântica E2E na camada de aplicação nos clientes suportados. |
+| **Comprometimento de Chave de Longa Duração** | Exfiltração de chaves de identidade de longo prazo em momento futuro. | **Forward Secrecy Preservada (Emenda A.3)**: A DEK de cada mensagem é encapsulada via par de chaves X25519 efêmero e seed efêmera ML-KEM-768. O comprometimento das chaves de identidade não compromete mensagens passadas. Evolução contínua planejada para **P-C2 (Double Ratchet PQ)**. |
 
 ---
 
@@ -55,6 +59,22 @@ A emenda A.2 estipula que dispositivos híbridos não podem ser rebaixados silen
   - Salt `pmsg-identity-mlkem-salt-v1`: Semente FIPS 203 ML-KEM-768.
 - **Safety Number de 60 Dígitos (Signal-Style Híbrido)**:
   O número de segurança de verificação presencial/verbal é gerado a partir do hash combinado de todas as quatro chaves públicas ($\text{Pub}_{\text{X25519}} \parallel \text{Pub}_{\text{Ed25519}} \parallel \text{Pub}_{\text{ML-KEM}} \parallel \text{Pub}_{\text{ML-DSA}}$), garantindo que a comparação manual cobre simultaneamente a segurança clássica e a pós-quântica.
+
+### 2.5 Hashing Quântico-Seguro e Resistência ao Algoritmo de Grover (Track 1)
+- **Impacto do Algoritmo de Grover sobre Funções Hash**:
+  O algoritmo quântico de Grover acelera buscas não estruturadas com ganho quadrático, reduzindo a complexidade de busca de pré-imagem de $2^n$ para $2^{n/2}$. Como consequência, funções hash de 256 bits (ex.: SHA-256) oferecem ~128 bits de entropia efetiva contra um computador quântico criptograficamente relevante (CRQC).
+- **Diretriz de Hashes $\ge 384$ bits para Longa Duração**:
+  Enquanto 128 bits de segurança quântica permanecem adequados para identificadores transitórios de curto ciclo de vida (envelopes efêmeros $\le 24$h), dados e compromissos de longa duração exigem margem conservadora ampliada.
+  - Para **derivação de identidade mestre a partir do BIP-39**, **impressões digitais perenes de identidade** e **compromissos criptográficos de longa duração**, o sistema estabelece a transição para **SHA-384 / SHA-512** ($\ge 384$ bits), garantindo $\ge 192$ bits de segurança pós-quântica efetiva sob ataque quântico.
+  - Registro formal no roadmap da Track 1: revisão das rotinas de derivação em `IdentityCryptoManager` e schemas de compromisso para hashes $\ge 384$ bits.
+
+### 2.6 Reforço de Prioridades Criptográficas: P-C1, P-C2 e Criptoagilidade Contínua
+- **P-C1 (TLS Pós-Quântico)** e **P-C2 (Double Ratchet Pós-Quântico)**:
+  Permanecem categorizadas como prioridades críticas inegociáveis do Raix. Constituem a muralha fundamental contra ataques HNDL (*Harvest-Now-Decrypt-Later*):
+  - **P-C1**: Blinda o tráfego de transporte no handshake HTTP/2/QUIC com X25519MLKEM768 nos clientes nativos.
+  - **P-C2**: Garante *Break-in Recovery* e *Forward Secrecy* contínua por mensagem na camada E2E, assegurando que o comprometimento de uma chave efêmera não exponha mensagens passadas ou futuras.
+- **Criptoagilidade como Princípio Contínuo de Engenharia**:
+  A crypto-agility não é uma funcionalidade estática entregue em marco único, mas um processo contínuo de governança de código. As interfaces `SignatureScheme`, `KeyExchangeScheme` e o envelope versionado `pmsg-routing-v2` asseguram que qualquer algoritmo (inclusive FIPS 203/204) possa ser rotacionado sem reescrever o protocolo de mensageria caso surjam novos vetores de criptoanálise.
 
 ---
 
@@ -143,6 +163,17 @@ No entanto, sob a análise adversarial formal da Emenda B.1:
      - **Android:** Detecta binários de root (`su`), injeção dinâmica de frameworks de hooking (Frida em portas 27042 e `/proc/self/maps`, Xposed) e anexação de depuradores.
      - **Web/Wasm:** Alerta sobre a execução em contexto de navegador sem garantias de isolamento de memória contra DevTools.
 
+### 6.3 Código Gerado por IA como Risco Contínuo de Supply Chain (P0.4 Reforço)
+O emprego de assistentes e executores autônomos de Inteligência Artificial na engenharia de software introduz uma nova categoria permanente de risco na cadeia de suprimentos de software (*AI-Generated Code Supply Chain Threat*):
+- **Vetores de Risco Mapeados**:
+  - *Package Hallucination / Dependency Confusion*: IA sugerindo bibliotecas inexistentes que podem ser registradas por atacantes em registros públicos (npm, Maven Central, PyPI).
+  - *Enfraquecimento Sutil de Invariantes*: Introdução de regressões imperceptíveis em verificações constant-time, regras de isolamento de memória, permissões do Firestore ou tratamento de exceções de downgrade.
+  - *Injeção Inadvertida de Backdoors ou Falhas Lógicas*: Código gerado sem contexto adversarial completo que neutralize ataques de canal lateral ou vazamento de metadados.
+- **Controles Institucionais Mandatórios de Governança**:
+  1. **Revisão Humana de Segurança Rigorosa e Cética**: Todo commit contendo código sugerido ou gerado por IA deve passar por revisão humana formal com escrutínio focado em primitivas criptográficas, gerenciamento de memória e regras de acesso.
+  2. **Baterias de Testes Adversariais Mandatórios**: O pipeline de CI/CD deve executar asserções adversariais automatizadas (ex.: `functions/test/rules.test.ts` e suites de integridade do cliente) antes de qualquer autorização de merge.
+  3. **SBOM Determinístico e Atestação a Cada Release**: Atualização e validação contínua do inventário CycloneDX 1.5 (`docs/sbom/`) e atestado de proveniência criptográfica SLSA 2+ em todo build de produção, garantindo rastreabilidade integral.
+
 ---
 
 ## 7. Matriz Exaustiva de Metadados: "Quem Vê o Quê, por Quanto Tempo e Sob Quais Condições" (P1.1)
@@ -153,7 +184,7 @@ Em conformidade com a substituição de alegações de "zero-trace absoluto" por
 | :--- | :--- | :--- | :--- | :--- |
 | **Google Cloud Platform** (Provedor de Infraestrutura) | • Endereço IP e porta de transporte nos Load Balancers / Cloud NAT.<br/>• Timestamps de requisição HTTP/2 / QUIC.<br/>• Volume de tráfego e tamanho dos pacotes TLS.<br/>• Certificado TLS do servidor.<br/>• Envelopes cifrados transitórios em `identities/*/inbox/*`.<br/>• Ciphertexts de DEK em `messageKeys/*`. | • Conteúdo em claro de mensagens.<br/>• Chaves privadas de identidade (X25519, Ed25519, ML-KEM-768, ML-DSA-65).<br/>• Sementes e mnemônicos BIP-39.<br/>• DEK em claro (protegida por Sealed-Box híbrido).<br/>• Correlação estática de pares (emenda B.3). | • Logs de borda GCP: até 30 dias (padrão Cloud Logging).<br/>• Firestore: $\le 24$h (ou incinerado imediatamente no *Vanish-After-Read*). | Comprometimento administrativo de infraestrutura do GCP ou ordem judicial expedida sob jurisdição norte-americana / FISA / CLOUD Act. |
 | **Operador do Raix** (Cat Tech / Administrador) | • Registro de conexão sob o MCI Art. 15: timestamp UTC e endpoint acessado (`/storeMessageKey`, `/getMessageKey`).<br/>• Hash HMAC-SHA256 pseudonimizado do IP (com salt rotativo mensal).<br/>• Fingerprint de roteamento da caixa postal.<br/>• Métricas agregadas de anomalias (`securityAnomalies`). | • Endereço IP bruto em repouso (descartado no ato da requisição).<br/>• Porta de conexão efêmera do usuário (não armazenada).<br/>• Identificador de hardware ou fingerprinting de dispositivo.<br/>• Conteúdo legível de conversas (*Zero-Knowledge*).<br/>• Chaves privadas ou sementes mnemônicas.<br/>• Grafo de interlocução remetente↔destinatário. | • `accessLogs` (MCI Art. 15): estritamente 180 dias com expurgo automático.<br/>• Envelopes efêmeros: $\le 24$h (ou destruição imediata no *Vanish*).<br/>• Anomalias: 30 dias. | Ordem judicial brasileira individualizada e fundamentada expedida por autoridade judiciária competente (MCI Art. 15, § 1º). |
-| **Atacante de Rede Passivo / MitM** (Operador de ISP, Roteador Wi-Fi, Grampo de Tráfego) | • IPs de origem e destino da sessão TLS.<br/>• Porta de conexão e volume de bytes transmitidos.<br/>• SNI e domínio de conexão (`firebaseio.com`, `raixtech.com`).<br/>• Padrões temporais de atividade online. | • URLs exatas dos endpoints REST / Cloud Functions.<br/>• Conteúdo dos envelopes HTTP/2.<br/>• Chaves efêmeras e ciphertexts de mensagens.<br/>• Fingerprints de roteamento e identidades.<br/>• Conteúdo decifrado de qualquer natureza. | Ilimitado (caso o atacante grave tráfego passivo para cenário HNDL). | Interceptação física de cabos submarinos, roteadores ou redes locais. O KEM Híbrido PQC (ML-KEM-768 + X25519) garante que o conteúdo permanece indecifrável mesmo para atacantes quânticos com gravação perene. |
+| **Atacante de Rede Passivo / MitM / Análise de Tráfego por IA** (Operador de ISP, Roteador Wi-Fi, Grampo de Tráfego, Modelos Neurais de Fluxo) | • IPs de origem e destino da sessão TLS.<br/>• Porta de conexão e volume de bytes transmitidos.<br/>• SNI e domínio de conexão (`firebaseio.com`, `raixtech.com`).<br/>• Padrões temporais de atividade online e rajadas (*bursts*).<br/>• Correlação heurística via ML de timing e fluxo de envelopes. | • URLs exatas dos endpoints REST / Cloud Functions.<br/>• Conteúdo dos envelopes HTTP/2.<br/>• Chaves efêmeras e ciphertexts de mensagens.<br/>• Fingerprints de roteamento e identidades.<br/>• Conteúdo decifrado de qualquer natureza.<br/>• Correlação determinística quando ativos os controles da Track 2 (*packet padding*, *cover traffic* e *timing jitter* estocástico). | Ilimitado (caso o atacante grave tráfego passivo para cenário HNDL). | Interceptação física de cabos submarinos, roteadores ou redes locais. O KEM Híbrido PQC (ML-KEM-768 + X25519) e o TLS-PQ (P-C1) garantem que o conteúdo permanece indecifrável mesmo para atacantes quânticos com gravação perene. A Trilha 2 (Onion Routing, Mixnet, padding uniforme e tráfego de cobertura) quebra correlações estatísticas avançadas de IA. |
 | **Atacante de Servidor Comprometido** (Invasor com Acesso ao Firestore / Admin SDK) | • Envelopes transitórios ativos não lidos (`payloadEncrypted` em AES-256-GCM).<br/>• Metadados de envelope: `createdAt`, `expiresAt`, `ephemeralPublicKey`.<br/>• Ciphertexts de `wrappedDek` cifrados com KEK híbrida.<br/>• Logs de conexão pseudonimizados com salt mensal (`accessLogs`). | • Texto plano de qualquer mensagem.<br/>• Chaves de identidade e decapsulação KEM (isoladas nos endpoints).<br/>• Chaves DEK em claro.<br/>• Histórico de mensagens antigas já incineradas pelo Shredder.<br/>• Associação de pares de conversa (inexistência de `senderHash` + `recipientHash` associados no mesmo doc). | Enquanto o documento não for purgado pelo Shredder ($\le 24$h). | Exfiltração de credenciais de serviço ou bypass de autenticação do backend. |
 | **Destinatário Autorizado** (Interlocutor na Conversa) | • Conteúdo legível da mensagem decifrada.<br/>• Timestamp de emissão informado pelo remetente.<br/>• Mídias e anexos efêmeros decifrados.<br/>• Fingerprint e Safety Number dual de 60 dígitos do remetente. | • Frase mnemônica BIP-39 do remetente.<br/>• Chaves privadas do remetente.<br/>• IP ou porta do remetente.<br/>• Outras conversas ou caixas postais do remetente. | Controlado pela política de efemeridade local: até a leitura (*Vanish-After-Read*), expiração do temporizador local ($\le 24$h) ou acionamento voluntário do *Shake-to-Clear* / *Panic Wipe*. | Posse legítima do par de chaves privadas no dispositivo e autorização biométrica / PIN no client. |
 
@@ -185,6 +216,18 @@ A restauração da identidade criptográfica é de **responsabilidade exclusiva 
 - Apresenta aviso de alto risco enfatizando que a perda do mnemônico acarreta na perda permanente e irreversível da identidade e dos contatos.
 - Recomenda expressamente o armazenamento em **gerenciador de senhas confiável offline, cofre físico ou hardware wallet**, desaconselhando screenshots e anotações digitais desprotegidas.
 
+### 8.4 Proteção do Mnemônico contra Engenharia Social por IA e Hardening de Hardware (P-H1)
+A ascensão de ferramentas avançadas de Inteligência Artificial generativa transforma o usuário no principal vetor de ataque através de engenharia social de alta fidelidade:
+- **Ameaça Ativa de Engenharia Social por IA**:
+  Agentes adversariais utilizam IA para clonagem de voz (vishing), geração de mensagens de phishing hiperpersonalizadas em canais de mensageria e automação de chatbots persuasivos fingindo suporte técnico, atualização de segurança urgente ou validação de conta para induzir a vítima a fornecer suas 12 palavras BIP-39.
+- **Elevação de Prioridade de Hardware-Backed Keys (P-H1)**:
+  - Elevação no roadmap para prioridade **P-H1**: isolamento físico das chaves mestras e derivadas diretamente em hardware criptográfico dedicado (**StrongBox / TEE** no Android, **Secure Enclave** no iOS/macOS e **TPM / DPAPI** no Windows).
+  - Justificativa técnica: Sob custódia de hardware, mesmo que o sistema operacional host ou a camada de aplicação sofram comprometimento ou o usuário seja alvo de persuasão, as chaves privadas nunca deixam o enclave seguro em texto claro.
+- **UX de Segurança Anti-Phishing Explícita**:
+  A interface do Raix incorpora salvaguardas explícitas e indelúveis na tela de gerenciamento de chaves e visualização de backup:
+  > **Aviso Permanente Anti-Engenharia Social**:  
+  > *"O mnemônico de 12 palavras NUNCA é solicitado por nenhum desenvolvedor, funcionário, atendente, canal de suporte, sistema automatizado ou Inteligência Artificial sob hipótese alguma. Se qualquer pessoa ou IA solicitar essas palavras, trata-se inequivocamente de um golpe."*
+
 ---
 
 ## 9. Detecção Proativa de Anomalias de Acesso e Força Bruta (P1.3)
@@ -201,3 +244,27 @@ O módulo `functions/src/anomalyDetector.ts` introduz telemetria de contenção 
    - Registrado como evento estruturado `REPEATED_PERMISSION_DENIED` com correlação temporal.
 3. **Isolamento de Segurança:**
    - A coleção `securityAnomalies` é protegida com `allow read, write: if false;` em `firestore.rules`, sendo manipulável exclusivamente pelo Firebase Admin SDK.
+
+---
+
+## 10. Governança de Criptoagilidade e Monitoramento Quântico Contínuo (Track 6)
+
+A preparação pós-quântica do Raix não é uma fotografia pontual, mas um processo vivo de governança de segurança contínua para assegurar resiliência à medida que o estado da arte de computadores quânticos e criptoanálise avança:
+
+### 10.1 Monitoramento Sistemático de Ameaças e Quebras de Primitivas
+A equipe de engenharia e governança institucionaliza o monitoramento contínuo das seguintes fontes de inteligência técnica:
+1. **Rastreamento no `ecdsa.fail`**:
+   - Acompanhamento do observatório público `ecdsa.fail` e bases de vulnerabilidade de implementações criptográficas para identificação tempestiva de falhas de nonce, vulnerabilidades de canal lateral, ataques de curva elíptica e eventuais fraquezas descobertas em esquemas clássicos e híbridos.
+2. **Normas e Publicações do NIST**:
+   - Acompanhamento formal das emendas e padrões definitivos do NIST pós-quântico: **FIPS 203** (ML-KEM), **FIPS 204** (ML-DSA), **FIPS 205** (SLH-DSA), além das diretrizes para combiners híbridos em **NIST SP 800-227**.
+   - Avaliação de algoritmos adicionais em padronização (ex.: candidatos stateless baseados em hash ou esquemas de assinaturas baseados em reticulados alternativos como FALCON).
+3. **Roadmaps Globais de Hardware Quântico (CRQC Watch)**:
+   - Acompanhamento trimestral dos roadmaps públicos de fornecedores de computação quântica de grande porte:
+     - **IBM Quantum**: Metas de contagem de qubits físicos/lógicos e métricas de fidelidade (Heron, Flamingo, Kookaburra).
+     - **Google Quantum AI**: Avanços em correção quântica de erros (QEC) e processadores Willow/Sycamore.
+     - **QuEra Computing**: Avanços em processadores de átomos neutros e arquiteturas de computação quântica tolerante a falhas (FTQC).
+
+### 10.2 Cadência Periódica de Revisão de Primitivas Criptográficas
+- **Revisão Semestral Mandatória**: A cada 6 meses, o comitê de governança e arquitetura executa uma revisão formal de todas as suítes criptográficas ativas no código (`ML-KEM-768`, `ML-DSA-65`, `X25519`, `Ed25519`, `AES-256-GCM`, `Argon2id`, `HKDF-SHA256`).
+- **Gatilhos de Rotação Criptoágil**: Caso uma primitiva atinja qualquer limiar de degradação teórica ou prática (ex.: novo ataque em reticulados, enfraquecimento de parâmetros ou aproximação de marco de CRQC), o mecanismo de criptoagilidade (`SignatureScheme`, `KeyExchangeScheme` e payload versionado `pmsg-routing-v2`) é acionado para rotacionar ou introduzir novas primitivas híbridas sem necessidade de refatoração do protocolo de transporte e persistência.
+

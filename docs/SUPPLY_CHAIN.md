@@ -78,3 +78,27 @@ O cliente Raix implementa uma camada multiplataforma em tempo de execução para
   - Varredura de memória de processo em `/proc/self/maps` procurando assinaturas de frameworks de hooking dinâmico (`frida-agent`, `frida-gadget`, `xposed`);
   - Detecção de depurador ativo (`Debug.isDebuggerConnected()`) e flags `FLAG_DEBUGGABLE`.
 - **Implementação Web (WasmJs) e iOS:** [`RuntimeIntegrityVerifier.wasmJs.kt`](file:///c:/Dev/Pmsg/composeApp/src/wasmJsMain/kotlin/com/example/security/integrity/RuntimeIntegrityVerifier.wasmJs.kt) e [`RuntimeIntegrityVerifier.ios.kt`](file:///c:/Dev/Pmsg/composeApp/src/iosMain/kotlin/com/example/security/integrity/RuntimeIntegrityVerifier.ios.kt) com avisos e auditorias específicas do ambiente.
+
+---
+
+## 6. Governança de Código Gerado por IA como Risco Contínuo de Supply Chain (P0.4 Reforço)
+
+O uso de inteligência artificial (assistentes, copilots e executores autônomos) no ciclo de desenvolvimento é reconhecido formalmente pelo Raix como um **vetor permanente de risco na cadeia de suprimentos de software**.
+
+### 6.1 Análise de Riscos Específicos
+- **Alucinação de Dependências (*Package Hallucination*)**:
+  Modelos de linguagem podem sugerir pacotes ou bibliotecas inexistentes que, se não verificados, podem ser registrados por adversários em registros públicos (npm, Maven, CocoaPods) com cargas maliciosas (*dependency squatting*).
+- **Degradação de Invariantes Criptográficas**:
+  Código gerado por IA pode introduzir inadvertidamente desvios de tempo constante (*timing side-channels*), manipulação incorreta de zeroização de memória ou relaxamento em regras de autorização do Firestore.
+- **Inserção Sutil de Backdoors**:
+  Adversários em ataques de envenenamento de dados de treino (*data poisoning*) ou prompts manipulados podem induzir a IA a produzir código aparentemente correto, mas com fraquezas exploráveis.
+
+### 6.2 Controles Institucionais Mandatórios
+Para mitigar esses vetores, o Raix estabelece três barreiras permanentes de governança:
+1. **Revisão Humana de Segurança Rigorosa e Cética**:
+   - Todo e qualquer trecho de código gerado ou sugerido por IA deve passar por revisão humana obrigatória, com foco cético na integridade de dados, regras de acesso e primitivas de segurança antes de ser integrado à branch principal.
+2. **Testes Adversariais Automatizados Obrigatórios**:
+   - O pipeline de CI (`.github/workflows/`) deve conter suítes automatizadas de testes negativos e adversariais (ex.: `functions/test/rules.test.ts` e testes de integridade em runtime) que validem restrições contra bypass.
+3. **Geração Determinística de SBOM e Atestado SLSA a Cada Release**:
+   - Cada release de produção gera automaticamente o inventário CycloneDX 1.5 e atestado Sigstore de proveniência criptográfica (SLSA 2+), assegurando que nenhuma dependência alucinada ou não autorizada entre nos binários distribuídos.
+

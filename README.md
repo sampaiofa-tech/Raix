@@ -521,21 +521,57 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
 - 🚀 **Push Notifications Zero-Knowledge**: Notificações em segundo plano para Android (FCM), Windows Desktop (Toast local) e iOS (stubs APNs), respeitando estritamente o TTL $\le 24$h e sem tráfego de conteúdo de mensagens.
 - 🚀 **Prontidão de Distribuição**: Atestado de Rebuild Legal v3.0, geração de Android App Bundle (AAB) assinado para a Play Store e assets de listagem institucional.
 
-### 3. Alocação de Recursos Pós-Rodada (Decisões de Governança & Pós-Aporte Seed)
+### 3. Alocação de Recursos Pós-Rodada (Decisões de Governança & Trilhas Estratégicas)
+
 - 🔒 **P2.1 — Auditoria Externa Independente de Criptografia (PRIMEIRA Entrega Pós-Rodada)**:
   - Contratação prioritária e imediata de auditoria externa de segurança e criptoanálise independente por consultoria especializada de primeira linha logo após o aporte de capital da rodada (alocada no início do ciclo pós-rodada, e não no fim da fila).
   - Escopo: Auditoria do acordo de chaves KEM híbrido (ML-KEM-768 + X25519), assinaturas ML-DSA-65, isolamento do Firestore e zeroização de memória.
-- 🧅 **Fase P2 — Roteamento em Cebola (Onion Routing)**:
-  - Implementação de roteamento multi-hop em cebola para ofuscação de metadados de rede, desvinculando trânsito de endereços IP de origem.
-- 🔀 **Mixnet (Mixagem com Atraso Aleatório)**:
-  - Fase posterior e opcional, avaliada sob demanda volumétrica de tráfego contra adversários de vigilância estatística global.
-- 🌐 **Arquitetura Multi-Região — ADIADO**:
-  - Decisão formal: **ADIADO**. Não será realizada replicação geográfica ou redundância cega de dados e envelopes efêmeros, evitando propagação residual em repouso e preservando o expurgo tempestivo. Caso haja expansão de escala, replicações serão estritamente operacionais (controle de rate-limiting).
-- ⚖️ **Impacto Econômico do Overhead ML-DSA / PQXDH**:
-  - O overhead criptográfico de envelopes híbridos (~6,48 KB) é integralmente absorvido no free tier atual do Google Cloud / Firestore, sem custo adicional no momento.
-  - Serve como fundamentação técnica de custo para a oferta comercial corporativa (**Plano Escritório / Private**), justificando precificação diferenciada para tráfego empresarial de alta escala e instâncias dedicadas.
-- 📱 **v1.7 — Web Push (VAPID) & Distribuição iOS**:
-  - Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
+
+- ⚛️ **Track 1 — Criptografia Pós-Quântica (PQC) & Resiliência Algorítmica**:
+  - **Reforço de Prioridades Críticas (P-C1 e P-C2 contra HNDL)**:
+    - **P-C1 (TLS-PQ)**: Implementação de TLS pós-quântico híbrido (X25519MLKEM768) na camada de transporte HTTP/2/QUIC para clientes nativos (Android/Desktop), blindando tráfego contra *Harvest-Now-Decrypt-Later*.
+    - **P-C2 (Double Ratchet PQ)**: Evolução do protocolo de envelopes efêmeros para um Double Ratchet pós-quântico contínuo (PQXDH), assegurando *Break-in Recovery* e *Forward Secrecy* pós-quântica por mensagem.
+  - **Hashing Quântico-Seguro ($\ge 384$ bits)**:
+    - O algoritmo de Grover reduz a busca exaustiva de funções hash pela metade ($2^{n/2}$), reduzindo hashes de 256 bits a ~128 bits de entropia efetiva quântica.
+    - Revisão formal no roadmap: transição da derivação de identidade BIP-39 (`IdentityCryptoManager`), chaves-mestras e compromissos criptográficos duradouros para **SHA-384 / SHA-512** ($\ge 384$ bits), garantindo $\ge 192$ bits de segurança quântica efetiva.
+  - **Criptoagilidade Contínua**:
+    - A agilidade criptográfica é mantida como processo institucional contínuo (`SignatureScheme`, `KeyExchangeScheme`), e não como entrega única, assegurando substituição rápida de primitivas diante de novos avanços de criptoanálise.
+
+- 🧅 **Track 2 — Anonimato, Defesa de Metadados & Anti-Análise de Tráfego por IA**:
+  - **Defesa Ativa contra Análise de Tráfego por IA (Ameaça Ativa)**:
+    - Reconhecimento formal de que modelos de Inteligência Artificial / Machine Learning correlacionam fluxos de rede em tempo real por padrões temporais, volume, rajadas (*bursts*) e grafos sociais, mesmo sob túneis cifrados ou roteamento multi-hop.
+  - **Arquitetura de Mitigação Integrada**:
+    - **Packet Padding**: Preenchimento e normalização determinística para que todos os envelopes possuam tamanhos de bloco fixos e padronizados, eliminando correlação por volume.
+    - **Cover Traffic**: Injeção periódica de tráfego de cobertura falso/dummy indistinguível de mensagens reais, ofuscando estados de presença, atividade e inatividade.
+    - **Timing Obfuscation**: Introdução de jitter estocástico e atrasos aleatórios calculados para desestruturar a correlação temporal por modelos de aprendizado de máquina.
+    - **Onion Routing (Fase P2)**: Roteamento multi-hop em cebola para ofuscação de nós de transporte, desvinculando trânsito de endereços IP de origem.
+    - **Mixnet (Mixagem com Atraso Aleatório)**: Camada de reordenação estatística com atraso estocástico, avaliada sob demanda volumétrica.
+
+- 🛡️ **Track 3 (P-H1 Reforço) — Segurança de Hardware & UX Anti-Engenharia Social por IA**:
+  - **Elevação de Prioridade de Hardware-Backed Keys (P-H1)**:
+    - Elevação no roadmap para prioridade **P-H1**: custódia física de sementes e chaves em silício dedicado (**StrongBox / TEE** no Android, **Secure Enclave** no Apple, **TPM / DPAPI** no Windows).
+    - Justificativa técnica: Barreira definitiva contra exfiltração de chaves em memória e proteção de longo prazo caso o usuário seja alvo de persuasão ou o software do host seja comprometido.
+  - **UX de Segurança Anti-Phishing contra IA**:
+    - Interface de segurança com aviso ostensivo e mandatório na UI: o mnemônico de 12 palavras **NUNCA é solicitado por nenhum desenvolvedor, funcionário, suporte técnico, sistema automatizado ou Inteligência Artificial sob hipótese alguma**.
+
+- 🔍 **Track 4 (P0.4 Reforço) — Cadeia de Suprimentos & Governança de Código por IA**:
+  - **IA no Desenvolvimento como Risco Contínuo de Supply Chain**:
+    - Código assistido ou gerado por IA (Executores) é tratado como vetor permanente de risco de cadeia de suprimentos (alucinação de pacotes, enfraquecimento sutil de invariantes e falhas lógicas).
+  - **Controles Obrigatórios Institucionalizados**:
+    - Revisão humana rigorosa e cética de segurança para 100% das alterações de código antes de merge.
+    - Baterias de testes adversariais automatizados mandatórios em CI/CD.
+    - Software Bill of Materials (SBOM) CycloneDX v1.5 e atestado criptográfico SLSA 2+ determinísticos a cada release.
+
+- 🔭 **Track 6 — Governança de Monitoramento Quântico Contínuo**:
+  - **Acompanhamento Contínuo no `ecdsa.fail`**: Rastreamento sistemático de falhas de implementação, ataques de canal lateral e fraquezas em curvas elípticas clássicas e primitivas híbridas.
+  - **Normas e Publicações NIST**: Monitoramento de atualizações nos padrões FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA) e recomendações SP 800-227.
+  - **CRQC Watch**: Acompanhamento trimestral dos roadmaps públicos de hardware quântico (IBM Quantum, Google Quantum AI, QuEra Computing).
+  - **Revisão Periódica Semestral de Primitivas**: Cadência formal semestral de avaliação das primitivas criptográficas em produção para garantir rotação ágil e preventiva.
+
+- 🌐 **Decisões Estratégicas de Infraestrutura & Negócio**:
+  - **Arquitetura Multi-Região — ADIADO**: Decisão formal: **ADIADO**. Não será realizada replicação geográfica cega de dados e envelopes efêmeros, evitando propagação residual em repouso e preservando o expurgo tempestivo.
+  - **Impacto Econômico do Overhead ML-DSA / PQXDH**: O overhead criptográfico de envelopes híbridos (~6,48 KB) é absorvido no free tier atual do Google Cloud / Firestore e serve como fundamentação técnica para a oferta corporativa (**Plano Escritório / Private**).
+  - **v1.7 — Web Push (VAPID) & Distribuição iOS**: Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
 
 ---
 
