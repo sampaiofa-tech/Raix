@@ -93,6 +93,7 @@ kotlin {
             implementation(libs.androidx.room.ktx)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.messaging)
             implementation(libs.firebase.ai)
             implementation(libs.firebase.appcheck.recaptcha)
             implementation(libs.firebase.appcheck.debug)

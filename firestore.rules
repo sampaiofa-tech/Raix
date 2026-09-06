@@ -134,5 +134,19 @@ service cloud.firestore {
     match /connectionLogs/{logId} {
       allow read, write: if false;
     }
+
+    // =========================================================================
+    // COLEÇÃO: devicePushTokens (Push Notifications FCM/APNs - v1.6)
+    // =========================================================================
+    match /devicePushTokens/{tokenId} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // COLEÇÃO: securityAnomalies (Detecção Proativa de Anomalias - P1.3)
+    // =========================================================================
+    match /securityAnomalies/{anomalyId} {
+      allow read, write: if false;
+    }
   }
 }

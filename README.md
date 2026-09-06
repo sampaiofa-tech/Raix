@@ -502,6 +502,31 @@ Em caso de detecção de segredos reais, consulte e siga rigorosamente o [Runboo
 
 ---
 
+## 🗺️ Roadmap & Alocação de Recursos Pós-Rodada
+
+O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano estruturado de evolução contínua:
+
+### 1. Entregas Concluídas (v1.5)
+- ✅ **P0 (Prioridade Máxima)**:
+  - **P0.1**: Migração Pós-Quântica Híbrida (NIST FIPS 203 ML-KEM-768 + FIPS 204 ML-DSA-65), combiner NIST SP 800-227 / RFC 9180 HPKE, proteção anti-downgrade e Safety Number dual de 60 dígitos.
+  - **P0.2**: Regras adversariais de isolamento no Firestore (`identities/{id}/inbox/{envelope}`), *deny-by-default* na raiz e anti-correlação de identidades.
+  - **P0.3**: Tratamento de gaps de destruição com Shredder ativo a cada 15 min idempotente e métrica `ttl_expiration_to_deletion_delays`.
+  - **P0.4**: Cadeia de suprimentos hermética com pin de hashes SHA-256 no Gradle, SBOM CycloneDX v1.5, atestados SLSA Nível 2+ (Sigstore) e detecção de tampering em runtime (`RuntimeIntegrityVerifier`).
+- ✅ **P1 (Prioridade Média)**:
+  - **P1.1**: Minimização de metadados com pseudonimização de IP via HMAC-SHA256 (salt rotativo mensal), remoção de portas e substituição rigorosa de alegações de "zero-trace" por privacidade forte por design.
+  - **P1.2**: Mnemônico em Keystore nativa (StrongBox/TEE no Android, DPAPI no Windows, Keychain no Apple) e zeroização física de RAM com barreira volátil anti-Dead-Store Elimination (`MemorySanitizer`).
+  - **P1.3**: Detecção proativa de anomalias de acesso (> 20 leituras/min) e força bruta (> 5 falhas/min) no backend Cloud Functions.
+
+### 2. Ciclo Ativo de Negócio (v1.6)
+- 🚀 **Push Notifications Zero-Knowledge**: Notificações em segundo plano para Android (FCM), Windows Desktop (Toast local) e iOS (stubs APNs), respeitando estritamente o TTL $\le 24$h e sem tráfego de conteúdo de mensagens.
+- 🚀 **Prontidão de Distribuição**: Atestado de Rebuild Legal v3.0, geração de Android App Bundle (AAB) assinado para a Play Store e assets de listagem institucional.
+
+### 3. Alocação de Recursos Pós-Rodada (Pós-Aporte Seed)
+- 🔒 **P2.1 — Auditoria Externa Independente de Criptografia**: Contratação de auditoria externa de segurança e criptoanálise independente por firma especializada de primeira linha (alocação prioritária dos recursos da rodada de captação).
+- 🌐 **v1.7 — Web Push (VAPID) & Chamadas Efêmeras**: Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
+
+---
+
 ## 📄 Licença
 
 Este projeto é disponibilizado sob o modelo de **duplo licenciamento**:

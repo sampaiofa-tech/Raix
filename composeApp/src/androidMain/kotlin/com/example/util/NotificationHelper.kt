@@ -135,4 +135,47 @@ object NotificationHelper {
             // Handled safely across all OEM implementations
         }
     }
+
+    /**
+     * Dispatches a remote push notification received via FCM with high priority.
+     */
+    fun showPushNotification(
+        context: Context,
+        title: String = "Raix",
+        body: String = "Nova mensagem efêmera recebida.",
+        roomId: String = ""
+    ) {
+        if (!hasNotificationPermission(context)) return
+        createNotificationChannels(context)
+
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("SELECTED_ROOM_ID", roomId)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            notificationCounter,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_NEW_CONVERSATIONS_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setColor(0xFF22C55E.toInt())
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        try {
+            val notificationManager = NotificationManagerCompat.from(context)
+            notificationCounter = (notificationCounter + 1) % 50
+            notificationManager.notify(NOTIFICATION_ID_BASE + notificationCounter, notification)
+        } catch (_: Throwable) {
+        }
+    }
 }

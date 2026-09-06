@@ -92,6 +92,57 @@ export const storeMessageKey = onCall(async (request) => {
     `storeMessageKey: Opaque wrapped DEK stored securely for message ${data.messageId} with TTL ${clampedTtl}ms.`
   );
 
+  // 6. Zero-Knowledge Push Notification to Recipient (v1.6)
+  try {
+    const tokenDoc = await db.collection("devicePushTokens").doc(data.recipientId).get();
+    if (tokenDoc.exists) {
+      const tokenData = tokenDoc.data();
+      const pushToken = tokenData?.token;
+      if (pushToken && typeof pushToken === "string") {
+        const clampedTtlSeconds = Math.max(1, Math.floor(clampedTtl / 1000));
+        await admin.messaging().send({
+          token: pushToken,
+          notification: {
+            title: "Raix",
+            body: "Nova mensagem efêmera recebida.",
+          },
+          data: {
+            type: "new_message",
+            messageId: data.messageId,
+            expiresAtMillis: String(effectiveExpiresAtMillis),
+          },
+          android: {
+            priority: "high",
+            ttl: clampedTtlSeconds * 1000,
+            notification: {
+              channelId: "new_conversations_channel",
+              sound: "default",
+            },
+          },
+          apns: {
+            headers: {
+              "apns-priority": "10",
+              "apns-expiration": String(Math.floor(effectiveExpiresAtMillis / 1000)),
+            },
+            payload: {
+              aps: {
+                alert: {
+                  title: "Raix",
+                  body: "Nova mensagem efêmera recebida.",
+                },
+                sound: "default",
+              },
+            },
+          },
+        });
+        logger.info(`storeMessageKey: Zero-knowledge push notification sent to recipient ${data.recipientId}`);
+      }
+    }
+  } catch (pushErr: any) {
+    // Non-blocking: failure to send push must never prevent message delivery
+    logger.warn(`storeMessageKey: Push notification dispatch non-blocking notice:`, pushErr?.message || pushErr);
+  }
+
   return {
     success: true,
     messageId: data.messageId,
