@@ -2,43 +2,98 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: Verifica se o cliente está autenticado
+    // =========================================================================
+    // REGRA RAIZ MANDATÓRIA: DENY-BY-DEFAULT EXPLÍCITO (P0.2)
+    // =========================================================================
+    // Nenhuma rota, documento ou subcoleção permite leitura ou escrita a menos
+    // que uma regra estrita e explicitamente autorizada abaixo conceda acesso.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper: Verifica se a requisição possui contexto autenticado
     function isAuthenticated() {
-      return request.auth != null;
+      return request.auth != null && request.auth.uid != null;
     }
 
-    // Helper: Verifica se o solicitante é participante (remetente ou destinatário)
-    function isParticipant(senderId, recipientId) {
-      return isAuthenticated() && (request.auth.uid == senderId || request.auth.uid == recipientId);
+    // Helper: Verifica se o solicitante autenticado é o detentor legítimo do identityHash
+    // O identityHash é o fingerprint derivado do mnemônico/chaves
+    function isIdentityOwner(identityHash) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/identities/$(identityHash)) &&
+        request.auth.uid == get(/databases/$(database)/documents/identities/$(identityHash)).data.currentAuthUid;
+    }
+
+    // Helper: Validação estrita de timestamp de expiração (TTL de mensagem)
+    function hasValidFutureExpiration() {
+      return request.resource.data.expiresAt is timestamp &&
+             request.resource.data.expiresAt > request.time;
     }
 
     // =========================================================================
-    // COLEÇÃO: messages
+    // RAIZ DE IDENTIDADE E ROTEAMENTO: identities/{identityHash}
+    // Todo conteúdo estruturado sob a raiz da identidade (P0.2).
     // =========================================================================
-    // Read: Restrito a participantes da conversa.
-    // Create: Exige expiresAt obrigatório (tipo timestamp e superior a request.time).
-    // Update: TERMINANTEMENTE NEGADO (mensagens são imutáveis após gravação).
-    // Delete: Permitido apenas a participantes (vanish-after-read e deleção voluntária).
-    // NOTA DE DESIGN: Não exige request.app != null para manter interoperabilidade
-    // com clientes desktop (cuja proteção provém da autenticação via proxy).
+    match /identities/{identityHash} {
+      // Read: Listagem TERMINANTEMENTE NEGADA para impedir varredura/enumeração.
+      // Get pontual permitido apenas ao próprio titular para inspeção de seu estado.
+      allow get: if isAuthenticated() && request.auth.uid == resource.data.currentAuthUid;
+      allow list: if false;
+
+      // Create: Permitido apenas se autenticado, se for novo documento e o UID corresponder
+      allow create: if isAuthenticated()
+                    && request.resource.data.currentAuthUid == request.auth.uid
+                    && !exists(/databases/$(database)/documents/identities/$(identityHash));
+
+      // Update e Delete diretos via SDK são TERMINANTEMENTE NEGADOS
+      // (Atualizações de rota exigem Cloud Function 'updateIdentityRouting' com prova de posse FIPS 204)
+      allow update, delete: if false;
+
+      // =======================================================================
+      // CAIXA DE ENTRADA EFÊMERA POR DESTINATÁRIO: identities/{identityHash}/inbox/{envelopeId}
+      // Evita correlação (Emenda B.3): o documento de envelope vive sob a identidade
+      // do destinatário e NUNCA armazena os dois identityHash simultaneamente.
+      // =======================================================================
+      match /inbox/{envelopeId} {
+        // Leitura: Restrita exclusivamente ao proprietário do identityHash
+        allow read: if isIdentityOwner(identityHash);
+
+        // Criação: Remetentes autenticados podem depositar envelopes cifrados para o destinatário,
+        // exigindo TTL obrigatório e proibindo atualização posterior (imutabilidade)
+        allow create: if isAuthenticated() && hasValidFutureExpiration();
+
+        // Update: TERMINANTEMENTE NEGADO (envelopes são imutáveis)
+        allow update: if false;
+
+        // Delete: Permitido apenas ao destinatário legítimo (Vanish-After-Read)
+        allow delete: if isIdentityOwner(identityHash);
+      }
+    }
+
+    // =========================================================================
+    // COLEÇÃO LEGADA: messages (Compatibilidade transitória com isolamento estrito)
+    // =========================================================================
     match /messages/{messageId} {
-      allow read: if isParticipant(resource.data.senderId, resource.data.recipientId);
+      allow get: if isAuthenticated() &&
+                 (request.auth.uid == resource.data.senderId || request.auth.uid == resource.data.recipientId);
+      allow list: if isAuthenticated() &&
+                  request.auth.uid == resource.data.recipientId;
 
-      allow create: if isParticipant(request.resource.data.senderId, request.resource.data.recipientId)
-                    && request.resource.data.expiresAt is timestamp
-                    && request.resource.data.expiresAt > request.time;
+      allow create: if isAuthenticated() &&
+                    (request.auth.uid == request.resource.data.senderId || request.auth.uid == request.resource.data.recipientId) &&
+                    hasValidFutureExpiration();
 
       allow update: if false;
 
-      allow delete: if isParticipant(resource.data.senderId, resource.data.recipientId);
+      allow delete: if isAuthenticated() &&
+                    (request.auth.uid == resource.data.senderId || request.auth.uid == resource.data.recipientId);
     }
 
     // =========================================================================
     // COLEÇÃO: messageKeys (DEK - Data Encryption Keys)
     // =========================================================================
     // ISOLAMENTO TOTAL: Leitura e escrita NEGADAS para todos os clientes SDK.
-    // Somente o Firebase Admin SDK (Cloud Functions backend) possui privilégio
-    // de acesso para geração e destruição programática das chaves (Crypto-Shredding).
+    // Gerenciamento e destruição exclusivos via Admin SDK (Cloud Functions backend).
     match /messageKeys/{messageId} {
       allow read, write: if false;
     }
@@ -46,8 +101,6 @@ service cloud.firestore {
     // =========================================================================
     // COLEÇÃO: userRateLimits
     // =========================================================================
-    // ISOLAMENTO TOTAL: Contadores de rate limit gerenciados exclusivamente pelo
-    // Admin SDK nas Cloud Functions.
     match /userRateLimits/{uid} {
       allow read, write: if false;
     }
@@ -55,32 +108,13 @@ service cloud.firestore {
     // =========================================================================
     // COLEÇÃO: invites (Modelo C - Convites Efêmeros Remotos)
     // =========================================================================
-    // ISOLAMENTO TOTAL: Leitura e escrita NEGADAS para todos os clientes SDK.
-    // Gerenciamento e incineração (vanish-after-accept) exclusivos via Cloud Functions Admin SDK.
     match /invites/{inviteId} {
       allow read, write: if false;
     }
 
     // =========================================================================
-    // COLEÇÃO: identities (Diretório Técnico de Roteamento)
+    // COLEÇÕES: abuseReports e abuseMetrics (Denúncias Comportamentais)
     // =========================================================================
-    // Read: NEGADO para clientes SDK (resolução restrita à callable resolveFingerprint).
-    // Create: Permitido apenas se autenticado, se for novo doc e request.auth.uid == currentAuthUid.
-    // Update: TERMINANTEMENTE NEGADO para clientes SDK (exige updateIdentityRouting com prova de posse Ed25519).
-    // Delete: NEGADO.
-    match /identities/{fingerprint} {
-      allow read: if false;
-      allow create: if isAuthenticated()
-                    && request.resource.data.currentAuthUid == request.auth.uid
-                    && !exists(/databases/$(database)/documents/identities/$(fingerprint));
-      allow update, delete: if false;
-    }
-
-    // =========================================================================
-    // COLEÇÕES: abuseReports e abuseMetrics (Denúncias Comportamentais - v1.3)
-    // =========================================================================
-    // ISOLAMENTO TOTAL: Leitura e escrita NEGADAS para todos os clientes SDK.
-    // Registro e métricas comportamentais exclusivos via Cloud Functions Admin SDK.
     match /abuseReports/{reportId} {
       allow read, write: if false;
     }
@@ -92,18 +126,11 @@ service cloud.firestore {
     // =========================================================================
     // COLEÇÃO: accessLogs & connectionLogs (Marco Civil Art. 15 - 180 dias TTL)
     // =========================================================================
-    // ISOLAMENTO TOTAL: Leitura e escrita NEGADAS para todos os clientes SDK.
-    // Registro estrito de IP, porta e timestamp UTC via Cloud Functions Admin SDK.
     match /accessLogs/{logId} {
       allow read, write: if false;
     }
 
     match /connectionLogs/{logId} {
-      allow read, write: if false;
-    }
-
-    // Bloqueio preventivo padrão para qualquer outro documento não mapeado
-    match /{document=**} {
       allow read, write: if false;
     }
   }

@@ -17,7 +17,7 @@ O **Raix** é projetado sob a premissa de **privacidade forte por design com ret
 | **Atacante HNDL (*Harvest-Now-Decrypt-Later*)** | Gravação passiva em massa do tráfego de rede e dados de envelopes para decifragem futura quando um computador quântico criptograficamente relevante (CRQC) estiver disponível. | **KEM Híbrido NIST FIPS 203 (ML-KEM-768) + X25519**, assegurado pelo combiner NIST SP 800-227 / RFC 9180 HPKE. Conteúdo permanece indecifrável mesmo contra adversários quânticos. |
 | **Atacante Ativo MitM (*Man-in-the-Middle*)** | Interceptação de tráfego, injeção de pacotes e tentativa de coerção de downgrade para protocolos clássicos (forçando apenas curvas elípticas Ed25519/X25519). | **Proteção Anti-Downgrade no Handshake (Emenda A.2)**: `minSecurityLevel` e suítes suportadas embutidas criptograficamente no payload autenticado (`pmsg-routing-v2`). Qualquer sessão abaixo do nível acordado é terminada com `DowngradeAttackException`. |
 | **Operador de Nuvem / Servidor Comprometido** | Acesso ao banco de dados Firestore, snapshots ou memória do backend Cloud Functions. | Criptografia ponta-a-ponta (E2E) em nível de aplicação com envelopes selados (*SealedBox*). O servidor armazena apenas ciphertexts opacos da DEK e do conteúdo. Zero posse de chaves privadas. |
-| **Adversário de Trânsito de Metadados** | Interceptação de cabeçalhos de transporte HTTP/2 e conexões QUIC para correlação de tráfego. | **TLS Pós-Quântico Híbrido (X25519MLKEM768 - Emenda A.4)** entre clientes e Google Frontends/Cloud Functions, eliminando HNDL sobre os metadados de transporte. |
+| **Adversário de Trânsito de Metadados** | Interceptação de cabeçalhos de transporte HTTP/2 e conexões QUIC para correlação de tráfego. | **TLS Pós-Quântico Híbrido (X25519MLKEM768 - Emenda A.4)**: Planejado, ativação plena quando suportado pelo cliente/runtime (Conscrypt/BoringSSL/JVM JSSE) e infraestrutura GCP. O conteúdo e chaves já possuem proteção pós-quântica E2E na camada de aplicação. |
 | **Comprometimento de Chave de Longa Duração** | Exfiltração de chaves de identidade de longo prazo em momento futuro. | **Forward Secrecy Preservada (Emenda A.3)**: A DEK de cada mensagem é encapsulada via par de chaves X25519 efêmero e seed efêmera ML-KEM-768. O comprometimento das chaves de identidade não compromete mensagens passadas. |
 
 ---
@@ -58,8 +58,35 @@ A emenda A.2 estipula que dispositivos híbridos não podem ser rebaixados silen
 
 ---
 
-## 3. Matriz de Concessões e Limitações Conhecidas
+## 3. Isolamento e Regras de Acesso do Firestore (P0.2 & Emenda B.3)
+
+O armazenamento de metadados de roteamento e envelopes efêmeros no Cloud Firestore segue uma política estrita de defesa em profundidade:
+
+### 3.1 Deny-by-Default na Raiz
+- Regra raiz explícita: `match /{document=**} { allow read, write: if false; }`.
+- Nenhum caminho ou coleção não declarada concede leitura ou gravação.
+
+### 3.2 Estrutura Baseada na Raiz de Identidade
+- Não existem coleções top-level de conteúdo acessíveis livremente: todo o fluxo efêmero é organizado sob `identities/{identityHash}/inbox/{envelopeId}`.
+- O `identityHash` é a impressão digital criptográfica derivada do mnemônico e chaves de identidade (SHA-256 da chave pública), impedindo o desacoplamento de identidade e autenticação.
+- O acesso à leitura e descarte de envelopes em `inbox` é restrito com exclusividade ao titular legítimo que comprovou posse de `currentAuthUid`.
+
+### 3.3 Anti-Correlação de Identidades no Roteamento (Emenda B.3)
+- O modelo de envelopes efêmeros proíbe o armazenamento simultâneo de ambos os hashes de identidade (`senderHash` e `recipientHash`) no mesmo documento de rota.
+- Envelopes transitórios são endereçados diretamente à caixa de entrada do destinatário (`identities/{recipientHash}/inbox/{envelopeId}`), acompanhados unicamente de tokens efêmeros de sessão ou chaves descartáveis, eliminando o grafo de correlação estático entre remetente e destinatário em caso de comprometimento da visão de leitura.
+
+### 3.4 Isolamento Absoluto de Chaves e Auditoria (DEK Isolation)
+- Coleções `messageKeys` (DEKs cifradas), `accessLogs`, `connectionLogs`, `abuseReports`, `abuseMetrics` e `userRateLimits` possuem regra de bloqueio total para clientes SDK (`allow read, write: if false;`).
+- Toda interação com chaves mestras e registros de conexão do Marco Civil da Internet é restrita ao Firebase Admin SDK executado em ambiente protegido (Cloud Functions).
+
+### 3.5 Teste Adversarial em CI/CD
+- Todas as regras são submetidas a 20+ testes adversariais automatizados no Firebase Emulator Suite (`functions/test/rules.test.ts`), executados a cada PR e push via GitHub Actions (`.github/workflows/firestore-rules.yml`). Qualquer violação de isolamento bloqueia o merge.
+
+---
+
+## 4. Matriz de Concessões e Limitações Conhecidas
 
 - **Plataformas com Modo Híbrido Total:** Desktop (JVM/Windows/Linux/macOS) e Android (via Bouncy Castle 1.79 nativo FIPS 203/204).
 - **Plataforma Web (Wasm):** A WebCrypto nativa dos navegadores atuais não suporta primitivas pós-quânticas. O cliente Web opera com suporte clássico Ed25519/X25519 e modo degradado controlado, explicitamente indicado na interface do usuário, até a incorporação dos binários Wasm compilados de referência (C pq-crystals).
-- **Metadados Transitórios:** Metadados de roteamento (`senderId`, `recipientId`) existem no Firestore estritamente pelo tempo de vida da mensagem transitória ($\le 24$h), sendo incinerados no momento da leitura (*Vanish*) ou pelo Shredder automatizado.
+- **Metadados Transitórios:** Metadados de roteamento existem no Firestore estritamente pelo tempo de vida da mensagem transitória ($\le 24$h), sendo incinerados no momento da leitura (*Vanish*) ou pelo Shredder automatizado.
+
