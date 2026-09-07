@@ -1,0 +1,5 @@
+secret:
+  ignored_matches:
+  - match: 173c8ea518a16a865b55cd1a475611e7adad7b4e66d5997f243eff4e74c8119d
+    name: ModelCE2ETest synthetic test token
+version: 2

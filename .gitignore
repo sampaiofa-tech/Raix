@@ -33,3 +33,6 @@ functions/lib/
 *-debug.log
 firestore-debug.log
 composeApp/google-services.json
+
+# Added by ggshield
+.cache_ggshield
