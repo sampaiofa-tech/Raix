@@ -98,3 +98,26 @@ X-Content-Type-Options: nosniff
 2. Configurar modo SSL como **Full (Strict)**.
 3. Alternar os registros `A` e `CNAME` de DNS-Only para **Proxied (Nuvem Laranja)**.
 4. Ativar as regras do **WAF Managed Rules** e o **Super Bot Fight Mode** para inspeção e bloqueio perimetral de tráfego HTTP.
+
+---
+
+## 6. Governança e Verificações de Segurança do Domínio Adicional raixtech.com.br
+
+Em 07 de setembro de 2026, foi registrado e incorporado à infraestrutura institucional o domínio nacional **`raixtech.com.br`**, configurado como apontamento de redirecionamento canônico (HTTP 301) permanente para `https://raixtech.com`.
+
+### 6.1 Status do SSL / TLS Edge
+- **Status:** ⏳ **PENDENTE DE PROPAGAÇÃO**
+- **Diagnóstico Técnico:** Domínio registrado em 07/09/2026 perante o Registro.br (RDAP confirmado sob handle `FIASA55`). A delegação autoritativa dos servidores de nome para a Cloudflare encontra-se em ciclo de propagação DNS no Registro.br (apontando transitoriamente para `*.auto.dns.br`). O Cloudflare emite e ativa o certificado SSL/TLS Edge automaticamente mediante validação DCV assim que a delegação dos nameservers for ativada (status *Active*).
+- **Ação Programada:** Agendada a revalidação da requisição HTTPS `https://raixtech.com.br` ➔ `https://raixtech.com` assim que a zona constar como *Active* no painel Cloudflare.
+
+### 6.2 Decisão Formal sobre SPF, DKIM e DMARC (.com.br)
+- **Cenário Atual:** O domínio `raixtech.com.br` opera **exclusivamente como redirecionamento web** (HTTP 301). Não há caixas postais, servidores MX ou rotinas de disparo de e-mail associadas a `@raixtech.com.br`. Toda a comunicação institucional e o canal oficial do DPO operam estritamente sob `@raixtech.com` (onde SPF, DKIM RSA-2048 e DMARC estão 100% ativos e validados).
+- **Decisão de Governança:** **Não é crítico configurar SPF, DKIM e DMARC no `.com.br` neste momento**.
+- **Regra de Evolução:** Caso o domínio `.com.br` venha a receber ou enviar mensagens no futuro, será mandatório configurar os três registros DNS (SPF, DKIM e DMARC), replicando a política do domínio principal.
+- **Hardening Preventivo (Recomendado Pós-Propagação):** Para mitigar qualquer risco residual de spoofing em nome do domínio inativo, registrar futuramente:
+  - SPF Nulo: `v=spf1 -all`
+  - DMARC de Rejeição: `v=DMARC1; p=reject; rua=mailto:contato@raixtech.com`
+
+### 6.3 DNS Hygiene & Prevenção de Subdomain Takeover
+- **Higiene de CNAME:** Não há apontamentos CNAME pendurados (*dangling CNAME*) ou órfãos direcionados a serviços desativados. O redirecionamento na Cloudflare é executado nativamente por regras de borda (Redirect Rules).
+- **Suporte a DNSSEC no Registro.br:** O TLD `.br` possui suporte nativo e maduro a DNSSEC via Registro.br. Ativação programada: assim que a zona for ativada no Cloudflare, o registro DS gerado na Cloudflare (Algoritmo 13 - ECDSA P-256) será cadastrado no painel do Registro.br, garantindo autenticação criptográfica completa da zona `.com.br`.

@@ -40,7 +40,8 @@ O **Raix** foi desenvolvido com um objetivo claro: **garantir privacidade forte 
    - `android:allowBackup="false"` e regras de exclusão completas para prevenir cópia de banco via ADB ou nuvem.
 
 7. **Segurança Perimetral, HSTS e Autenticação de Domínio (P2 & P3)**:
-   - Domínio institucional com **HTTPS + RFC 9116 security.txt + SPF + DKIM (RSA 2048) + DMARC + DNSSEC**.
+   - Domínio institucional principal com **HTTPS + RFC 9116 security.txt + SPF + DKIM (RSA 2048) + DMARC + DNSSEC**.
+   - Domínio adicional **`raixtech.com.br`** configurado como redirecionamento canônico 301 para `https://raixtech.com` (SSL reportado como pendente de propagação no Registro.br/Cloudflare; sem serviços de e-mail associados, dispensando SPF/DKIM/DMARC no momento; higiene DNS verificada sem CNAMEs órfãos).
    - Política rigorosa **HSTS Preload (`max-age=31536000; includeSubDomains; preload`)** em trânsito.
    - **WAF & Super Bot Fight Mode (Cloudflare)**: Devidamente **CONFIGURADOS**, tornando-se ativos quando o proxy Cloudflare (nuvem laranja) for habilitado no hardening pós-reunião. Atualmente operando em modo DNS-only para validação estável do certificado GitHub Pages.
    - Detalhamento e governança de borda documentados em [`docs/DNS_SECURITY.md`](docs/DNS_SECURITY.md).
@@ -637,6 +638,12 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
     - **Decisão Operacional**: O proxy da Cloudflare (nuvem laranja) **NÃO** será ativado antes da reunião de apresentação para eliminar qualquer risco de quebra ou indisponibilidade no portal e páginas legais do GitHub Pages (o GitHub Pages exige resolução DNS direta para emissão e validação estável do certificado TLS; ademais, a superfície de ataque em páginas puramente estáticas é mínima).
     - **Linguagem Honesta no Data Room/README**: Domínio com HTTPS + security.txt + DMARC + DNSSEC ativos; WAF e Super Bot Fight Mode **CONFIGURADOS**, tornando-se ativos quando o proxy for habilitado (hardening pós-reunião). Não afirmar que o WAF está ativo enquanto operar em modo DNS-only.
     - **Execução Pós-Reunião**: Habilitação planejada do proxy Cloudflare + WAF Managed Rules + Bot Fight Mode na borda mediante configuração de Cloudflare Origin Certificate / Full (Strict) SSL.
+  - **Domínio Nacional raixtech.com.br (Redirecionamento 301)**:
+    - **Finalidade**: Redirecionamento permanente canônico (HTTP 301) de `raixtech.com.br` para `https://raixtech.com`.
+    - **Status do SSL/TLS**: Reportado formalmente como **PENDENTE DE PROPAGAÇÃO** (zona registrada em 07/09/2026 perante o Registro.br sob handle `FIASA55`; delegação para nameservers Cloudflare em ciclo de propagação; revalidação agendada para quando constar como Active).
+    - **Decisão SPF/DKIM/DMARC**: Como o `.com.br` opera exclusivamente como redirecionamento web e **não possui caixas postais nem serviços de envio/recebimento de e-mail** (todo o tráfego institucional e de governança opera sob `contato@raixtech.com`), foi registrado formalmente que **não é crítico configurar SPF/DKIM/DMARC no `.com.br` no momento**; se um dia receber e-mail, precisará dos 3 registros como no `.com`.
+    - **Higiene de DNS**: Zero CNAMEs pendurados/órfãos (sem risco de subdomain takeover). Suporte a DNSSEC confirmado no Registro.br (cadastramento do registro DS planejado pós-ativação da zona na Cloudflare).
+
   - **Arquitetura Multi-Região — ADIADO**: Decisão formal: **ADIADO**. Não será realizada replicação geográfica cega de dados e envelopes efêmeros, evitando propagação residual em repouso e preservando o expurgo tempestivo.
   - **Impacto Econômico do Overhead ML-DSA / PQXDH**: O overhead criptográfico de envelopes híbridos (~6,48 KB) é absorvido no free tier atual do Google Cloud / Firestore e serve como fundamentação técnica para a oferta corporativa (**Plano Escritório / Private**).
   - 💼 **Serviço Paralelo de Consultoria de Cuidados de Privacidade — Oportunidade de Receita Complementar (Pós-Rodada)**:
