@@ -40,9 +40,9 @@ O **Raix** foi desenvolvido com um objetivo claro: **garantir privacidade forte 
    - `android:allowBackup="false"` e regras de exclusão completas para prevenir cópia de banco via ADB ou nuvem.
 
 7. **Segurança Perimetral, HSTS e Autenticação de Domínio (P2 & P3)**:
+   - Domínio institucional com **HTTPS + RFC 9116 security.txt + SPF + DKIM (RSA 2048) + DMARC + DNSSEC**.
    - Política rigorosa **HSTS Preload (`max-age=31536000; includeSubDomains; preload`)** em trânsito.
-   - Autenticação anti-phishing de e-mail institucional: **SPF**, **DKIM (RSA 2048)** e **DMARC** ativos em `raixtech.com`.
-   - Divulgação responsável de vulnerabilidades via **RFC 9116 security.txt** (`/.well-known/security.txt`).
+   - **WAF & Super Bot Fight Mode (Cloudflare)**: Devidamente **CONFIGURADOS**, tornando-se ativos quando o proxy Cloudflare (nuvem laranja) for habilitado no hardening pós-reunião. Atualmente operando em modo DNS-only para validação estável do certificado GitHub Pages.
    - Detalhamento e governança de borda documentados em [`docs/DNS_SECURITY.md`](docs/DNS_SECURITY.md).
 
 ---
@@ -619,6 +619,10 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
   - **Revisão Periódica Semestral de Primitivas**: Cadência formal semestral de avaliação das primitivas criptográficas em produção para garantir rotação ágil e preventiva.
 
 - 🌐 **Decisões Estratégicas de Infraestrutura & Negócio**:
+  - **Proxy Cloudflare (WAF & Super Bot Fight Mode na Borda) — Hardening Pós-Reunião**:
+    - **Decisão Operacional**: O proxy da Cloudflare (nuvem laranja) **NÃO** será ativado antes da reunião de apresentação para eliminar qualquer risco de quebra ou indisponibilidade no portal e páginas legais do GitHub Pages (o GitHub Pages exige resolução DNS direta para emissão e validação estável do certificado TLS; ademais, a superfície de ataque em páginas puramente estáticas é mínima).
+    - **Linguagem Honesta no Data Room/README**: Domínio com HTTPS + security.txt + DMARC + DNSSEC ativos; WAF e Super Bot Fight Mode **CONFIGURADOS**, tornando-se ativos quando o proxy for habilitado (hardening pós-reunião). Não afirmar que o WAF está ativo enquanto operar em modo DNS-only.
+    - **Execução Pós-Reunião**: Habilitação planejada do proxy Cloudflare + WAF Managed Rules + Bot Fight Mode na borda mediante configuração de Cloudflare Origin Certificate / Full (Strict) SSL.
   - **Arquitetura Multi-Região — ADIADO**: Decisão formal: **ADIADO**. Não será realizada replicação geográfica cega de dados e envelopes efêmeros, evitando propagação residual em repouso e preservando o expurgo tempestivo.
   - **Impacto Econômico do Overhead ML-DSA / PQXDH**: O overhead criptográfico de envelopes híbridos (~6,48 KB) é absorvido no free tier atual do Google Cloud / Firestore e serve como fundamentação técnica para a oferta corporativa (**Plano Escritório / Private**).
   - **v1.7 — Web Push (VAPID) & Distribuição iOS**: Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).

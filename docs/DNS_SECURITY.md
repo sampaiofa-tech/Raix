@@ -39,36 +39,28 @@ O canal institucional de governança e segurança do Raix opera sob o endereço 
 
 ## 2. Auditoria de CNAME e Prevenção de Subdomain Takeover
 
-> [!CAUTION]
-> **ALERTA CRÍTICO DE SUBDOMAIN TAKEOVER DETECTADO NA AUDITORIA**:
-> O registro CNAME de `www.raixtech.com` foi configurado na Cloudflare com erro de digitação apontando para:
-> `ampaiofa-tech.github.io` (faltou a letra **`s`** inicial!).
-> **Ação Imediata Necessária no Painel Cloudflare DNS**:
-> Corrigir o CNAME do subdomínio `www` para:
-> `sampaiofa-tech.github.io`
+- **Status:** ✅ **CORRIGIDO E VERIFICADO**
+- O apontamento CNAME de `www.raixtech.com` foi validado como `sampaiofa-tech.github.io.`, eliminando o risco anterior de erro tipográfico e prevenindo qualquer tentativa de subdomain takeover.
 
-### Matriz de Apontamentos DNS Recomendada para GitHub Pages na Cloudflare:
-| Tipo | Nome | Conteúdo | Proxy Status | Finalidade |
-| :--- | :--- | :--- | :--- | :--- |
-| **CNAME** | `www` | `sampaiofa-tech.github.io` | Proxied (Laranja) | Redirecionamento canônico |
-| **A** | `@` | `185.199.108.153` | Proxied (Laranja) | Apex para GitHub Pages |
-| **A** | `@` | `185.199.109.153` | Proxied (Laranja) | Apex para GitHub Pages |
-| **A** | `@` | `185.199.110.153` | Proxied (Laranja) | Apex para GitHub Pages |
-| **A** | `@` | `185.199.111.153` | Proxied (Laranja) | Apex para GitHub Pages |
+### Matriz de Apontamentos DNS Atual vs. Hardening Pós-Reunião:
+| Tipo | Nome | Conteúdo | Status Atual (Pré-Reunião) | Pós-Reunião (Hardening) | Finalidade |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **CNAME** | `www` | `sampaiofa-tech.github.io` | **DNS Only (Cinza)** | **Proxied (Laranja)** | Redirecionamento canônico |
+| **A** | `@` | `185.199.108.153` | **DNS Only (Cinza)** | **Proxied (Laranja)** | Apex para GitHub Pages |
+| **A** | `@` | `185.199.109.153` | **DNS Only (Cinza)** | **Proxied (Laranja)** | Apex para GitHub Pages |
+| **A** | `@` | `185.199.110.153` | **DNS Only (Cinza)** | **Proxied (Laranja)** | Apex para GitHub Pages |
+| **A** | `@` | `185.199.111.153` | **DNS Only (Cinza)** | **Proxied (Laranja)** | Apex para GitHub Pages |
 
 ---
 
 ## 3. DNSSEC (Domain Name System Security Extensions)
 
-- **Diagnóstico:** A Cloudflare oferece suporte nativo a DNSSEC, porém o registro **DS (Delegation Signer)** ainda não foi publicado na zona pai `.com`.
-- **Procedimento para Ativação:**
-  1. No painel da Cloudflare em `DNS ➔ Settings ➔ DNSSEC`, clicar em **Enable DNSSEC**.
-  2. A Cloudflare fornecerá os parâmetros:
-     - **Key Tag:** (ex: 2371)
-     - **Algorithm:** 13 (ECDSA Curve P-256 with SHA-256)
-     - **Digest Type:** 2 (SHA-256)
-     - **Digest:** (hash hexadecimal fornecido)
-  3. No registrador do domínio (Squarespace Domains / Google Domains), acessar as configurações avançadas de DNS e adicionar o registro DS com esses parâmetros.
+- **Status:** ✅ **ATIVO e PROPAGADO**
+- **Verificação:** Registro `DS` (Delegation Signer) confirmado na zona raiz `.com`:
+  - **Key Tag:** `2371`
+  - **Algorithm:** `13` (ECDSA Curve P-256 with SHA-256)
+  - **Digest Type:** `2` (SHA-256)
+  - **Digest:** `134DCCC4A64F6B154468238852A620B154351813E95324EFC0FD9C2ACFA2E089`
 
 ---
 
@@ -89,3 +81,20 @@ No painel Cloudflare em **SSL/TLS ➔ Edge Certificates ➔ HTTP Strict Transpor
 Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 X-Content-Type-Options: nosniff
 ```
+
+---
+
+## 5. Decisão de Borda: Proxy Cloudflare, WAF e Super Bot Fight Mode (Hardening Pós-Reunião)
+
+### 5.1 Decisão do Assessor Técnico
+- **Postura Pré-Reunião (Atual)**: O proxy da Cloudflare (nuvem laranja) **permanece desativado** (modo DNS-Only / Cinza).
+  - *Fundamentação Técnica*: O GitHub Pages requer resolução DNS direta para emissão e validação inicial ininterrupta de certificados TLS Let's Encrypt. A ativação precipitada do proxy antes da homologação de certificados de origem poderia gerar erro `520/525 (SSL Handshake Failed)` na véspera da reunião. Ademais, a superfície de ataque em páginas puramente estáticas é mínima.
+- **Linguagem Honesta no Data Room e README**:
+  > *"Domínio com HTTPS + security.txt + DMARC + DNSSEC ativos; WAF e Super Bot Fight Mode CONFIGURADOS, ativos quando o proxy for habilitado (hardening pós-reunião)."*
+  > É vedado afirmar que o WAF está ativo em tempo real enquanto o domínio operar em modo DNS-only.
+
+### 5.2 Roteiro de Ativação Pós-Reunião
+1. No painel Cloudflare em **SSL/TLS ➔ Origin Server**, gerar o certificado de origem Cloudflare.
+2. Configurar modo SSL como **Full (Strict)**.
+3. Alternar os registros `A` e `CNAME` de DNS-Only para **Proxied (Nuvem Laranja)**.
+4. Ativar as regras do **WAF Managed Rules** e o **Super Bot Fight Mode** para inspeção e bloqueio perimetral de tráfego HTTP.
