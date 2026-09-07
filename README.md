@@ -625,6 +625,26 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
     - **Execução Pós-Reunião**: Habilitação planejada do proxy Cloudflare + WAF Managed Rules + Bot Fight Mode na borda mediante configuração de Cloudflare Origin Certificate / Full (Strict) SSL.
   - **Arquitetura Multi-Região — ADIADO**: Decisão formal: **ADIADO**. Não será realizada replicação geográfica cega de dados e envelopes efêmeros, evitando propagação residual em repouso e preservando o expurgo tempestivo.
   - **Impacto Econômico do Overhead ML-DSA / PQXDH**: O overhead criptográfico de envelopes híbridos (~6,48 KB) é absorvido no free tier atual do Google Cloud / Firestore e serve como fundamentação técnica para a oferta corporativa (**Plano Escritório / Private**).
+  - 💼 **Serviço Paralelo de Consultoria de Cuidados de Privacidade — Oportunidade de Receita Complementar (Pós-Rodada)**:
+    - **Enquadramento Estratégico (Pós-Rodada)**: O serviço de consultoria em cuidados de privacidade e higienização de rastros digitais é classificado formalmente como oportunidade de **receita complementar (não core)**, com execução estritamente **PÓS-RODADA** (não executar agora; baseline congelado).
+    - **10 Áreas de Conteúdo Temáticas**:
+      1. *Pegada Digital*: Auditoria e redução de dados públicos expostos na web;
+      2. *Redes Sociais*: Higienização de configurações de privacidade, visibilidade e vazamentos de relacionamentos;
+      3. *Dispositivos*: Hardening de smartphones, laptops, estações de trabalho e sistemas operacionais;
+      4. *Segredos*: Gestão de senhas mestras, passkeys, cofres locais, sementes e autenticação multifator (MFA);
+      5. *Anti-Phishing por IA*: Defesa contra engenharia social automatizada, spear phishing, clones de voz e deepfakes;
+      6. *Rede*: Roteamento seguro, DNS criptografado (DoH/DoT), VPNs auditadas e segmentação de perímetro;
+      7. *Metadados*: Identificação, auditoria e expurgo de dados EXIF, metadados de arquivos e telemetrias ocultas;
+      8. *Comunicação*: Adoção de canais efêmeros, mensageria cifrada e protocolos com Forward Secrecy;
+      9. *Identidade*: Minimização de dados cadastrais, pseudonimização e mitigação contra roubo/furto de identidade;
+      10. *Segurança Física*: Defesa contra shoulder surfing, portas USB públicas/adulteradas, blindagem e custódia segura de hardware.
+    - **Pré-Requisitos Regulatórios e Operacionais Obrigatórios**:
+      - *Revisão Jurídica*: Redação prévia de termos de serviço específicos, limites de responsabilidade técnica e disclaimers contratuais de assessoria;
+      - *Compliance LGPD Próprio*: Governança, inventário de dados e ROPA dedicados para os eventuais dados tratados no escopo da própria consultoria;
+      - *Diferenciação Técnica*: Posicionamento de mercado pautado pelo rigor técnico, mentalidade adversarial e metodologias *zero-trace*;
+      - *Alocação Limitada de Tempo/Recursos*: Trava operacional rigorosa para não dispersar a capacidade produtiva da equipe nem desviar do core product (o aplicativo Raix).
+    - **Sinergia Institucional**: Totalmente alinhado à feature premium de análise de arquivos e detecção de rastros (Track 5) e à autoridade técnica de privacidade da marca Raix.
+    - **Governança Comercial**: Mantém estritamente inalterados o one-pager institucional, os materiais congelados de captação e o roadmap de negócio do produto core.
   - **v1.7 — Web Push (VAPID) & Distribuição iOS**: Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
 
 ---
