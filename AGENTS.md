@@ -36,3 +36,10 @@ Este documento estabelece as regras mandatórias e permanentes de segurança, go
      - **Chaves Privadas e Certificados**: `"BEGIN PRIVATE KEY"`, `"BEGIN RSA PRIVATE KEY"`, `"BEGIN EC PRIVATE KEY"`
    - É expressamente proibido commitar, logar ou exibir qualquer valor correspondente a esses padrões.
 
+---
+
+## Diretrizes de Operação e Execução
+
+1. **Previsão de Tempo de Execução**:
+   - Ao receber qualquer tarefa, o agente deve informar, **ANTES** de iniciar a execução, uma estimativa de tempo (ex.: `~15 min`, `~1-2 horas`, `~1 dia`) e o número de fases/etapas previstas.
+   - Ao concluir a tarefa, reportar o tempo real gasto vs. a estimativa.
