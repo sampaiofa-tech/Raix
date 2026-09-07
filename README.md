@@ -644,6 +644,17 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
       - *Diferenciação Técnica*: Posicionamento de mercado pautado pelo rigor técnico, mentalidade adversarial e metodologias *zero-trace*;
       - *Alocação Limitada de Tempo/Recursos*: Trava operacional rigorosa para não dispersar a capacidade produtiva da equipe nem desviar do core product (o aplicativo Raix).
     - **Sinergia Institucional**: Totalmente alinhado à feature premium de análise de arquivos e detecção de rastros (Track 5) e à autoridade técnica de privacidade da marca Raix.
+    - **Conteúdo-Base Pesquisado e Estruturado (Ativo de Conteúdo Pós-Rodada)**:
+      - *Top 3 Erros Mais Críticos de Rastreabilidade*:
+        1. Localização em segundo plano configurada como *"Always / Permitir o tempo todo"* e histórico de localização ativado;
+        2. Identificadores de publicidade e rastreamento ativos (*Advertising ID* no Android / permissão no *App Tracking Transparency - ATT* no iOS);
+        3. Metadados forenses e geotags em mídias (*EXIF/GPS* em fotos compartilhadas e armazenadas na nuvem).
+      - *Mapeamento por Plataforma (Priorizado por Impacto com Roteiro de Correção)*:
+        - **Android (16 erros mapeados)**: Escaneamento contínuo de Bluetooth/Wi-Fi em segundo plano, permissões excessivas concedidas a apps dormentes, teclados virtuais com telemetria/predição na nuvem, backups desprotegidos de dados de apps, clipboard compartilhado, entre outros, todos acompanhados de roteiro prático de remediação;
+        - **iOS (15 erros mapeados)**: Locais Importantes (*Significant Locations*) habilitados, telemetria/análises compartilhadas com a Apple e desenvolvedores, proteção de privacidade no Mail desativada, rastreamento entre apps autorizado (ATT), rastros via AirDrop/NameDrop, entre outros, com passo a passo de hardening;
+        - **Vulnerabilidades Transversais (13 vetores)**: Vazamento de IP via WebRTC, vazamento de DNS e IPv6 (*DNS/IPv6 leaks*), uso desprotegido de Wi-Fi público, exposição de IP do remetente em cabeçalhos SMTP/e-mail, perfilamento e coleta por data brokers, reuso de senhas e riscos de autenticação federada (*"Sign in with Google/Apple"* sem isolamento de identidade).
+      - *Potencial Comercial e Entregáveis*: Ativo preparado para ser estruturado como checklists práticos, auditorias de segurança pessoal e o guia premium da consultoria.
+      - *Fontes de Referência Técnica (2025–2026)*: Pesquisa fundamentada em diretrizes de segurança da Electronic Frontier Foundation (EFF), National Security Agency (NSA Mobile Device Best Practices), Wirecutter Privacy Guides, Proton Privacy Research, Kaspersky Security Bulletins e relatórios de ameaças mobile da McAfee.
     - **Governança Comercial**: Mantém estritamente inalterados o one-pager institucional, os materiais congelados de captação e o roadmap de negócio do produto core.
   - **v1.7 — Web Push (VAPID) & Distribuição iOS**: Implementação de Web Push padronizado para a versão Wasm e expansão da distribuição iOS após ativação da conta corporativa Apple Developer (D-U-N-S).
 
