@@ -20,6 +20,7 @@ O **Raix** é projetado sob a premissa de **privacidade forte por design com ret
 | **Adversário Quântico via Algoritmo de Grover (Track 1 — Hashing Quântico-Seguro)** | Redução quadrática da segurança de funções hash ($2^{n/2}$) por computador quântico (CRQC), rebaixando hashes de 256 bits para ~128 bits de entropia efetiva contra busca exaustiva. | **Hashing Quântico-Seguro (Track 1)**: Regra de ouro: nenhum hash de 256 bits para compromissos de longa duração. Derivação mnemônico$\to$seed mantida em PBKDF2-HMAC-SHA512 (preservando recovery BIP-39). Adoção de SHA-384 para `identityHash`, IDs de documentos e compromissos duradouros (192 bits de segurança quântica, anti length-extension, saída de 48 bytes). ML-DSA mantido com SHAKE256 nativamente PQ-safe. |
 | **Engenharia Social Automatizada por IA (P-H1 — Hardening do Mnemônico)** | Campanhas adaptativas de phishing hiperpersonalizado, vishing, clones de voz e agentes de IA simulando suporte técnico para induzir o usuário a entregar a frase mnemônica BIP-39 (12 palavras). | **Hardware-Backed Keys (P-H1)**: Isolamento das chaves em silício seguro de hardware (StrongBox/TEE no Android, Secure Enclave no Apple, DPAPI/TPM no Windows) e **UX de Segurança Anti-Phishing**: alerta ostensivo de que o mnemônico NUNCA é solicitado por humanos ou por IA sob hipótese alguma. |
 | **Comprometimento de Supply Chain por Código Gerado por IA (P0.4 Reforço)** | Introdução sutil de dependências alucinadas (*package hallucination*), backdoors lógicos ou enfraquecimento de invariantes criptográficas por assistentes de IA (Executores). | **Governança Estrita de Código por IA (P0.4)**: Revisão humana cética e minuciosa obrigatória de 100% do código gerado por IA, testes adversariais automatizados em CI e geração determinística de SBOM CycloneDX v1.5 com atestado SLSA Nível 2+ a cada release. |
+| **Vazamento de Metadados e Rastreabilidade em Mídias (Track 5 — Feature Premium)** | Rastreamento e desanonimização de usuários através de metadados ocultos em anexos/mídias (EXIF, GPS, autor, timestamps) ou correlação de procedência por IA. | **Análise Forense e Sanitização em Duas Camadas (Track 5)**: **Camada 1** (local/grátis, extração e auditoria *on-device* com zero-rastro); **Camada 2** (IA premium sob consentimento explícito, anonimização prévia, minimização de dados e provedor zero-retention); **Fase 3** (roadmap pós-rodada *self-hosted* com agente próprio 100% sem rastro externo). |
 | **Operador de Nuvem / Servidor Comprometido** | Acesso ao banco de dados Firestore, snapshots ou memória do backend Cloud Functions. | Criptografia ponta-a-ponta (E2E) em nível de aplicação com envelopes selados (*SealedBox*). O servidor armazena apenas ciphertexts opacos da DEK e do conteúdo. Zero posse de chaves privadas. |
 | **Adversário de Trânsito de Metadados** | Interceptação de cabeçalhos de transporte HTTP/2 e conexões QUIC para correlação de tráfego. | **TLS Pós-Quântico Híbrido (X25519MLKEM768 - Emenda A.4 / P-C1)**: Planejado para clientes nativos (Android/Desktop), com ativação quando suportado pelos runtimes (BoringSSL/Conscrypt/JVM) e infraestrutura GCP. **Limitação da Plataforma Web (Wasm)**: A versão Web não pode entregar ou garantir TLS pós-quântico, visto que navegadores não expõem a seleção de grupos TLS-PQ às páginas web (Web = cliente de menor garantia técnica). O conteúdo e as chaves contam com proteção pós-quântica E2E na camada de aplicação nos clientes suportados. |
 | **Comprometimento de Chave de Longa Duração** | Exfiltração de chaves de identidade de longo prazo em momento futuro. | **Forward Secrecy Preservada (Emenda A.3)**: A DEK de cada mensagem é encapsulada via par de chaves X25519 efêmero e seed efêmera ML-KEM-768. O comprometimento das chaves de identidade não compromete mensagens passadas. Evolução contínua planejada para **P-C2 (Double Ratchet PQ)**. |
@@ -313,4 +314,30 @@ A equipe de engenharia e governança institucionaliza o monitoramento contínuo 
 ### 10.2 Cadência Periódica de Revisão de Primitivas Criptográficas
 - **Revisão Semestral Mandatória**: A cada 6 meses, o comitê de governança e arquitetura executa uma revisão formal de todas as suítes criptográficas ativas no código (`ML-KEM-768`, `ML-DSA-65`, `X25519`, `Ed25519`, `AES-256-GCM`, `Argon2id`, `HKDF-SHA256`).
 - **Gatilhos de Rotação Criptoágil**: Caso uma primitiva atinja qualquer limiar de degradação teórica ou prática (ex.: novo ataque em reticulados, enfraquecimento de parâmetros ou aproximação de marco de CRQC), o mecanismo de criptoagilidade (`SignatureScheme`, `KeyExchangeScheme` e payload versionado `pmsg-routing-v2`) é acionado para rotacionar ou introduzir novas primitivas híbridas sem necessidade de refatoração do protocolo de transporte e persistência.
+
+---
+
+## 11. Análise Forense de Arquivos, Detecção de Rastros e Governança de IA (Track 5)
+
+A introdução planejada do módulo de análise forense de arquivos e detecção de pegadas digitais (*footprint detection*) atende à demanda de proteção preventiva de usuários corporativos e de alta exposição, respeitando estritamente os princípios de soberania e não-rastreabilidade:
+
+### 11.1 Estrutura em Duas Camadas e Modelo de Confiança
+1. **Camada 1 (Local, Grátis / Core — Zero-Rastro)**:
+   - Extração forense de metadados puramente no dispositivo do usuário (*on-device*): dados EXIF, autor, modelo do aparelho, coordenadas GPS, timestamps e softwares de edição.
+   - **Garantia de Isolamento**: Processamento 100% local sem tráfego de rede, sem requisições remotas e sem qualquer pegada externa.
+2. **Camada 2 (IA, Oferta Premium — Consentimento Mandatório)**:
+   - Inspeção heurística e semântica avançada via modelos de IA: detecção de capturas de tela (*screenshots*), análise de artefatos de compressão, inferência de dispositivo de origem, busca reversa de imagem e análise de esteganografia básica.
+   - **Acionamento Condicionado**: Execução restrita a solicitações deliberadas do usuário sob consentimento informado explícito.
+
+### 11.2 Mitigação Estrita de Rastro na Análise de IA
+Para qualquer processamento terceirizado em nuvem durante a Camada 2:
+- **Anonimização Prévia**: Higienização e expurgo de qualquer metadado pessoal identificável antes do despacho dos dados.
+- **Minimização de Dados**: Envio exclusivo da versão mínima necessária para o processamento do modelo (ex.: imagem reduzida ou recorte específico).
+- **Provedores com Zero-Retention**: Contratação estrita de APIs corporativas com política formal de retenção zero (*zero-retention*), com garantia contratual de não-armazenamento e vedação de uso dos dados para retreino de IA.
+- **Consentimento e Transparência na UX**: Alerta ostensivo ao usuário detalhando os limites de privacidade e o trade-off do processamento antes de qualquer envio.
+
+### 11.3 Direção Estratégica Futura — Fase 3 (Self-Hosted / Servidor Próprio)
+- **Infraestrutura Própria Pós-Rodada**: Implementação de servidor dedicado executando agentes próprios de IA (*self-hosted*), viabilizando inferência 100% privada e sem rastro externo.
+- **Comunicação ao Usuário**: Orientação na interface de usuário antecipando a evolução: *"Em breve teremos uma forma 100% sem rastro de análise"*.
+
 

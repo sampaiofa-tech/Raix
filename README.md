@@ -578,6 +578,23 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
     - Baterias de testes adversariais automatizados mandatórios em CI/CD.
     - Software Bill of Materials (SBOM) CycloneDX v1.5 e atestado criptográfico SLSA 2+ determinísticos a cada release.
 
+- 🔬 **Track 5 — Análise de Arquivos com Detecção de Rastros (Feature Premium Pós-Rodada)**:
+  - **Visão Geral da Funcionalidade**: Módulo forense de inspeção e sanitização de arquivos e mídias para identificação de vazamentos involuntários de privacidade e pegadas digitais (*footprint detection*), estruturado em modelo progressivo de duas camadas:
+    - **Camada 1 (Local, Grátis / Core — Zero-Rastro)**:
+      - Extração e auditoria forense de metadados diretamente no dispositivo do usuário (dados EXIF, autor/proprietário, coordenadas GPS de localização, timestamps de criação/modificação, modelo de hardware e software gerador).
+      - **Execução On-Device**: Processamento 100% no aparelho, em isolamento local, sem emissão de tráfego de rede ou envio de dados a servidores externos.
+    - **Camada 2 (IA, Oferta Premium — Consentimento Explícito)**:
+      - Inspeção inteligente e multimodal via modelos de IA: detecção de capturas de tela (*screenshots*), inferência de dispositivo de origem da mídia, busca reversa visual de similaridade e análise de esteganografia básica.
+      - **Acionamento Condicionado**: Executada estritamente sob consentimento explícito e voluntário do usuário antes de qualquer requisição externa.
+  - **Mitigação Rigorosa de Rastro na Análise de IA**:
+    - **Anonimização Prévia**: Higienização e remoção completa de metadados pessoais e identificadores antes de despachar o payload.
+    - **Minimização de Dados**: Envio estrito apenas do conteúdo mínimo essencial para inferência analítica (versão reduzida/downsampled ou recorte focado).
+    - **Provedor com Zero-Retention**: Uso exclusivo de parceiros/APIs corporativas com política mandatória de retenção zero (*zero-retention policy*), garantindo que nenhum dado é retido em repouso ou reutilizado para treinamento de modelos.
+    - **Consentimento Explícito com Alerta de Trade-Off**: Interface com aviso claro e transparente detalhando as implicações de privacidade antes da autorização do envio.
+  - **Roadmap Futuro — Fase 3 (Self-Hosted / Servidor Próprio Pós-Rodada)**:
+    - **Evolução de Infraestrutura**: Implantação de servidor próprio executando agente autônomo local dedicado (*self-hosted*), viabilizando análise inteligente **100% sem rastro externo** e sem intermediação de terceiros.
+    - **Aviso Educativo ao Usuário (UX)**: Inclusão de aviso transparente na UI do aplicativo: *"Em breve teremos uma forma 100% sem rastro de análise"*.
+
 - 🔭 **Track 6 — Governança de Monitoramento Quântico Contínuo**:
   - **Acompanhamento Contínuo no `ecdsa.fail`**: Rastreamento sistemático de falhas de implementação, ataques de canal lateral e fraquezas em curvas elípticas clássicas e primitivas híbridas.
   - **Normas e Publicações NIST**: Monitoramento de atualizações nos padrões FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA) e recomendações SP 800-227.
