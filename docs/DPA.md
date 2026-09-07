@@ -63,6 +63,9 @@ A Operadora compromete-se a manter ativas as seguintes salvaguardas técnicas e 
 7. **Sub-operadores Autorizados:**
    - **Google Cloud Platform (Google LLC):** Infraestrutura de banco de dados (Firestore), execução em nuvem (Cloud Functions) e autenticação anônima (Firebase Auth) na região `us-central1`.
    - **Cloudflare Inc.:** Resolução DNS e mitigação perimetral de ataques no domínio `raixtech.com`.
+8. **Módulo de Análise de Arquivos e Detecção de Rastros (Track 5 — Delimitação de Tratamento)**:
+   - **Nível 1 (Local Determinística) e Nível 2 (IA On-Device — TFLite / ONNX / Core ML)**: O processamento ocorre com exclusividade no hardware do Usuário. A Operadora **não coleta, não recebe e não processa** arquivos, imagens ou seus respectivos metadados no servidor, inexistindo qualquer hipótese ou operação de tratamento em nuvem que demande consentimento de envio.
+   - **Nível 4 (IA Externa / Terceirizada — Hipótese Futura sob Consentimento)**: Caso disponibilizado como funcionalidade opcional (análise opt-in com rastro reduzido; nunca zero-trace), constituirá formalmente operação de tratamento de dados sob o **Art. 7º, I da LGPD (Consentimento Explícito)**. A Operadora garantirá anonimização prévia, minimização de dados e subcontratação estrita de provedor com política mandatória de *zero-retention* (vedada retenção em repouso ou treino de modelos).
 
 ---
 

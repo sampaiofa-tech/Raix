@@ -36,6 +36,9 @@ Em atendimento ao Art. 37 da LGPD, a **Cat Tech** mantém o presente registro es
 1. **Custódia Local de Chaves:** As chaves criptográficas privadas (X25519 e Ed25519) e o mnemônico de 12 palavras permanecem **custodiadas exclusivamente no dispositivo do Usuário, sob proteção do sistema operacional** (DPAPI no Windows, KeyStore no Android), não constando como dados tratados pelo servidor.
 2. **Princípio da Não-Retenção Relacional:** A infraestrutura **não mantém logs relacionais persistentes** vinculando remetente e destinatário.
 3. **Padrão de TLS:** Confirmado suporte a **TLS 1.2+ com preferência TLS 1.3** nos pontos de terminação de borda da nuvem Google Cloud.
+4. **Análise de Arquivos e Detecção de Rastros (Track 5 — Delimitação Regulatória)**:
+   - **Nível 1 (Local Determinística) e Nível 2 (IA On-Device — TFLite / ONNX / Core ML)**: Executados com exclusividade em processamento local no aparelho do usuário. **NÃO constituem operação de tratamento de dados pessoais pela Controladora/Operadora** (inexistência de ingestão, trânsito ou guarda em servidores; dispensada autorização de tratamento em nuvem).
+   - **Nível 4 (IA Externa / Terceirizada — Hipótese Futura sob Demanda)**: Se ativado como funcionalidade opt-in de rastro reduzido (nunca zero-trace), constituirá formalmente operação de tratamento de dados com base no **Art. 7º, I da LGPD (Consentimento do Titular)**, condicionada à anonimização prévia, minimização de payload e contrato estrito de *zero-retention* com o sub-operador de IA.
 
 ---
 

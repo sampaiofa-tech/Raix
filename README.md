@@ -578,22 +578,33 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
     - Baterias de testes adversariais automatizados mandatórios em CI/CD.
     - Software Bill of Materials (SBOM) CycloneDX v1.5 e atestado criptográfico SLSA 2+ determinísticos a cada release.
 
-- 🔬 **Track 5 — Análise de Arquivos com Detecção de Rastros (Feature Premium Pós-Rodada)**:
-  - **Visão Geral da Funcionalidade**: Módulo forense de inspeção e sanitização de arquivos e mídias para identificação de vazamentos involuntários de privacidade e pegadas digitais (*footprint detection*), estruturado em modelo progressivo de duas camadas:
-    - **Camada 1 (Local, Grátis / Core — Zero-Rastro)**:
-      - Extração e auditoria forense de metadados diretamente no dispositivo do usuário (dados EXIF, autor/proprietário, coordenadas GPS de localização, timestamps de criação/modificação, modelo de hardware e software gerador).
-      - **Execução On-Device**: Processamento 100% no aparelho, em isolamento local, sem emissão de tráfego de rede ou envio de dados a servidores externos.
-    - **Camada 2 (IA, Oferta Premium — Consentimento Explícito)**:
-      - Inspeção inteligente e multimodal via modelos de IA: detecção de capturas de tela (*screenshots*), inferência de dispositivo de origem da mídia, busca reversa visual de similaridade e análise de esteganografia básica.
-      - **Acionamento Condicionado**: Executada estritamente sob consentimento explícito e voluntário do usuário antes de qualquer requisição externa.
-  - **Mitigação Rigorosa de Rastro na Análise de IA**:
-    - **Anonimização Prévia**: Higienização e remoção completa de metadados pessoais e identificadores antes de despachar o payload.
-    - **Minimização de Dados**: Envio estrito apenas do conteúdo mínimo essencial para inferência analítica (versão reduzida/downsampled ou recorte focado).
-    - **Provedor com Zero-Retention**: Uso exclusivo de parceiros/APIs corporativas com política mandatória de retenção zero (*zero-retention policy*), garantindo que nenhum dado é retido em repouso ou reutilizado para treinamento de modelos.
-    - **Consentimento Explícito com Alerta de Trade-Off**: Interface com aviso claro e transparente detalhando as implicações de privacidade antes da autorização do envio.
-  - **Roadmap Futuro — Fase 3 (Self-Hosted / Servidor Próprio Pós-Rodada)**:
-    - **Evolução de Infraestrutura**: Implantação de servidor próprio executando agente autônomo local dedicado (*self-hosted*), viabilizando análise inteligente **100% sem rastro externo** e sem intermediação de terceiros.
-    - **Aviso Educativo ao Usuário (UX)**: Inclusão de aviso transparente na UI do aplicativo: *"Em breve teremos uma forma 100% sem rastro de análise"*.
+- 🔬 **Track 5 — Análise de Arquivos com Detecção de Rastros (Hierarquia Final de 4 Níveis — Pós-Rodada)**:
+  - **Visão Geral da Funcionalidade**: Módulo forense de inspeção e sanitização de arquivos e mídias para identificação de vazamentos involuntários de privacidade e pegadas digitais (*footprint detection*), estruturado na hierarquia definitiva de 4 níveis aprovada:
+    - **Nível 1 (Local Determinística — Grátis / Core — Zero-Rastro)**:
+      - Extração e auditoria forense de metadados diretamente no dispositivo do usuário (*on-device*): dados EXIF, autor/proprietário, coordenadas GPS de localização, timestamps de criação/modificação, modelo de hardware e software gerador.
+      - **Garantia de Isolamento**: Processamento 100% no aparelho, **ZERO-RASTRO**, custo operacional ~0, constituindo a base do modelo freemium. Zero emissão de tráfego de rede ou chamadas remotas.
+    - **Nível 2 (IA On-Device — Padrão Premium — Zero-Rastro Real)**:
+      - **Detecção de Rastros On-Device**: Inspeção inteligente via IA local dedicada para detecção de capturas de tela (*screenshots*), correlação de metadados/EXIF e esteganografia básica.
+      - **Zero-Rastro Real**: Processamento estritamente local no silício do usuário, com esforço estimado em ~8–16 semanas pós-rodada (**PADRÃO PREMIUM**). Nenhum byte ou metadado sai do aparelho.
+      - **Motores de Inferência por Plataforma**: Integração nativa via TensorFlow Lite (TFLite) no Android, ONNX Runtime no Windows e Core ML no iOS futuro.
+      - **Limitação da Plataforma Web (Wasm)**: A versão Web/Wasm possui IA on-device limitada ou não oferecida devido a restrições de sandbox de navegador, tamanho de modelo e limitações de aceleração por GPU/NPU.
+      - **Escopo Técnico (Esteganografia)**: Esteganografia avançada classificada como parcial (⚠️) — apenas técnicas básicas de inspeção de ruído/canais são executadas no Nível 2.
+    - **Nível 3 (Self-Hosted / Servidor Próprio — Pós-Rodada)**:
+      - **Infraestrutura Própria Dedicada**: Implantação de servidor próprio executando agente autônomo local dedicado (*self-hosted*), viabilizando análise aprofundada, inferência pesada, análise de origem e busca reversa via base própria com **100% sem rastro externo** e sem intermediação de terceiros comerciais.
+    - **Nível 4 (IA Externa / Terceirizada — Rastro Reduzido / Último Recurso)**:
+      - **Análise Opt-In com Rastro Reduzido**: IA externa acionada exclusivamente como **último recurso** para análises que demandam bases globais externas (ex.: busca reversa de imagem na web, inferência de origem ampla). **NUNCA é classificada como zero-trace / zero-rastro**.
+      - **Mitigações Mandatórias de Rastro no Nível 4**:
+        - *Anonimização Prévia*: Higienização e expurgo irrestrito de metadados pessoais, identificadores e dados de localização antes do envio.
+        - *Minimização de Dados*: Envio estrito apenas do payload essencial (imagem em versão reduzida/downsampled ou recorte analítico focado).
+        - *Provedor com Zero-Retention*: Parceria exclusiva com provedores sob contrato corporativo com política formal de retenção zero (*zero-retention policy*), sem retenção em repouso e com vedação total de reaproveitamento para treino de modelos.
+        - *Consentimento Explícito com Alerta de Trade-Off*: Consentimento prévio mandatório na UI com aviso transparente sobre o trade-off de privacidade e a existência de rastro reduzido.
+  - **Correções de Escopo, Linguagem de Marketing & UX de Transparência**:
+    - **Origem e Busca Reversa**: Não são zero-rastro (exigem banco/serviço externo) e residem estritamente nos Níveis 3 e 4.
+    - **Calibração de Marketing**: O Nível 2 é comercializado como *"detecção de rastros on-device"*; o termo *"100% sem rastro"* é reservado com exclusividade para on-device (Níveis 1 e 2) e self-hosted (Nível 3). O Nível 4 é expressamente rotulado como *"análise opt-in com rastro reduzido"*.
+    - **UX de Transparência**: Aviso educativo exibido ao usuário na UI: *"Em breve teremos uma forma 100% sem rastro de análise"*, enquadrado estritamente como o roadmap do servidor próprio (Nível 3), e NÃO como garantia antecipada incondicional.
+  - **Governança de Dados & Enquadramento Regulatório (LGPD / DPA / ROPA)**:
+    - **Nível 2 (On-Device)**: Não há processamento de conteúdo em servidores da empresa ou de terceiros; portanto, não configura operação de tratamento de dados pela nuvem e dispensa consentimento de tratamento remoto.
+    - **Nível 4 (Terceirizado)**: Constitui formalmente operação de tratamento de dados pessoais (Art. 7º, I da LGPD — Consentimento), exigindo anonimização prévia, minimização, zero-retention e registro formal em ROPA se um dia vier a ser disponibilizado.
 
 - 🔭 **Track 6 — Governança de Monitoramento Quântico Contínuo**:
   - **Acompanhamento Contínuo no `ecdsa.fail`**: Rastreamento sistemático de falhas de implementação, ataques de canal lateral e fraquezas em curvas elípticas clássicas e primitivas híbridas.
