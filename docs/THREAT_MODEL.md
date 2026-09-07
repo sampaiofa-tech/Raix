@@ -1,8 +1,8 @@
 # Modelo de Ameaça e Postura de Segurança Pós-Quântica — Raix
 
-**Versão:** 1.4 (P1+ — Governança Pós-Quântica, Defesa contra Análise de Tráfego por IA, Hashing ≥384 bits e Hardening Anti-Engenharia Social)  
-**Data:** 06 de setembro de 2026  
-**Status:** Implementado, Verificado em CI/CD e Governança Pós-Quântica Atualizada  
+**Versão:** 1.5 (P1+ — Governança Pós-Quântica, Defesa contra Análise de Tráfego por IA, Auditoria de Sanitização do Repositório e Disciplina Contínua de Governança)  
+**Data:** 07 de setembro de 2026  
+**Status:** Implementado, Verificado em CI/CD, Auditoria de Sanitização (7 Fases) Concluída e Governança Atualizada  
 
 ---
 
@@ -355,5 +355,39 @@ Para qualquer processamento terceirizado em nuvem acionado como último recurso 
 ### 11.5 Governança de Privacidade & Enquadramento DPA / ROPA (LGPD)
 - **Nível 2 (On-Device)**: O processamento ocorre exclusivamente no hardware do usuário. A Cat Tech não coleta, transmite ou armazena os arquivos em sua infraestrutura, inexistindo operação de tratamento de dados pessoais no servidor (dispensado consentimento para envio à nuvem).
 - **Nível 4 (Terceirizado)**: Constitui formalmente operação de tratamento de dados pessoais sob o **Art. 7º, I da LGPD (Consentimento Explícito)**, sujeita a anonimização prévia, minimização de dados, acordo de processamento com provedor parceiro com política de zero-retention e registro formal específico no ROPA e DPA.
+ 
+---
+ 
+## 12. Auditoria de Sanitização do Repositório e Disciplina Contínua de Governança
+ 
+### 12.1 Conclusão da Auditoria de Sanitização (Commit `b5b57a1`)
+ O repositório do **Raix** é mantido publicamente sob a licença **GNU AGPL-3.0**, assegurando auditabilidade aberta enquanto mantém o risco residual de segurança estritamente em **nível gerenciável e mínimo**.
+ 
+ Em 07 de setembro de 2026, foi concluída com sucesso a **Auditoria Integral de Sanitização do Repositório (7 Fases)**, formalmente documentada em [`docs/AUDITORIA_SANITIZACAO_REPOSITORIO.md`](AUDITORIA_SANITIZACAO_REPOSITORIO.md):
+ - **Zero Segredos e Chaves Privadas (Fase 1)**: Varredura de 100% do histórico e estado atual (`ggshield v1.54.0` e regex `git log -S`). Chaves públicas de cliente Firebase confirmadas como seguras por design (protegidas por App Check, regras Firestore *deny-by-default* e IAM). Falso-positivo de token sintético de teste unitário isolado em [`.gitguardian.yaml`](../.gitguardian.yaml). Zero credenciais de infraestrutura ou service accounts no repositório.
+ - **Zero PII Real (Fase 2)**: Zero CPFs, telefones, endereços ou e-mails de usuários finais no código ou fixtures. Sementes BIP-39 (12 palavras) em testes usam apenas vetores fixos ou entropia aleatória transitória; zero seed phrases reais expostas.
+ - **Zero Material Interno Confidencial (Fase 3)**: Documentação estritamente de código aberto. Zero IPs corporativos ou arquivos `.env` commitados.
+ - **Histórico Íntegro e Purga Avaliada (Fase 4)**: Inexistência de segredos administrativos comprometidos; purga destrutiva desnecessária, preservando a imutabilidade e a cadeia de confiança do Git.
+ - **Cadeia de Suprimentos & Dependências (Fase 5)**: Zero CVEs críticas ou altas (`npm audit`). Pinning de hashes SHA-256 no Gradle para Bouncy Castle 1.79. SBOM CycloneDX v1.5 determinístico versionado em `docs/sbom/`.
+ - **Configuração de CI/CD (Fase 6)**: Workflows auditados sem segredos expostos, operando com permissões mínimas OIDC (`id-token: write`) e isolamento hermético.
+ - **Verificação Final (Fase 7)**: 100% das suítes de teste (backend, emulador, índices, KMP Desktop e Android) verdes e pre-commit hook ativo.
+ 
+### 12.2 Disciplina Contínua de Governança e Re-Auditoria Periódica
+ A manutenção do repositório público e sanitizado exige governança ativa e ininterrupta:
+ 1. **GitGuardian Ativo e Mandatório**:
+    - Bloqueio preventivo na estação de trabalho via hook pre-commit (`ggshield`).
+    - Barreira de CI/CD em todas as Pull Requests e pushes para `main` (`.github/workflows/gitguardian.yml`).
+    - Monitoramento contínuo em tempo real via dashboard institucional e alertas automáticos para `contato@raixtech.com`.
+ 2. **Ciclo de Dependências e SBOM por Release**:
+    - Atualização periódica de dependências com verificação de integridade criptográfica.
+    - Geração determinística e versionamento obrigatório de SBOMs CycloneDX v1.5 (`scripts/generate_sbom.cjs`) a cada nova versão ou release tag.
+ 3. **Revisão Rigorosa de Código (Especialmente Código Gerado por IA)**:
+    - Todo código assistido ou gerado por agentes de IA é submetido a escrutínio humano rigoroso e testes adversariais antes de ser integrado, prevenindo *package hallucination*, degradação de invariantes criptográficas e vazamento acidental de chaves.
+ 4. **Re-Auditoria Periódica como Item Permanente de Governança**:
+    - A auditoria completa de sanitização de 7 fases é institucionalizada como processo de governança periódica, com reexecução obrigatória:
+      - **A cada release significativo (major/minor)**;
+      - **Previamente a qualquer rodada de auditoria externa de segurança ou conformidade regulatória**;
+      - **Sempre que houver refatorações arquiteturais de autenticação, infraestrutura de nuvem ou novas integrações de SDKs**.
+
 
 

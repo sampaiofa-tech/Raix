@@ -506,6 +506,18 @@ O repositório é público e conta com monitoramento automatizado e contínuo co
 ### 3. Resposta a Incidentes de Credenciais
 Em caso de detecção de segredos reais, consulte e siga rigorosamente o [Runbook de Resposta a Incidentes](docs/INCIDENT_RESPONSE.md) e as regras do [`AGENTS.md`](AGENTS.md). Canal oficial de notificação: `contato@raixtech.com`.
 
+### 4. Auditoria de Sanitização e Disciplina Contínua de Governança
+O repositório do **Raix** é público (**AGPL-3.0**), combinando máxima auditabilidade de código aberto com risco residual mantido em nível gerenciável e mínimo:
+
+- **Auditoria de Sanitização Concluída (7 Fases)**:
+  - Executada e validada em 07/09/2026 (commit `b5b57a1`), com evidências e diagnóstico integralmente documentados em [`docs/AUDITORIA_SANITIZACAO_REPOSITORIO.md`](docs/AUDITORIA_SANITIZACAO_REPOSITORIO.md).
+  - **Resultados Homologados**: Zero credenciais ou chaves privadas no código/histórico, zero dados pessoais (PII) reais, zero material interno confidencial, zero CVEs críticas ou altas (`npm audit`), hashes SHA-256 fixados para bibliotecas criptográficas e SBOMs CycloneDX v1.5 versionados em `docs/sbom/`.
+- **Disciplina Contínua (Governança Permanente)**:
+  1. **GitGuardian Ativo**: Barreira tripla ininterrupta de proteção (pre-commit hook local, verificação automática em CI/CD via GitHub Actions e monitoramento contínuo em tempo real com alertas para `contato@raixtech.com`).
+  2. **Dependências Atualizadas & SBOM por Release**: Varredura contínua de vulnerabilidades e geração determinística de SBOMs CycloneDX v1.5 a cada nova versão.
+  3. **Revisão Rigorosa de Código por IA**: Revisão humana cética e testes adversariais automatizados mandatórios para 100% das alterações assistidas ou geradas por IA, prevenindo alucinação de pacotes e quebra de invariantes.
+  4. **Re-Auditoria Periódica Institucionalizada**: Reexecução formal e obrigatória da auditoria de sanitização de 7 fases a cada release significativo (major/minor) ou previamente a auditorias externas de conformidade.
+
 ---
 
 ## 🗺️ Roadmap & Alocação de Recursos Pós-Rodada
@@ -526,6 +538,8 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
 ### 2. Ciclo Ativo de Negócio (v1.6)
 - 🚀 **Push Notifications Zero-Knowledge**: Notificações em segundo plano para Android (FCM), Windows Desktop (Toast local) e iOS (stubs APNs), respeitando estritamente o TTL $\le 24$h e sem tráfego de conteúdo de mensagens.
 - 🚀 **Prontidão de Distribuição**: Atestado de Rebuild Legal v3.0, geração de Android App Bundle (AAB) assinado para a Play Store e assets de listagem institucional.
+- ✅ **Auditoria de Sanitização do Repositório (7 Fases)**: Concluída com sucesso (commit `b5b57a1`), atestando zero segredos/PII/material interno, zero CVEs críticas/altas, SBOM CycloneDX v1.5 versionado e governança de re-auditoria periódica formalizada.
+
 
 ### 3. Alocação de Recursos Pós-Rodada (Decisões de Governança & Trilhas Estratégicas)
 
