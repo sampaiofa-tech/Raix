@@ -216,4 +216,71 @@ describe("Crypto-Shredder Authoritative Server-Side TTL & Escalation Test Suite 
 
     expect(attemptDecryptWithWrongKey).toThrow();
   });
+
+  it("TRANSACTIONAL ISOLATION: should destroy messageKeys/messages even if secondary inbox query fails", async () => {
+    const nowMillis = 1700000000000;
+    const nowTimestamp = {
+      toMillis: () => nowMillis,
+    } as any;
+
+    const expiredDoc = {
+      id: "key_isolated_001",
+      data: () => ({
+        messageId: "msg_isolated_001",
+        dek: "isolated_aes_dek",
+        expiresAt: { toMillis: () => nowMillis - 1000 },
+      }),
+      ref: { path: "messageKeys/key_isolated_001", parent: { id: "messageKeys" } },
+    };
+
+    let dekBatchCommitted = false;
+
+    mockDb = {
+      collection: (name: string) => ({
+        where: () => ({
+          limit: () => ({
+            get: async () => ({
+              empty: name !== "messageKeys",
+              docs: name === "messageKeys" ? [expiredDoc] : [],
+            }),
+          }),
+        }),
+        doc: (id: string) => ({
+          path: `${name}/${id}`,
+        }),
+      }),
+      collectionGroup: (name: string) => ({
+        where: () => ({
+          limit: () => ({
+            get: async () => {
+              if (name === "inbox") {
+                const err = new Error("9 FAILED_PRECONDITION: The query requires a COLLECTION_GROUP_ASC index for collection inbox and field expiresAt");
+                throw err;
+              }
+              return { empty: true, docs: [] };
+            },
+          }),
+        }),
+      }),
+      batch: () => ({
+        delete: (ref: any) => {
+          batchDeletedPaths.push(ref.path);
+        },
+        commit: async () => {
+          dekBatchCommitted = true;
+        },
+      }),
+    };
+
+    // The execution should throw an aggregate error because inbox failed,
+    // BUT Stage 1 (messageKeys/messages) must have already been committed and deleted!
+    await expect(executeCryptoShredding(mockDb, nowTimestamp)).rejects.toThrow(
+      /Crypto-Shredder partial failure/
+    );
+
+    // CRITICAL ZERO-TRACE PROOF: Stage 1 priority commit was executed
+    expect(dekBatchCommitted).toBe(true);
+    expect(batchDeletedPaths).toContain("messageKeys/key_isolated_001");
+    expect(batchDeletedPaths).toContain("messages/msg_isolated_001");
+  });
 });

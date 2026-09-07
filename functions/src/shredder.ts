@@ -33,137 +33,170 @@ export async function executeCryptoShredding(
   db: admin.firestore.Firestore,
   currentTime: admin.firestore.Timestamp
 ): Promise<CryptoShreddingResult> {
-  const batch = db.batch();
-  let hasDeletions = false;
+  let messageCount = 0;
+  let inboxCount = 0;
+  let logsCount = 0;
   let maxDelayMs = 0;
   let escalationAlertsCount = 0;
+  const stageErrors: Array<{ stage: string; error: unknown }> = [];
 
-  // 1. Mensagens expiradas: Hard-delete DEK em messageKeys + Hard-delete ciphertext em messages
-  const expiredKeysQuery = db
-    .collection("messageKeys")
-    .where("expiresAt", "<=", currentTime)
-    .limit(500);
+  // =========================================================================
+  // STAGE 1: CORE ZERO-TRACE CRYPTO-SHREDDING (PRIORITY 1 - ISOLATED & ATOMIC)
+  // Hard-delete DEK em messageKeys + Hard-delete ciphertext em messages.
+  // Independent atomic batch commit: NEVER blocked by downstream secondary queries.
+  // =========================================================================
+  try {
+    const expiredKeysQuery = db
+      .collection("messageKeys")
+      .where("expiresAt", "<=", currentTime)
+      .limit(500);
 
-  const snapshot = await expiredKeysQuery.get();
-  let messageCount = 0;
+    const snapshot = await expiredKeysQuery.get();
+    if (!snapshot.empty) {
+      const dekBatch = db.batch();
+      for (const doc of snapshot.docs) {
+        const data = doc.data();
+        const messageId = data.messageId || doc.id;
 
-  if (!snapshot.empty) {
-    for (const doc of snapshot.docs) {
-      const data = doc.data();
-      const messageId = data.messageId || doc.id;
+        if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
+          const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
+          if (delayMs > maxDelayMs) maxDelayMs = delayMs;
 
-      if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
-        const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
-        if (delayMs > maxDelayMs) maxDelayMs = delayMs;
-
-        logger.info("ttl_expiration_to_deletion_delays", {
-          metric: "ttl_expiration_to_deletion_delays",
-          collection: "messageKeys",
-          docId: doc.id,
-          delayMs,
-        });
-
-        if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
-          escalationAlertsCount++;
-          if (delayMs > SEVERE_SURVIVAL_DELAY_MS) {
-            logger.error("[ALERT_ESCALATION_LEVEL_2] CRITICAL: Envelope key survived > 3 hours past expiration!", {
-              docId: doc.id,
-              delayMs,
-              threshold: "180m",
-            });
-          } else {
-            logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Envelope key survived > 60 min past expiration!", {
-              docId: doc.id,
-              delayMs,
-              threshold: "60m",
-            });
-          }
-        }
-      }
-
-      // 1. Hard-delete DEK (Irreversible Crypto-Shredding)
-      batch.delete(doc.ref);
-
-      // 2. Hard-delete matching ciphertext message document (if exists)
-      const messageRef = db.collection("messages").doc(messageId);
-      batch.delete(messageRef);
-
-      messageCount++;
-    }
-    hasDeletions = true;
-  }
-
-  // 2. Envelopes efêmeros em caixas de entrada por identidade (P0.2/P0.3): identities/{identityHash}/inbox/{envelopeId}
-  let inboxCount = 0;
-  const expiredInboxQuery = db
-    .collectionGroup("inbox")
-    .where("expiresAt", "<=", currentTime)
-    .limit(500);
-
-  const inboxSnapshot = await expiredInboxQuery.get();
-  if (!inboxSnapshot.empty) {
-    for (const doc of inboxSnapshot.docs) {
-      const data = doc.data();
-      if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
-        const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
-        if (delayMs > maxDelayMs) maxDelayMs = delayMs;
-
-        logger.info("ttl_expiration_to_deletion_delays", {
-          metric: "ttl_expiration_to_deletion_delays",
-          collection: "inbox",
-          docId: doc.id,
-          delayMs,
-        });
-
-        if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
-          escalationAlertsCount++;
-          logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Inbox envelope survived > 60 min past expiration!", {
+          logger.info("ttl_expiration_to_deletion_delays", {
+            metric: "ttl_expiration_to_deletion_delays",
+            collection: "messageKeys",
             docId: doc.id,
             delayMs,
           });
+
+          if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
+            escalationAlertsCount++;
+            if (delayMs > SEVERE_SURVIVAL_DELAY_MS) {
+              logger.error("[ALERT_ESCALATION_LEVEL_2] CRITICAL: Envelope key survived > 3 hours past expiration!", {
+                docId: doc.id,
+                delayMs,
+                threshold: "180m",
+              });
+            } else {
+              logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Envelope key survived > 60 min past expiration!", {
+                docId: doc.id,
+                delayMs,
+                threshold: "60m",
+              });
+            }
+          }
         }
+
+        // 1. Hard-delete DEK (Irreversible Crypto-Shredding)
+        dekBatch.delete(doc.ref);
+
+        // 2. Hard-delete matching ciphertext message document (if exists)
+        const messageRef = db.collection("messages").doc(messageId);
+        dekBatch.delete(messageRef);
+
+        messageCount++;
       }
 
-      batch.delete(doc.ref);
-      inboxCount++;
+      await dekBatch.commit();
+      logger.info(`Crypto-Shredder [Stage 1]: Priority commit successful. Destroyed ${messageCount} DEKs and messages.`);
     }
-    hasDeletions = true;
+  } catch (error) {
+    logger.error("[Crypto-Shredder] Fatal error during primary DEK shredding stage:", error);
+    stageErrors.push({ stage: "messageKeys/messages", error });
   }
 
-  // 3. Logs de conexão expirados (Marco Civil Art. 15 - Retenção de 180 dias):
-  // Expurgo ativo das coleções connectionLogs e accessLogs
-  let logsCount = 0;
+  // =========================================================================
+  // STAGE 2: SECONDARY - INBOX ENVELOPES (ISOLATED)
+  // Ephemeral envelopes in per-identity inboxes: identities/{identityHash}/inbox/{envelopeId}
+  // Runs in its own atomic batch; failure does not affect Stage 1 or Stage 3.
+  // =========================================================================
+  try {
+    const expiredInboxQuery = db
+      .collectionGroup("inbox")
+      .where("expiresAt", "<=", currentTime)
+      .limit(500);
 
-  const expiredConnLogsQuery = db
-    .collection("connectionLogs")
-    .where("expiresAt", "<=", currentTime)
-    .limit(500);
+    const inboxSnapshot = await expiredInboxQuery.get();
+    if (!inboxSnapshot.empty) {
+      const inboxBatch = db.batch();
+      for (const doc of inboxSnapshot.docs) {
+        const data = doc.data();
+        if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
+          const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
+          if (delayMs > maxDelayMs) maxDelayMs = delayMs;
 
-  const connLogsSnapshot = await expiredConnLogsQuery.get();
-  if (!connLogsSnapshot.empty) {
-    for (const doc of connLogsSnapshot.docs) {
-      batch.delete(doc.ref);
-      logsCount++;
+          logger.info("ttl_expiration_to_deletion_delays", {
+            metric: "ttl_expiration_to_deletion_delays",
+            collection: "inbox",
+            docId: doc.id,
+            delayMs,
+          });
+
+          if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
+            escalationAlertsCount++;
+            logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Inbox envelope survived > 60 min past expiration!", {
+              docId: doc.id,
+              delayMs,
+            });
+          }
+        }
+
+        inboxBatch.delete(doc.ref);
+        inboxCount++;
+      }
+
+      await inboxBatch.commit();
+      logger.info(`Crypto-Shredder [Stage 2]: Successfully purged ${inboxCount} expired inbox envelopes.`);
     }
-    hasDeletions = true;
+  } catch (error) {
+    logger.error("[Crypto-Shredder] Error during secondary inbox shredding stage:", error);
+    stageErrors.push({ stage: "inbox", error });
   }
 
-  const expiredAccessLogsQuery = db
-    .collection("accessLogs")
-    .where("expiresAt", "<=", currentTime)
-    .limit(500);
+  // =========================================================================
+  // STAGE 3: SECONDARY - CONNECTION & ACCESS LOGS (ISOLATED)
+  // Marco Civil Art. 15 - 180 days retention purge
+  // Runs in its own atomic batch.
+  // =========================================================================
+  try {
+    const logsBatch = db.batch();
+    let hasLogDeletions = false;
 
-  const accessLogsSnapshot = await expiredAccessLogsQuery.get();
-  if (!accessLogsSnapshot.empty) {
-    for (const doc of accessLogsSnapshot.docs) {
-      batch.delete(doc.ref);
-      logsCount++;
+    const expiredConnLogsQuery = db
+      .collection("connectionLogs")
+      .where("expiresAt", "<=", currentTime)
+      .limit(500);
+
+    const connLogsSnapshot = await expiredConnLogsQuery.get();
+    if (!connLogsSnapshot.empty) {
+      for (const doc of connLogsSnapshot.docs) {
+        logsBatch.delete(doc.ref);
+        logsCount++;
+      }
+      hasLogDeletions = true;
     }
-    hasDeletions = true;
-  }
 
-  if (hasDeletions) {
-    await batch.commit();
+    const expiredAccessLogsQuery = db
+      .collection("accessLogs")
+      .where("expiresAt", "<=", currentTime)
+      .limit(500);
+
+    const accessLogsSnapshot = await expiredAccessLogsQuery.get();
+    if (!accessLogsSnapshot.empty) {
+      for (const doc of accessLogsSnapshot.docs) {
+        logsBatch.delete(doc.ref);
+        logsCount++;
+      }
+      hasLogDeletions = true;
+    }
+
+    if (hasLogDeletions) {
+      await logsBatch.commit();
+      logger.info(`Crypto-Shredder [Stage 3]: Successfully purged ${logsCount} connection/access logs.`);
+    }
+  } catch (error) {
+    logger.error("[Crypto-Shredder] Error during secondary connection/access logs shredding stage:", error);
+    stageErrors.push({ stage: "connectionLogs/accessLogs", error });
   }
 
   if (messageCount === 0 && inboxCount === 0 && logsCount === 0) {
@@ -172,6 +205,24 @@ export async function executeCryptoShredding(
     logger.info(
       `Crypto-Shredder: Successfully shredded ${messageCount} keys/messages, ${inboxCount} inbox envelopes and ${logsCount} connection logs. Max delay: ${maxDelayMs}ms.`
     );
+  }
+
+  // Structured rethrow if any stage failed, preserving full error stack without silent suppression
+  if (stageErrors.length > 0) {
+    const summary = stageErrors
+      .map((e) => `[Stage: ${e.stage}]: ${e.error instanceof Error ? e.error.message : String(e.error)}`)
+      .join("; ");
+    const aggregateError = new Error(`Crypto-Shredder partial failure: ${summary}`);
+    (aggregateError as any).stageErrors = stageErrors;
+    (aggregateError as any).partialResult = {
+      shreddedKeysCount: messageCount,
+      deletedMessagesCount: messageCount,
+      deletedInboxEnvelopesCount: inboxCount,
+      deletedLogsCount: logsCount,
+      maxDelayMs,
+      escalationAlertsCount,
+    };
+    throw aggregateError;
   }
 
   return {
