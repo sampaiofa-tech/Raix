@@ -516,7 +516,7 @@ O repositório do **Raix** é público (**AGPL-3.0**), combinando máxima audita
   1. **GitGuardian Ativo**: Barreira tripla ininterrupta de proteção (pre-commit hook local, verificação automática em CI/CD via GitHub Actions e monitoramento contínuo em tempo real com alertas para `contato@raixtech.com`).
   2. **Dependências Atualizadas & SBOM por Release**: Varredura contínua de vulnerabilidades e geração determinística de SBOMs CycloneDX v1.5 a cada nova versão.
   3. **Revisão Rigorosa de Código por IA**: Revisão humana cética e testes adversariais automatizados mandatórios para 100% das alterações assistidas ou geradas por IA, prevenindo alucinação de pacotes e quebra de invariantes.
-  4. **Re-Auditoria Periódica Institucionalizada**: Reexecução formal e obrigatória da auditoria de sanitização de 7 fases a cada release significativo (major/minor) ou previamente a auditorias externas de conformidade.
+  4. **Re-Auditoria Periódica Institucionalizada**: Reexecução formal mandatória a cada release significativo (mudança de stack, dependências ou infraestrutura) OU a cada 6 meses (o que vier primeiro). Escopo otimizado: Fases 1–3 (segredos, PII, material interno) e 5 (dependências/CVEs) re-rodadas **sempre**; Fases 4, 6 e 7 sob mudanças relevantes. Governança com papéis segregados: Executor (execução e relatório), Analista (validação dos critérios de aceite) e Principal (revisão final executiva). Detalhado em [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md#123-protocolo-operacional-de-re-auditoria-periódica).
 
 ---
 

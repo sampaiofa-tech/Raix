@@ -384,10 +384,35 @@ Para qualquer processamento terceirizado em nuvem acionado como último recurso 
  3. **Revisão Rigorosa de Código (Especialmente Código Gerado por IA)**:
     - Todo código assistido ou gerado por agentes de IA é submetido a escrutínio humano rigoroso e testes adversariais antes de ser integrado, prevenindo *package hallucination*, degradação de invariantes criptográficas e vazamento acidental de chaves.
  4. **Re-Auditoria Periódica como Item Permanente de Governança**:
-    - A auditoria completa de sanitização de 7 fases é institucionalizada como processo de governança periódica, com reexecução obrigatória:
-      - **A cada release significativo (major/minor)**;
-      - **Previamente a qualquer rodada de auditoria externa de segurança ou conformidade regulatória**;
-      - **Sempre que houver refatorações arquiteturais de autenticação, infraestrutura de nuvem ou novas integrações de SDKs**.
+    - A auditoria completa de sanitização de 7 fases é institucionalizada como processo de governança periódica, detalhado na subseção 12.3 a seguir.
+
+### 12.3 Protocolo Operacional de Re-Auditoria Periódica
+
+A re-auditoria periódica é institucionalizada como processo permanente de governança contínua com cadência, gatilhos, escopo diferenciado e matriz de responsabilidade bem definidos:
+
+#### 1. Cadência e Gatilhos
+- **Gatilho por Evento**: A cada **release significativo** (mudança de stack técnica, adição/atualização de dependências críticas ou alterações na infraestrutura de nuvem).
+- **Gatilho Temporal**: **A cada 6 meses** caso nenhum release com mudanças estruturais tenha ocorrido no período.
+- **Regra Geral**: O que ocorrer primeiro (critério temporal de 6 meses ou evento de release significativo).
+
+#### 2. Matriz de Escopo da Re-Auditoria
+Nem todas as fases demandam a mesma profundidade quando não há alterações de infraestrutura, otimizando o esforço operacional sem degradar a segurança do repositório:
+
+| Fase da Auditoria | Escopo na Re-Auditoria | Obrigatoriedade | Justificativa Técnica |
+| :--- | :--- | :---: | :--- |
+| **Fase 1 (Segredos)** | Varredura de segredos no histórico recente e árvore atual (`ggshield` + regex). | **SEMPRE** | Prevenir commit acidental de tokens, chaves ou credenciais. |
+| **Fase 2 (PII)** | Busca por e-mails, CPFs, telefones, mnemônicos BIP-39 e dados reais em testes. | **SEMPRE** | Garantir que fixtures e novos testes continuem usando exclusivamente dados sintéticos. |
+| **Fase 3 (Material Interno)** | Busca por planos, docs internos, credenciais privadas, IPs e arquivos `.env`. | **SEMPRE** | Evitar vazamento acidental de propriedade intelectual ou arquivos de ambiente. |
+| **Fase 4 (Purga de Histórico)** | Avaliação da necessidade de reescrita via `git filter-repo` / BFG. | **Condicional** | Re-rodar apenas se uma violação real de segredo for detectada nas Fases 1–3. |
+| **Fase 5 (Dependências/CVEs)** | Varredura de vulnerabilidades (`npm audit`), pinning de hashes SHA-256 e geração de SBOM. | **SEMPRE** | Novas CVEs públicas surgem continuamente mesmo sem mudanças de código. |
+| **Fase 6 (Config / Infra)** | Auditoria de workflows de CI/CD, permissões OIDC, logs e chaves de nuvem. | **Condicional** | Re-rodar apenas se houver alteração em `.github/workflows/` ou na infraestrutura GCP/Firebase. |
+| **Fase 7 (Verificação Final)** | Clone limpo, conferência de pre-commit e homologação formal do relatório. | **Condicional** | Execução plena quando houver mudanças relevantes em código ou dependências. |
+
+#### 3. Matriz de Responsabilidade (Papéis de Governança)
+- **Executor**: Responsável técnico pela execução operacional das fases de auditoria (executar scanners, testes adversariais, gerar SBOMs e redigir o relatório de evidências).
+- **Analista**: Validador independente responsável pela conferência rigorosa dos critérios de aceite (verificar conformidade estrita de zero segredos/PII/CVEs e regras do `AGENTS.md`).
+- **Principal (Liderança Técnica / DPO)**: Revisor final responsável pela aprovação formal do resumo executivo, aceite do risco residual e publicação institucional do relatório atualizado.
+
 
 
 
