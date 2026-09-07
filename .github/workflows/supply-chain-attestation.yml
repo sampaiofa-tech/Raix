@@ -37,6 +37,16 @@ jobs:
           distribution: 'microsoft'
           java-version: 17
 
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/libs.versions.toml', '**/*.gradle*', 'gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Validate Gradle Dependency Verification (SHA-256)
         run: ./gradlew :composeApp:desktopTest --no-daemon
 
@@ -65,6 +75,16 @@ jobs:
         with:
           distribution: 'microsoft'
           java-version: 17
+
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/libs.versions.toml', '**/*.gradle*', 'gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Build Desktop Artifact
         run: ./gradlew :composeApp:desktopJar --no-daemon
