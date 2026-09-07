@@ -3,224 +3,818 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Raix — Portal Legal, Termos de Uso, Política de Privacidade, DPA e Governança LGPD">
-  <title>Raix — Documentos Legais & Governança LGPD</title>
+  <meta name="description" content="Raix — Comunicação Efêmera Segura, Criptografia Pós-Quântica Híbrida e Privacidade Forte por Design. Governança LGPD e Cartilhas de Proteção.">
+  <title>Raix — Privacidade Forte por Design & Comunicação Efêmera</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1325;
-      --surface: #131c33;
-      --card-bg: #1c2744;
-      --text: #f3f4f6;
+      --bg: #070d19;
+      --surface: #0f172a;
+      --card-bg: #141f38;
+      --card-border: #1e2e50;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
+      --text-dim: #64748b;
       --primary: #00e676;
       --primary-hover: #00c853;
+      --primary-glow: rgba(0, 230, 118, 0.2);
       --accent-gold: #d4af37;
-      --border: #233154;
+      --accent-gold-glow: rgba(212, 175, 55, 0.15);
+      --danger: #ef4444;
+      --border: #1e293b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      padding: 2rem 1rem;
-      display: flex;
-      justify-content: center;
+      overflow-x: hidden;
     }
+    a { color: inherit; text-decoration: none; }
+
+    /* Layout Container */
     .container {
-      max-width: 860px;
-      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
     }
-    header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 2rem;
+
+    /* Navbar */
+    .nav-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(7, 13, 25, 0.85);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
-    .brand-logo-wrapper {
-      margin-bottom: 1.5rem;
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 72px;
     }
-    .brand-logo-wrapper img {
-      max-width: 130px;
-      height: auto;
-      border-radius: 14px;
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      color: #fff;
     }
-    .badge {
-      display: inline-block;
-      background-color: rgba(0, 230, 118, 0.1);
+    .brand-logo img {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+    }
+    .nav-links {
+      display: none;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    @media (min-width: 768px) {
+      .nav-links { display: flex; }
+    }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-cta {
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid var(--primary);
       color: var(--primary);
-      border: 1px solid rgba(0, 230, 118, 0.3);
-      padding: 0.3rem 0.8rem;
-      border-radius: 9999px;
       font-size: 0.85rem;
       font-weight: 600;
-      margin-bottom: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      transition: all 0.2s ease;
+    }
+    .nav-cta:hover {
+      background: var(--primary);
+      color: #0b1325;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    /* Hero Section */
+    #hero {
+      padding: 5rem 0 4rem;
+      text-align: center;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 230, 118, 0.08);
+      color: var(--primary);
+      border: 1px solid rgba(0, 230, 118, 0.25);
+      padding: 0.4rem 1.1rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
       letter-spacing: 0.5px;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
     }
-    h1 {
-      font-size: 2.5rem;
+    h1.hero-title {
+      font-size: 2.75rem;
       font-weight: 800;
-      margin-bottom: 0.5rem;
+      line-height: 1.2;
       color: #ffffff;
-      letter-spacing: 1px;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.5px;
     }
-    p.subtitle {
+    @media (min-width: 768px) {
+      h1.hero-title { font-size: 3.75rem; }
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #00e676 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.hero-subtitle {
+      font-size: 1.15rem;
       color: var(--text-muted);
-      font-size: 1.1rem;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
     }
-    .grid {
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #070d19;
+      font-weight: 700;
+      padding: 0.9rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px var(--primary-glow);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-weight: 600;
+      padding: 0.9rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--text-muted);
+      transform: translateY(-2px);
+    }
+
+    /* Sections */
+    section {
+      padding: 4.5rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .section-header {
+      text-align: center;
+      max-width: 740px;
+      margin: 0 auto 3rem;
+    }
+    .section-tag {
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    h2.section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1rem;
+      letter-spacing: -0.5px;
+    }
+    p.section-description {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    /* Grid Layouts */
+    .grid-3 {
       display: grid;
       grid-template-columns: 1fr;
       gap: 1.5rem;
-      margin-bottom: 3rem;
     }
-    @media (min-width: 640px) {
-      .grid { grid-template-columns: 1fr 1fr; }
+    @media (min-width: 768px) {
+      .grid-3 { grid-template-columns: repeat(3, 1fr); }
     }
-    .card {
-      background-color: var(--surface);
-      border: 1px solid var(--border);
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Cards */
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 1.75rem;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: all 0.25s ease;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-    .card:hover {
-      transform: translateY(-3px);
+    .feature-card:hover {
       border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
     }
-    .card h2 {
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-      color: var(--primary);
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(0, 230, 118, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
     }
-    .card p {
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.6rem;
+    }
+    .feature-card p {
       color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
+      font-size: 0.92rem;
       line-height: 1.6;
     }
-    .card a.btn {
-      display: inline-block;
-      text-decoration: none;
-      background-color: var(--primary);
-      color: #0b1325;
-      font-weight: 700;
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
+
+    /* Problem Cards Specific */
+    .problem-card {
+      background: rgba(239, 68, 68, 0.03);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 14px;
+      padding: 1.75rem;
+    }
+    .problem-card:hover {
+      border-color: rgba(239, 68, 68, 0.4);
+      transform: translateY(-4px);
+    }
+    .problem-card .card-icon {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Mission Section Specific */
+    .mission-box {
+      background: linear-gradient(135deg, rgba(19, 28, 51, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 18px;
+      padding: 3rem 2rem;
       text-align: center;
-      transition: background-color 0.2s;
-      font-size: 0.9rem;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
-    .card a.btn:hover {
-      background-color: var(--primary-hover);
+    .mission-tag {
+      color: var(--accent-gold);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      display: block;
     }
-    .zero-trace-box {
-      background-color: rgba(19, 28, 51, 0.7);
+    blockquote.mission-quote {
+      font-size: 1.4rem;
+      font-weight: 600;
+      line-height: 1.6;
+      color: #ffffff;
+      max-width: 820px;
+      margin: 0 auto;
+      font-style: italic;
+    }
+    @media (min-width: 768px) {
+      blockquote.mission-quote { font-size: 1.7rem; }
+    }
+
+    /* Commitment & Honesty Box */
+    .honesty-box {
+      background: rgba(0, 230, 118, 0.03);
+      border: 1px solid rgba(0, 230, 118, 0.2);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    .honesty-box h3 {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .honesty-box p {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* Proof Metrics */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (min-width: 768px) {
+      .metrics-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Legal & Cartilhas Grid */
+    .doc-card {
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
-      margin-bottom: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
     }
-    .zero-trace-box h3 {
+    .doc-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .doc-card h4 {
       font-size: 1.1rem;
-      color: var(--accent-gold);
+      color: #fff;
       margin-bottom: 0.5rem;
     }
-    .zero-trace-box p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-    footer {
-      text-align: center;
+    .doc-card p {
       font-size: 0.85rem;
       color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      padding-top: 2rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
     }
-    footer a { color: var(--primary); text-decoration: none; }
+    .doc-btn {
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .doc-btn:hover { text-decoration: underline; }
+
+    /* CTA Section */
+    #cta {
+      text-align: center;
+      padding: 5rem 0;
+      background: radial-gradient(circle at center, rgba(0, 230, 118, 0.08) 0%, rgba(7, 13, 25, 0) 70%);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 0 2rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      text-align: center;
+    }
+    @media (min-width: 768px) {
+      .footer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.25rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .footer-links a:hover { color: var(--primary); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="brand-logo-wrapper">
-        <img src="logo-empresa.png" alt="Marca Corporativa da Controladora">
-      </div>
-      <div class="badge">SEGURANÇA & PRIVACIDADE ESTRITA</div>
-      <h1>RAIX</h1>
-      <p class="subtitle">Portal Legal, Governança de Dados e Conformidade LGPD / MCI</p>
-    </header>
 
-    <div class="grid">
-      <div class="card">
-        <div>
-          <h2>Política de Privacidade (v3.0)</h2>
-          <p>Consulte como seus dados técnicos são minimizados, tratados sob a LGPD e por que o servidor opera como uma entidade cega (zero-knowledge) sem acesso ao conteúdo das mensagens.</p>
+  <!-- Barra de Navegação -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav>
+        <a href="#hero" class="brand-logo" id="nav-brand">
+          <img src="logo-empresa.png" alt="Marca Corporativa Raix">
+          <span>RAIX</span>
+        </a>
+        <div class="nav-links">
+          <a href="#problema">O Problema</a>
+          <a href="#solucao">A Solução</a>
+          <a href="#consultoria">Cartilhas & Consultoria</a>
+          <a href="#missao">Missão</a>
+          <a href="#prova">Segurança & Prova</a>
         </div>
-        <a href="privacidade.html" class="btn">Ler Política de Privacidade</a>
-      </div>
-
-      <div class="card">
-        <div>
-          <h2>Termos de Uso (v3.0)</h2>
-          <p>Conheça as regras de utilização, classificação 18+, custódia local de chaves no dispositivo, verificação mútua obrigatória e sanções de moderação com revogação Ed25519.</p>
-        </div>
-        <a href="termos.html" class="btn">Ler Termos de Uso</a>
-      </div>
-
-      <div class="card">
-        <div>
-          <h2>Acordo de Processamento (DPA)</h2>
-          <p>Instrumento contratual sob o Art. 39 da LGPD que disciplina a relação técnica entre o Controlador e a Operadora (Cat Tech), estabelecendo garantias de segurança da informação.</p>
-        </div>
-        <a href="dpa.html" class="btn">Ler Acordo DPA</a>
-      </div>
-
-      <div class="card">
-        <div>
-          <h2>Governança & ROPA (Art. 37)</h2>
-          <p>Registro público e transparente das 13 operações de tratamento de dados pessoais e técnicos de tráfego realizadas pela infraestrutura, com bases legais e prazos de descarte.</p>
-        </div>
-        <a href="governanca.html" class="btn">Ver Registro ROPA</a>
-      </div>
+        <a href="#consultoria" class="nav-cta" id="nav-cta-btn">Cartilhas Gratuitas</a>
+      </nav>
     </div>
-
-    <h2 style="font-size: 1.35rem; margin-bottom: 1rem; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
-      📚 Cartilhas Práticas de Privacidade &amp; Higiene Digital
-    </h2>
-    <div class="grid" style="margin-bottom: 2.5rem;">
-      <div class="card">
-        <div>
-          <h2>📱 Cartilha Android (Edição Brasil / LGPD)</h2>
-          <p>Checklist guiável de 1 página para impressão e consulta rápida: corte de localização contínua, exclusão de Advertising ID, expurgo de EXIF/GPS, DNS privado e guia para exercício de direitos LGPD.</p>
-        </div>
-        <a href="cartilha-android.html" class="btn">Abrir Cartilha Android</a>
-      </div>
-
-      <div class="card">
-        <div>
-          <h2>🍎 Cartilha iOS (Edição Brasil / LGPD)</h2>
-          <p>Checklist guiável de 1 página com passos objetivos: bloqueio de rastreamento entre apps (ATT), desativação de Locais Importantes, proteção contra pixels no Mail, Safari e direitos do titular.</p>
-        </div>
-        <a href="cartilha-ios.html" class="btn">Abrir Cartilha iOS</a>
-      </div>
-    </div>
-
-    <div class="zero-trace-box">
-      <h3>🛡️ Privacidade Forte por Design e Transparência Radical</h3>
-      <p>Este portal não utiliza cookies, não carrega scripts invasivos de terceiros, não realiza telemetria comportamental e opera sob infraestrutura de proteção distribuída. Depósito de marca nominativa agendado para 08/09/2026 perante o INPI (guia/protocolo preparatório nº <strong>945109300</strong>).</p>
-    </div>
-
-    <footer>
-      <p>Controladora: <strong>Cat Tech</strong> (CNPJ 67.497.085/0001-36) • Encarregado de Dados (DPO): Filippe Andrade Sampaio</p>
-      <p>Canal Oficial de Contato: <a href="mailto:contato@raixtech.com">contato@raixtech.com</a></p>
-      <p style="margin-top: 0.5rem; font-size: 0.75rem; color: #64748b;">© 2026 Raix. Todos os direitos reservados. Código livre sob licença AGPL-3.0.</p>
-    </footer>
   </div>
+
+  <!-- 1. HERO SECTION -->
+  <header id="hero">
+    <div class="container">
+      <div class="hero-badge">🛡️ Privacidade Forte por Design</div>
+      <h1 class="hero-title">
+        Controle Exclusivo para Suas<br>
+        <span class="gradient-text">Conversas e Decisões Críticas</span>
+      </h1>
+      <p class="hero-subtitle">
+        Mensageria de alta confidencialidade com criptografia pós-quântica híbrida, destruição criptográfica ativa e arquitetura cega de dados. Sem promessas mágicas: apenas rigor técnico, transparência radical e minimização extrema de rastros.
+      </p>
+      <div class="hero-actions">
+        <a href="#consultoria" class="btn-primary" id="hero-btn-cartilhas">
+          <span>Baixar Cartilhas de Privacidade</span>
+          <span>↓</span>
+        </a>
+        <a href="#solucao" class="btn-secondary" id="hero-btn-tech">
+          <span>Conhecer a Arquitetura</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. O PROBLEMA -->
+  <section id="problema">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">O Cenário Atual</span>
+        <h2 class="section-title">A Rastreabilidade Excessiva no Mundo Digital</h2>
+        <p class="section-description">
+          A maioria das plataformas modernas trata sua privacidade como moeda de troca. Mesmo aplicativos com criptografia ponta a ponta deixam rastros permanentes de metadados, localização e telemetria.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="problem-card">
+          <div class="card-icon">📍</div>
+          <h3>Vazamento Passivo de Metadados</h3>
+          <p>
+            Coordenadas EXIF/GPS em fotos, registros de IP persistentes e cabeçalhos de mensagens expõem onde você esteve, quando se comunicou e com quem falou, mesmo sem ler o conteúdo cifrado.
+          </p>
+        </div>
+
+        <div class="problem-card">
+          <div class="card-icon">🏢</div>
+          <h3>Data Brokers &amp; Perfilamento Comercial</h3>
+          <p>
+            Identificadores de publicidade (GAID e ATT) e cruzamentos entre apps alimentam corretores de dados (como Serasa Experian e birôs globais), criando perfis detalhados de comportamento e rotina.
+          </p>
+        </div>
+
+        <div class="problem-card">
+          <div class="card-icon">⏳</div>
+          <h3>Persistência Residual &amp; Risco Quântico</h3>
+          <p>
+            Backups automáticos em nuvens de terceiros mantêm dados arquivados por anos, sujeitos a ataques de coleta hoje para descriptografia futura (*Harvest Now, Decrypt Later*) por computadores quânticos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. A SOLUÇÃO -->
+  <section id="solucao">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Nossa Resposta Técnica</span>
+        <h2 class="section-title">O RAIX: Mensageria Efêmera &amp; Segurança Ativa</h2>
+        <p class="section-description">
+          Construído sob o paradigma de <strong>privacidade forte por design</strong>, o Raix remove a dependência da confiança no servidor através de garantias matemáticas e expurgo determinístico.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="feature-card">
+          <div class="card-icon">⚛️</div>
+          <h3>Criptografia Pós-Quântica Híbrida</h3>
+          <p>
+            Combinação do padrão NIST FIPS 203 (ML-KEM-768) com X25519 e assinaturas FIPS 204 (ML-DSA-65). Seus segredos protegidos contra computadores quânticos futuros e ataques criptoanalíticos clássicos.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">🌪️</div>
+          <h3>Crypto-Shredding Autoritativo</h3>
+          <p>
+            Destruição criptográfica física no servidor e nos dispositivos: chaves temporárias (DEK) e envelopes expiram e são incinerados sem recuperação possível na memória flash, com rotina de shredded multi-pass.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">👁️‍🗨️</div>
+          <h3>Arquitetura Zero-Knowledge</h3>
+          <p>
+            O servidor opera como uma entidade estritamente cega: não armazena números de telefone, não tem acesso ao conteúdo e utiliza hashes HMAC para pseudonimização legal de logs transitórios.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">🔐</div>
+          <h3>Custódia em Hardware Seguro</h3>
+          <p>
+            Sementes mnemônicas e chaves isoladas em silício dedicado (StrongBox/TEE no Android, Secure Enclave no iOS e DPAPI no Windows), com barreira de memória volátil anti-Dead-Store Elimination.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">🚫</div>
+          <h3>Proteção Anti-Captura &amp; Pânico</h3>
+          <p>
+            Bloqueio de capturas de tela com <code>FLAG_SECURE</code>, detecção de gravações, sanitização de clipboard e botão de Pânico instantâneo (Panic Wipe) para destruição imediata de salas locais.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">📦</div>
+          <h3>Cadeia de Suprimentos Hermética</h3>
+          <p>
+            Builds reproduzíveis com pin de dependências por SHA-256, Software Bill of Materials (SBOM CycloneDX) e atestados criptográficos SLSA Nível 2+ comprovando a integridade de cada versão.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. CARTILHAS & CONSULTORIA -->
+  <section id="consultoria">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Educação e Serviços Especializados</span>
+        <h2 class="section-title">Cartilhas de Higiene Digital &amp; Consultoria</h2>
+        <p class="section-description">
+          Disponibilizamos checklists práticos e gratuitos de 1 página para você endurecer seu smartphone hoje. Conheça também nossa trilha de consultoria corporativa planejada para o ciclo pós-rodada.
+        </p>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 2.5rem;">
+        <div class="feature-card" style="border-color: rgba(0, 230, 118, 0.4);">
+          <div>
+            <div class="card-icon">📱</div>
+            <h3>Cartilha de Endurecimento — Android</h3>
+            <p style="margin-bottom: 1.25rem;">
+              Checklist objetivo para Android 14/15: corte de localização "Sempre", exclusão imediata do Advertising ID, bloqueio de beacons Wi-Fi/Bluetooth, DNS privado (DoT) e direitos sob a LGPD no Brasil.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="cartilha-android.html" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;" id="btn-open-android">Abrir Versão Web</a>
+            <a href="cartilha-android.html" onclick="window.open(this.href); return false;" class="btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">🖨️ Imprimir 1 Página</a>
+          </div>
+        </div>
+
+        <div class="feature-card" style="border-color: rgba(56, 189, 248, 0.4);">
+          <div>
+            <div class="card-icon">🍎</div>
+            <h3>Cartilha de Endurecimento — iOS</h3>
+            <p style="margin-bottom: 1.25rem;">
+              Checklist prático para iPhone (iOS 17/18): bloqueio de rastreamento entre apps (ATT), desativação de Locais Importantes, proteção de IP no Mail e Safari, limpeza de geotags EXIF e direitos do titular.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="cartilha-ios.html" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;" id="btn-open-ios">Abrir Versão Web</a>
+            <a href="cartilha-ios.html" onclick="window.open(this.href); return false;" class="btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">🖨️ Imprimir 1 Página</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consultoria Pós-Rodada -->
+      <div class="feature-card" style="background: rgba(19, 28, 51, 0.6); border-color: rgba(212, 175, 55, 0.3);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+          <span style="font-size: 1.5rem;">💼</span>
+          <h3 style="margin: 0; color: var(--accent-gold);">Serviço de Consultoria de Cuidados de Privacidade (Pós-Rodada)</h3>
+        </div>
+        <p style="margin-bottom: 1rem;">
+          Ativo de receita complementar estruturado para apoiar executivos, escritórios e organizações na redução metódica de sua superfície de exposição. Dividido em <strong>10 áreas de conteúdo</strong>: pegada digital, redes sociais, hardening de dispositivos, gestão de segredos/MFA, anti-phishing por IA, segurança de rede/DNS, higienização forense de metadados, canais efêmeros de comunicação, proteção de identidade e segurança física de hardware.
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin: 0;">
+          *Serviço complementar em planejamento para execução pós-rodada seed, condicionado a revisão jurídica estrita, conformidade LGPD própria e sem dispersão do foco no desenvolvimento do aplicativo core.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. MISSÃO OFICIAL -->
+  <section id="missao" style="background: rgba(11, 19, 37, 0.5);">
+    <div class="container">
+      <div class="mission-box">
+        <span class="mission-tag">Nossa Missão Institucional</span>
+        <blockquote class="mission-quote">
+          “Garantir que cada conversa, documento e decisão crítica permaneça sob o controle exclusivo de quem a criou — com a menor rastreabilidade possível e a maior segurança alcançável, sem nunca sacrificar a honestidade técnica pela promessa de marketing.”
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. COMPROMISSO COM A HONESTIDADE TÉCNICA -->
+  <section id="compromisso">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Ética e Rigor Científico</span>
+        <h2 class="section-title">Nosso Compromisso: Honestidade Técnica Radical</h2>
+        <p class="section-description">
+          Privacidade não se constrói com slogans apelativos. Conheça a postura ética que guia cada linha de código que escrevemos.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="feature-card">
+          <h3>Por que rejeitamos "Zero-Trace Absoluto"</h3>
+          <p>
+            Em qualquer sistema computacional conectado à internet, pacotes trafegam por roteadores, antenas e provedores físicos. Prometer "invisibilidade total" ou "anonimato absoluto" é desonestidade científica. Nosso compromisso é com a <strong>privacidade forte por design</strong>: minimização implacável de dados coletados, criptografia resistente a ataques quânticos e destruição rápida de estados voláteis.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Auditabilidade e Código Aberto</h3>
+          <p>
+            A segurança da informação não pode depender de segredos comerciais ou caixas-pretas proprietárias. O core do Raix é licenciado sob a <strong>GNU AGPL-3.0</strong>: o código que você audita é exatamente o código que executa. Mantemos um registro público ROPA (Art. 37 da LGPD) detalhando cada ciclo de vida dos dados técnicos.
+          </p>
+        </div>
+      </div>
+
+      <div class="honesty-box">
+        <h3>⚖️ Termos de Transparência e Limites de Proteção</h3>
+        <p>
+          O Raix é uma ferramenta de comunicação de alta segurança projetada para defender seus direitos legítimos à intimidade, sigilo profissional e proteção contra vigilância indevida. Nossas cartilhas e ferramentas são de natureza estritamente informativa e defensiva, não constituindo assessoria jurídica nem substituindo boas práticas individuais de higiene cibernética.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. PROVA: SEGURANÇA, COMPLIANCE & GOVERNANÇA -->
+  <section id="prova">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Fundamentação Técnica e Jurídica</span>
+        <h2 class="section-title">Evidências de Conformidade &amp; Resiliência</h2>
+        <p class="section-description">
+          Garantias auditáveis em conformidade com as melhores práticas de criptografia internacional e o ordenamento regulatório brasileiro.
+        </p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">FIPS 203/204</div>
+          <div class="metric-label">Padrões NIST Pós-Quânticos</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">LGPD &amp; MCI</div>
+          <div class="metric-label">Conformidade Legal Estrita</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">SLSA L2+</div>
+          <div class="metric-label">Atestados de Supply Chain</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">HSTS &amp; DNSSEC</div>
+          <div class="metric-label">Proteção Perimetral de Borda</div>
+        </div>
+      </div>
+
+      <!-- Portal Legal e Documentos -->
+      <h3 style="font-size: 1.3rem; color: #fff; margin-bottom: 1.25rem;">📄 Documentação Legal &amp; Governança Corporativa</h3>
+      <div class="grid-2">
+        <div class="doc-card">
+          <div>
+            <h4>Política de Privacidade (v3.0)</h4>
+            <p>Tratamento de dados técnicos de tráfego, minimização estrita e arquitetura cega de processamento sob a LGPD.</p>
+          </div>
+          <a href="privacidade.html" class="doc-btn">Ler Política Completa →</a>
+        </div>
+
+        <div class="doc-card">
+          <div>
+            <h4>Termos de Uso (v3.0)</h4>
+            <p>Regras de conduta, custódia local de chaves, verificação mútua e sanções de moderação com revogação Ed25519.</p>
+          </div>
+          <a href="termos.html" class="doc-btn">Ler Termos de Uso →</a>
+        </div>
+
+        <div class="doc-card">
+          <div>
+            <h4>Acordo de Processamento de Dados (DPA)</h4>
+            <p>Instrumento contratual sob o Art. 39 da LGPD entre o Controlador e a Operadora (Cat Tech).</p>
+          </div>
+          <a href="dpa.html" class="doc-btn">Consultar Acordo DPA →</a>
+        </div>
+
+        <div class="doc-card">
+          <div>
+            <h4>Governança de Dados &amp; ROPA (Art. 37)</h4>
+            <p>Inventário público e transparente de todas as 13 operações de tratamento técnico realizadas pela infraestrutura.</p>
+          </div>
+          <a href="governanca.html" class="doc-btn">Ver Registro ROPA →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. CTA FINAL -->
+  <section id="cta">
+    <div class="container">
+      <h2 style="font-size: 2.25rem; font-weight: 800; color: #fff; margin-bottom: 1rem;">
+        Pronto para Elevar o Padrão de Sua Privacidade?
+      </h2>
+      <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 640px; margin: 0 auto 2.5rem;">
+        Comece baixando gratuitamente nossas cartilhas de endurecimento para Android e iOS ou consulte nosso repositório de código e governança técnica.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="#consultoria" class="btn-primary" id="cta-btn-cartilhas">
+          <span>Acessar Cartilhas Gratuitas</span>
+          <span>↓</span>
+        </a>
+        <a href="https://github.com/sampaiofa-tech/Raix" target="_blank" rel="noopener noreferrer" class="btn-secondary" id="cta-btn-repo">
+          <span>Repositório GitHub (AGPL-3.0)</span>
+          <span>↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RODAPÉ -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <p><strong>Cat Tech</strong> (CNPJ 67.497.085/0001-36) • Encarregado pelo Tratamento de Dados (DPO): Filippe Andrade Sampaio</p>
+          <p style="margin-top: 0.25rem;">Canal Oficial de Privacidade: <a href="mailto:contato@raixtech.com" style="color: var(--primary);">contato@raixtech.com</a></p>
+          <p style="margin-top: 0.25rem; font-size: 0.78rem;">Depósito de marca nominativa agendado perante o INPI (guia nº <strong>945109300</strong>) • Domínio com DNSSEC, SPF, DKIM e DMARC ativos.</p>
+        </div>
+        <div class="footer-links">
+          <a href="privacidade.html">Privacidade</a>
+          <a href="termos.html">Termos</a>
+          <a href="dpa.html">DPA</a>
+          <a href="governanca.html">ROPA</a>
+          <a href="cartilha-android.html">Cartilha Android</a>
+          <a href="cartilha-ios.html">Cartilha iOS</a>
+          <a href="security.txt">security.txt</a>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 2rem; font-size: 0.78rem; color: #475569;">
+        © 2026 Raix. Privacidade forte por design. Todos os direitos reservados.
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>
