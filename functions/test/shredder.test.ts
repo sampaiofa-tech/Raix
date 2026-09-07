@@ -283,4 +283,71 @@ describe("Crypto-Shredder Authoritative Server-Side TTL & Escalation Test Suite 
     expect(batchDeletedPaths).toContain("messageKeys/key_isolated_001");
     expect(batchDeletedPaths).toContain("messages/msg_isolated_001");
   });
+
+  it("PER-DOCUMENT ISOLATION: a single corrupted document does not prevent deletion of other valid expired documents", async () => {
+    const nowMillis = 1700000000000;
+    const nowTimestamp = {
+      toMillis: () => nowMillis,
+    } as any;
+
+    const validDoc = {
+      id: "doc_valid_001",
+      data: () => ({
+        messageId: "msg_valid_001",
+        dek: "valid_aes_dek",
+        expiresAt: { toMillis: () => nowMillis - 1000 },
+      }),
+      ref: { path: "messageKeys/doc_valid_001", parent: { id: "messageKeys" } },
+    };
+
+    const corruptedDoc = {
+      id: "doc_corrupt_002",
+      data: () => {
+        throw new Error("Malicious or corrupted document structure in Firestore");
+      },
+      ref: { path: "messageKeys/doc_corrupt_002", parent: { id: "messageKeys" } },
+    };
+
+    let dekBatchCommitted = false;
+
+    mockDb = {
+      collection: (name: string) => ({
+        where: () => ({
+          limit: () => ({
+            get: async () => ({
+              empty: name !== "messageKeys",
+              docs: name === "messageKeys" ? [corruptedDoc, validDoc] : [],
+            }),
+          }),
+        }),
+        doc: (id: string) => ({ path: `${name}/${id}` }),
+      }),
+      collectionGroup: () => ({
+        where: () => ({
+          limit: () => ({
+            get: async () => ({ empty: true, docs: [] }),
+          }),
+        }),
+      }),
+      batch: () => ({
+        delete: (ref: any) => {
+          batchDeletedPaths.push(ref.path);
+        },
+        commit: async () => {
+          dekBatchCommitted = true;
+        },
+      }),
+    };
+
+    // The execution should throw because corruptedDoc failed,
+    // BUT validDoc must have been processed and committed!
+    await expect(executeCryptoShredding(mockDb, nowTimestamp)).rejects.toThrow(
+      /Crypto-Shredder partial failure.*messageKeys\/doc_corrupt_002/
+    );
+
+    // CRITICAL: The valid document DEK was destroyed and committed despite neighbor corruption!
+    expect(dekBatchCommitted).toBe(true);
+    expect(batchDeletedPaths).toContain("messageKeys/doc_valid_001");
+    expect(batchDeletedPaths).toContain("messages/msg_valid_001");
+  });
 });

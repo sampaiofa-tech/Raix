@@ -55,50 +55,57 @@ export async function executeCryptoShredding(
     if (!snapshot.empty) {
       const dekBatch = db.batch();
       for (const doc of snapshot.docs) {
-        const data = doc.data();
-        const messageId = data.messageId || doc.id;
+        try {
+          const data = doc.data();
+          const messageId = data.messageId || doc.id;
 
-        if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
-          const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
-          if (delayMs > maxDelayMs) maxDelayMs = delayMs;
+          if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
+            const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
+            if (delayMs > maxDelayMs) maxDelayMs = delayMs;
 
-          logger.info("ttl_expiration_to_deletion_delays", {
-            metric: "ttl_expiration_to_deletion_delays",
-            collection: "messageKeys",
-            docId: doc.id,
-            delayMs,
-          });
+            logger.info("ttl_expiration_to_deletion_delays", {
+              metric: "ttl_expiration_to_deletion_delays",
+              collection: "messageKeys",
+              docId: doc.id,
+              delayMs,
+            });
 
-          if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
-            escalationAlertsCount++;
-            if (delayMs > SEVERE_SURVIVAL_DELAY_MS) {
-              logger.error("[ALERT_ESCALATION_LEVEL_2] CRITICAL: Envelope key survived > 3 hours past expiration!", {
-                docId: doc.id,
-                delayMs,
-                threshold: "180m",
-              });
-            } else {
-              logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Envelope key survived > 60 min past expiration!", {
-                docId: doc.id,
-                delayMs,
-                threshold: "60m",
-              });
+            if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
+              escalationAlertsCount++;
+              if (delayMs > SEVERE_SURVIVAL_DELAY_MS) {
+                logger.error("[ALERT_ESCALATION_LEVEL_2] CRITICAL: Envelope key survived > 3 hours past expiration!", {
+                  docId: doc.id,
+                  delayMs,
+                  threshold: "180m",
+                });
+              } else {
+                logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Envelope key survived > 60 min past expiration!", {
+                  docId: doc.id,
+                  delayMs,
+                  threshold: "60m",
+                });
+              }
             }
           }
+
+          // 1. Hard-delete DEK (Irreversible Crypto-Shredding)
+          dekBatch.delete(doc.ref);
+
+          // 2. Hard-delete matching ciphertext message document (if exists)
+          const messageRef = db.collection("messages").doc(messageId);
+          dekBatch.delete(messageRef);
+
+          messageCount++;
+        } catch (docError) {
+          logger.error(`[Crypto-Shredder] Error preparing deletion for DEK doc ${doc.id}:`, docError);
+          stageErrors.push({ stage: `messageKeys/${doc.id}`, error: docError });
         }
-
-        // 1. Hard-delete DEK (Irreversible Crypto-Shredding)
-        dekBatch.delete(doc.ref);
-
-        // 2. Hard-delete matching ciphertext message document (if exists)
-        const messageRef = db.collection("messages").doc(messageId);
-        dekBatch.delete(messageRef);
-
-        messageCount++;
       }
 
-      await dekBatch.commit();
-      logger.info(`Crypto-Shredder [Stage 1]: Priority commit successful. Destroyed ${messageCount} DEKs and messages.`);
+      if (messageCount > 0) {
+        await dekBatch.commit();
+        logger.info(`Crypto-Shredder [Stage 1]: Priority commit successful. Destroyed ${messageCount} DEKs and messages.`);
+      }
     }
   } catch (error) {
     logger.error("[Crypto-Shredder] Fatal error during primary DEK shredding stage:", error);
@@ -120,33 +127,40 @@ export async function executeCryptoShredding(
     if (!inboxSnapshot.empty) {
       const inboxBatch = db.batch();
       for (const doc of inboxSnapshot.docs) {
-        const data = doc.data();
-        if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
-          const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
-          if (delayMs > maxDelayMs) maxDelayMs = delayMs;
+        try {
+          const data = doc.data();
+          if (data.expiresAt && typeof data.expiresAt.toMillis === "function") {
+            const delayMs = currentTime.toMillis() - data.expiresAt.toMillis();
+            if (delayMs > maxDelayMs) maxDelayMs = delayMs;
 
-          logger.info("ttl_expiration_to_deletion_delays", {
-            metric: "ttl_expiration_to_deletion_delays",
-            collection: "inbox",
-            docId: doc.id,
-            delayMs,
-          });
-
-          if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
-            escalationAlertsCount++;
-            logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Inbox envelope survived > 60 min past expiration!", {
+            logger.info("ttl_expiration_to_deletion_delays", {
+              metric: "ttl_expiration_to_deletion_delays",
+              collection: "inbox",
               docId: doc.id,
               delayMs,
             });
-          }
-        }
 
-        inboxBatch.delete(doc.ref);
-        inboxCount++;
+            if (delayMs > MAX_SAFE_SURVIVAL_DELAY_MS) {
+              escalationAlertsCount++;
+              logger.warn("[ALERT_ESCALATION_LEVEL_1] WARNING: Inbox envelope survived > 60 min past expiration!", {
+                docId: doc.id,
+                delayMs,
+              });
+            }
+          }
+
+          inboxBatch.delete(doc.ref);
+          inboxCount++;
+        } catch (docError) {
+          logger.error(`[Crypto-Shredder] Error preparing deletion for inbox doc ${doc.id}:`, docError);
+          stageErrors.push({ stage: `inbox/${doc.id}`, error: docError });
+        }
       }
 
-      await inboxBatch.commit();
-      logger.info(`Crypto-Shredder [Stage 2]: Successfully purged ${inboxCount} expired inbox envelopes.`);
+      if (inboxCount > 0) {
+        await inboxBatch.commit();
+        logger.info(`Crypto-Shredder [Stage 2]: Successfully purged ${inboxCount} expired inbox envelopes.`);
+      }
     }
   } catch (error) {
     logger.error("[Crypto-Shredder] Error during secondary inbox shredding stage:", error);
@@ -170,10 +184,15 @@ export async function executeCryptoShredding(
     const connLogsSnapshot = await expiredConnLogsQuery.get();
     if (!connLogsSnapshot.empty) {
       for (const doc of connLogsSnapshot.docs) {
-        logsBatch.delete(doc.ref);
-        logsCount++;
+        try {
+          logsBatch.delete(doc.ref);
+          logsCount++;
+          hasLogDeletions = true;
+        } catch (docError) {
+          logger.error(`[Crypto-Shredder] Error preparing deletion for connLog doc ${doc.id}:`, docError);
+          stageErrors.push({ stage: `connectionLogs/${doc.id}`, error: docError });
+        }
       }
-      hasLogDeletions = true;
     }
 
     const expiredAccessLogsQuery = db
@@ -184,10 +203,15 @@ export async function executeCryptoShredding(
     const accessLogsSnapshot = await expiredAccessLogsQuery.get();
     if (!accessLogsSnapshot.empty) {
       for (const doc of accessLogsSnapshot.docs) {
-        logsBatch.delete(doc.ref);
-        logsCount++;
+        try {
+          logsBatch.delete(doc.ref);
+          logsCount++;
+          hasLogDeletions = true;
+        } catch (docError) {
+          logger.error(`[Crypto-Shredder] Error preparing deletion for accessLog doc ${doc.id}:`, docError);
+          stageErrors.push({ stage: `accessLogs/${doc.id}`, error: docError });
+        }
       }
-      hasLogDeletions = true;
     }
 
     if (hasLogDeletions) {

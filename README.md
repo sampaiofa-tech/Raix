@@ -39,6 +39,12 @@ O **Raix** foi desenvolvido com um objetivo claro: **garantir privacidade forte 
 6. **Backup e Extração Desativados**:
    - `android:allowBackup="false"` e regras de exclusão completas para prevenir cópia de banco via ADB ou nuvem.
 
+7. **Segurança Perimetral, HSTS e Autenticação de Domínio (P2 & P3)**:
+   - Política rigorosa **HSTS Preload (`max-age=31536000; includeSubDomains; preload`)** em trânsito.
+   - Autenticação anti-phishing de e-mail institucional: **SPF**, **DKIM (RSA 2048)** e **DMARC** ativos em `raixtech.com`.
+   - Divulgação responsável de vulnerabilidades via **RFC 9116 security.txt** (`/.well-known/security.txt`).
+   - Detalhamento e governança de borda documentados em [`docs/DNS_SECURITY.md`](docs/DNS_SECURITY.md).
+
 ---
 
 ## 🌪️ Arquitetura Server-Side de Efemeridade (Expiração Autoritativa & Crypto-Shredding)

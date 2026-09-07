@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - 'firestore.rules'
+      - 'firestore.indexes.json'
       - 'functions/**'
       - '.github/workflows/firestore-rules.yml'
   pull_request:
     branches: [main]
     paths:
       - 'firestore.rules'
+      - 'firestore.indexes.json'
       - 'functions/**'
       - '.github/workflows/firestore-rules.yml'
   workflow_dispatch:
@@ -41,6 +43,10 @@ jobs:
       - name: Install Functions Dependencies
         run: |
           npm ci --prefix functions
+
+      - name: Index-as-Code CI Check (Firestore Index Coverage)
+        run: |
+          npm run check:indexes --prefix functions
 
       - name: Run Adversarial Rules Suite in Firebase Emulator
         run: |
