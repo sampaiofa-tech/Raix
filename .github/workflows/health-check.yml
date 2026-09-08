@@ -1,0 +1,314 @@
+name: System Health Check (Scheduled)
+
+on:
+  schedule:
+    # 07:00 UTC (04:00 Horário de Brasília / UTC-3)
+    - cron: '0 7 * * *'
+    # 23:00 UTC (20:00 Horário de Brasília / UTC-3)
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  health-check:
+    name: Regression Suite & Health Monitor
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Install Functions Dependencies
+        run: npm ci --prefix functions
+
+      - name: Restore Last Health Check Commit Cache
+        uses: actions/cache/restore@v4
+        id: last-commit-cache
+        with:
+          path: .health_check_last_commit
+          key: health-check-last-commit-${{ runner.os }}-
+          restore-keys: |
+            health-check-last-commit-${{ runner.os }}-
+
+      - name: Inspect Code Changes
+        id: git_diff
+        run: |
+          echo "=== Últimos 5 commits no repositório ==="
+          git log --oneline -5
+
+          PREV_COMMIT=""
+          if [ -f ".health_check_last_commit" ]; then
+            PREV_COMMIT=$(tr -d '[:space:]' < .health_check_last_commit)
+          fi
+
+          if [ -n "$PREV_COMMIT" ] && git merge-base --is-ancestor "$PREV_COMMIT" HEAD 2>/dev/null; then
+            echo "Comparando com a execução anterior ($PREV_COMMIT)..."
+            if [ "$PREV_COMMIT" = "$(git rev-parse HEAD)" ]; then
+              echo "Nenhum commit novo desde a última execução." > commits_raw.txt
+            else
+              NEW_COMMITS=$(git log --oneline "$PREV_COMMIT..HEAD")
+              if [ -z "$NEW_COMMITS" ]; then
+                echo "Nenhum commit novo desde a última execução." > commits_raw.txt
+              else
+                echo "$NEW_COMMITS" > commits_raw.txt
+              fi
+            fi
+          else
+            echo "Primeira execução ou commit base anterior não encontrado no histórico local."
+            git log --oneline -5 > commits_raw.txt
+          fi
+
+          echo "=== Lista de commits selecionada ==="
+          cat commits_raw.txt
+
+      - name: Run Backend Tests (Cloud Functions)
+        id: test_backend
+        continue-on-error: true
+        run: npm --prefix functions test
+
+      - name: Run Firestore Index Coverage Check
+        id: test_indexes
+        continue-on-error: true
+        run: npm --prefix functions run check:indexes
+
+      - name: Run Desktop Tests (Compose Desktop)
+        id: test_desktop
+        continue-on-error: true
+        run: ./gradlew :composeApp:desktopTest --no-daemon --stacktrace
+
+      - name: Run Android Unit Tests (Compose Android)
+        id: test_android
+        continue-on-error: true
+        run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Generate Health Check Reports (HTML & TXT)
+        id: report
+        if: always()
+        run: |
+          STATUS_BACKEND="${{ steps.test_backend.outcome }}"
+          STATUS_INDEXES="${{ steps.test_indexes.outcome }}"
+          STATUS_DESKTOP="${{ steps.test_desktop.outcome }}"
+          STATUS_ANDROID="${{ steps.test_android.outcome }}"
+
+          OVERALL_STATUS="SUCCESS"
+          STATUS_ICON="✅"
+          HEADER_COLOR="#059669"
+          BADGE_BG="#d1fae5"
+          BADGE_COLOR="#065f46"
+
+          if [ "$STATUS_BACKEND" != "success" ] || [ "$STATUS_INDEXES" != "success" ] || [ "$STATUS_DESKTOP" != "success" ] || [ "$STATUS_ANDROID" != "success" ]; then
+            OVERALL_STATUS="FAILURE"
+            STATUS_ICON="❌"
+            HEADER_COLOR="#dc2626"
+            BADGE_BG="#fee2e2"
+            BADGE_COLOR="#991b1b"
+          fi
+
+          get_html_badge() {
+            if [ "$1" = "success" ]; then
+              echo '<span style="color:#059669;font-weight:bold;">✅ PASSOU</span>'
+            elif [ "$1" = "skipped" ]; then
+              echo '<span style="color:#d97706;font-weight:bold;">⚠️ PULADO</span>'
+            else
+              echo '<span style="color:#dc2626;font-weight:bold;">❌ FALHOU</span>'
+            fi
+          }
+
+          get_plain_status() {
+            if [ "$1" = "success" ]; then
+              echo "[PASSOU]"
+            elif [ "$1" = "skipped" ]; then
+              echo "[PULADO]"
+            else
+              echo "[FALHOU]"
+            fi
+          }
+
+          BADGE_BACKEND=$(get_html_badge "$STATUS_BACKEND")
+          BADGE_INDEXES=$(get_html_badge "$STATUS_INDEXES")
+          BADGE_DESKTOP=$(get_html_badge "$STATUS_DESKTOP")
+          BADGE_ANDROID=$(get_html_badge "$STATUS_ANDROID")
+
+          PLAIN_BACKEND=$(get_plain_status "$STATUS_BACKEND")
+          PLAIN_INDEXES=$(get_plain_status "$STATUS_INDEXES")
+          PLAIN_DESKTOP=$(get_plain_status "$STATUS_DESKTOP")
+          PLAIN_ANDROID=$(get_plain_status "$STATUS_ANDROID")
+
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXEC_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          # Escapa caracteres HTML para exibição segura dos commits
+          COMMITS_HTML=$(sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' commits_raw.txt)
+          COMMITS_PLAIN=$(cat commits_raw.txt)
+
+          # Gerar report.html
+          cat <<EOF > report.html
+          <!DOCTYPE html>
+          <html lang="pt-BR">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Relatório de Saúde do Sistema - Pmsg</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 24px; line-height: 1.5; }
+              .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); max-width: 680px; margin: 0 auto; overflow: hidden; border: 1px solid #e2e8f0; }
+              .header { background-color: ${HEADER_COLOR}; color: #ffffff; padding: 24px; }
+              .header h2 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; }
+              .header p { margin: 0; font-size: 13px; opacity: 0.92; }
+              .content { padding: 24px; }
+              .status-badge { display: inline-block; padding: 6px 14px; border-radius: 9999px; font-weight: 700; font-size: 13px; background-color: ${BADGE_BG}; color: ${BADGE_COLOR}; margin-bottom: 20px; }
+              h3 { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 20px; margin-bottom: 12px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+              th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+              th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+              .commits-box { background-color: #0f172a; color: #f8fafc; padding: 14px; border-radius: 8px; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+              .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; }
+              .footer-meta { margin-bottom: 14px; }
+              .btn { display: inline-block; background-color: #0284c7; color: #ffffff !important; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; }
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <div class="header">
+                <h2>${STATUS_ICON} Relatório de Saúde do Sistema - Pmsg</h2>
+                <p>Executado em ${EXEC_DATE}</p>
+              </div>
+              <div class="content">
+                <div class="status-badge">Resultado Geral: ${OVERALL_STATUS}</div>
+
+                <h3>🧪 Suítes de Testes de Regressão</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Escopo / Componente</th>
+                      <th>Comando</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Backend Functions (Jest)</strong></td>
+                      <td><code>npm --prefix functions test</code></td>
+                      <td>${BADGE_BACKEND}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Firestore Indexes Coverage</strong></td>
+                      <td><code>npm --prefix functions run check:indexes</code></td>
+                      <td>${BADGE_INDEXES}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Desktop Multiplatform (JVM)</strong></td>
+                      <td><code>./gradlew :composeApp:desktopTest</code></td>
+                      <td>${BADGE_DESKTOP}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Android Multiplatform (Unit)</strong></td>
+                      <td><code>./gradlew :composeApp:testDebugUnitTest</code></td>
+                      <td>${BADGE_ANDROID}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3>📝 Mudanças de Código / Commits Recentes</h3>
+                <div class="commits-box">${COMMITS_HTML}</div>
+
+                <div class="footer">
+                  <div class="footer-meta">
+                    <strong>Branch:</strong> ${{ github.ref_name }} &bull; 
+                    <strong>Commit:</strong> <code>${{ github.sha }}</code> &bull; 
+                    <strong>Disparo:</strong> ${{ github.event_name }}
+                  </div>
+                  <a href="${RUN_URL}" class="btn">Visualizar Execução no GitHub Actions</a>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+          # Gerar report.txt (plain text fallback)
+          cat <<EOF > report.txt
+          ==================================================
+          PMSG - RELATÓRIO DE SAÚDE DO SISTEMA
+          Resultado Geral: ${OVERALL_STATUS} ${STATUS_ICON}
+          Data: ${EXEC_DATE}
+          ==================================================
+
+          SUÍTES DE TESTES:
+          - Backend Functions (Jest): ${PLAIN_BACKEND}
+          - Firestore Indexes Coverage: ${PLAIN_INDEXES}
+          - Desktop Multiplatform (JVM): ${PLAIN_DESKTOP}
+          - Android Multiplatform (Unit): ${PLAIN_ANDROID}
+
+          MUDANÇAS DE CÓDIGO / COMMITS:
+          ${COMMITS_PLAIN}
+
+          INFORMAÇÕES DA EXECUÇÃO:
+          - Branch: ${{ github.ref_name }}
+          - Commit: ${{ github.sha }}
+          - Evento: ${{ github.event_name }}
+          - Link do Run: ${RUN_URL}
+          ==================================================
+          EOF
+
+          echo "overall_status=$OVERALL_STATUS" >> $GITHUB_OUTPUT
+          echo "status_icon=$STATUS_ICON" >> $GITHUB_OUTPUT
+
+      - name: Send Health Check Email Report
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "[Pmsg Health] ${{ steps.report.outputs.status_icon }} Saúde do Sistema: ${{ steps.report.outputs.overall_status }} (${{ github.ref_name }})"
+          to: ${{ secrets.SMTP_TO }}
+          from: "Pmsg Health Monitor <${{ secrets.SMTP_USER }}>"
+          html_body: file://report.html
+          body: file://report.txt
+
+      - name: Prepare Last Commit State for Cache
+        if: always()
+        run: echo "${{ github.sha }}" > .health_check_last_commit
+
+      - name: Save Health Check Commit Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .health_check_last_commit
+          key: health-check-last-commit-${{ runner.os }}-${{ github.run_id }}
+
+      - name: Enforce Overall Job Status
+        if: always()
+        run: |
+          if [ "${{ steps.report.outputs.overall_status }}" != "SUCCESS" ]; then
+            echo "❌ Uma ou mais suítes de testes de regressão falharam. Finalizando job com código de erro."
+            exit 1
+          fi
+          echo "✅ Todas as suítes de teste foram executadas com sucesso."
