@@ -6,6 +6,7 @@
 > **DATA DO CONSENSO:** 22 de Maio de 2024 (Registro Formal e Definitivo)  
 > **CHANCELA:** Consenso Técnico Conjunto (Guru Criptográfico ↔ Futuro/Arquitetura) + Validação Executiva (Assessor de Investimentos)  
 > **CLASSIFICAÇÃO:** Documento Estratégico Diretor (Sem mais discussões pendentes)  
+> **DOCUMENTO-MESTRE:** [ESTADO_RAIX.md](ESTADO_RAIX.md) (Fonte Única de Verdade do Projeto v2.0)  
 
 ---
 
