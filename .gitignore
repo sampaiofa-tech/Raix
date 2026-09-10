@@ -24,6 +24,9 @@ dist/
 .navigation
 captures/
 output.json
+hosting_metrics.json
+hosting_table.html
+hosting_table.txt
 .backups/
 .agents/
 kotlin-js-store/
@@ -33,6 +36,8 @@ functions/lib/
 *-debug.log
 firestore-debug.log
 composeApp/google-services.json
+__pycache__/
+*.pyc
 
 # Added by ggshield
 .cache_ggshield
