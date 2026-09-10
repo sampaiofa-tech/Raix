@@ -5,6 +5,7 @@
 > **DATA:** 22 de Maio de 2024 (Registro Formal)  
 > **AUTOR:** Consenso Técnico (Guru Criptográfico ↔ Futuro / Arquitetura) + Validação Estratégica (Assessor)  
 > **CLASSIFICAÇÃO:** Documentação Estratégica de Plataforma e Engenharia de Segurança  
+> **MASTER PLAN DIRETOR:** [MASTER_PLAN.md](MASTER_PLAN.md) (Estratégia Trienal e 6 Camadas da Fortaleza)  
 
 ---
 
