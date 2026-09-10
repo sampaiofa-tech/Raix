@@ -193,3 +193,30 @@ A execução do Master Plan segue uma **cascata sequencial estrita**, onde a mat
    - Qualquer evolução nas diretrizes deste documento exige concordância unânime do Consenso Técnico e aprovação do Assessor Executivo, veiculada exclusivamente através do canal formal de Análise.
 3. **Segurança Permanente do Agente:**
    - Aplicação irrestrita das regras do [`AGENTS.md`](../AGENTS.md) em qualquer iteração presente ou futura: sigilo total de chaves, anonimato por padrão e zero tolerância ao vazamento de credenciais ou segredos.
+
+---
+
+## 7. Adendo de Evolução: Endurecimento e Satélites B2B (Registro Referencial)
+
+Conforme consenso estabelecido em 22 de Maio de 2024, fica registrado neste Master Plan o escopo complementar de endurecimento (Bloco A) e os satélites de monetização B2B (Bloco B), que comporão o roadmap pós-rodada. Este registro atua estritamente como referência documental, respeitando a regra de **Baseline Congelado** (nenhuma inclusão de código ou escopo novo no ciclo atual).
+
+### 7.1 Bloco A: Endurecimento da Fortaleza (Hardening)
+- **Padding de Tráfego:** Ofuscação e calibração de padrões de rede com injeção de pacotes (calibrado com piloto, Track 2).
+- **Isolamento Wasm/Rust em Clientes Web:** Garantia de execução protegida da lógica de chaves no navegador com limpezas rigorosas via `zeroize` na memória volátil.
+- **Contra-Inteligência:** O escopo do módulo RFI (Raix Forensic Intelligence) fica estritamente documentado sob o status mandatório `LOCKED_PENDING_LEGAL_REVIEW`.
+
+### 7.2 Bloco B: Satélites B2B e Continuidade
+Os satélites complementares ingressam na camada de Ativos (Camada 2) e Comunicação (Camada 3), estruturados como propulsores de monetização sucessores do PQ-Vault:
+1. **RAIX Sign (P1 - Prioridade Máxima):** Plataforma de assinatura digital B2B. Reutiliza as primitivas do `raix-crypto-core` (ML-DSA-65). Estratégia de precificação transacional por documento/assinatura corporativa.
+2. **RAIX Drop (P2):** Sistema efêmero para transferência de arquivos (*Low-Assurance*), focado em compartilhamento ágil e pontual. Modelo de aquisição Freemium/Pro.
+3. **Protocolo Lázaro (P3):** Solução premium de continuidade da semente (Mnemônico) baseada no esquema SLIP-0039 (*Shamir's Secret Sharing*). Endereçado aos segmentos Private/Enterprise.
+
+### 7.3 Priorização Integrada do Pipeline
+A alocação de recursos e introdução das novas features respeitará inegociavelmente a seguinte ordem sequencial de desenvolvimento e deploy:
+1. Auditoria Externa (P0)
+2. Integração Pós-Quântica (PQ)
+3. Cofre Pós-Quântico (PQ-Vault)
+4. **Satélites B2B (RAIX Sign > RAIX Drop > Protocolo Lázaro)**
+5. Track 2 (Modelos de tração alternativos)
+6. Camadas Premium e Consultoria B2B
+7. Sentinela Digital (R&D)
