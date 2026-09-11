@@ -26,6 +26,8 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 - **Landing page:** publicada (redesign com 8 correções)
 - **Consultoria de privacidade:** registrada (pós-rodada)
 - **PQ-Vault:** PRÓXIMA RECEITA (evolução imediata pós-estabilidade)
+- **Satélites B2B:** ROADMAP (Sign, Drop, Lázaro)
+- **RAIX Drive / Self-Hosted:** ROADMAP (pós satélites B2B)
 - **Sentinela Digital:** R&D (longo prazo)
 - **Cadeia de Custódia (RFI):** IMPLEMENTADA (commit `420a814`)
 - **Contra-Inteligência (RFI):** TRAVADA (`LOCKED_PENDING_LEGAL_REVIEW`)
@@ -82,10 +84,12 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 1. Auditoria externa (R$ 50k)
 2. Migração PQ (TLS-PQ + Double Ratchet)
 3. PQ-Vault (nova receita)
-4. Track 2 (anonimato)
-5. Feature premium (análise on-device)
-6. Consultoria
-7. Sentinela Digital (R&D)
+4. Satélites B2B (RAIX Sign, Drop, Lázaro)
+5. Infraestrutura Privada (RAIX Drive / Self-Hosted / Sovereign Box)
+6. Track 2 (anonimato)
+7. Feature premium (análise on-device)
+8. Consultoria (potencializada por setup Self-Hosted)
+9. Sentinela Digital (R&D)
 
 ---
 

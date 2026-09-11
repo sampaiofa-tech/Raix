@@ -211,12 +211,23 @@ Os satélites complementares ingressam na camada de Ativos (Camada 2) e Comunica
 2. **RAIX Drop (P2):** Sistema efêmero para transferência de arquivos (*Low-Assurance*), focado em compartilhamento ágil e pontual. Modelo de aquisição Freemium/Pro.
 3. **Protocolo Lázaro (P3):** Solução premium de continuidade da semente (Mnemônico) baseada no esquema SLIP-0039 (*Shamir's Secret Sharing*). Endereçado aos segmentos Private/Enterprise.
 
-### 7.3 Priorização Integrada do Pipeline
+### 7.3 Bloco C: Infraestrutura Privada e RAIX Drive (Self-Hosted)
+Extensão da camada de Ativos (Camada 2), a ser priorizada após o PQ-Vault e os satélites B2B. O RAIX Drive adapta a arquitetura para modelos de infraestrutura sob controle físico do cliente corporativo ou premium.
+
+- **Conceito e Soberania:** O **RAIX Drive** permanece um cliente zero-knowledge estrito. A única mudança arquitetural é o roteamento do backend: em vez da nuvem RAIX, o sistema aponta para um servidor/NAS local do cliente. Processamento e cifragem ocorrem 100% *on-device*. O NAS atua meramente como "depósito cego de bits" (armazenando apenas fragmentos criptografados, sem chaves).
+- **Modelos de Negócio e Precificação:**
+  - **SaaS (Padrão):** Hospedagem na infraestrutura RAIX. Precificação via **assinatura mensal**.
+  - **Self-Hosted:** O cliente hospeda no próprio NAS. Precificação via **licença única** + **consultoria de setup** + **suporte opcional**.
+  - **Sovereign Box:** Kit premium *plug-and-play* (requer parceria de hardware). Precificação premium em pacote único: **hardware + licença + setup + assinatura de suporte**.
+- **Sinergia:** Este bloco impulsiona a vertical de Consultoria ("engenharia de infraestrutura privada"), elevando significativamente o ticket médio B2B.
+
+### 7.4 Priorização Integrada do Pipeline
 A alocação de recursos e introdução das novas features respeitará inegociavelmente a seguinte ordem sequencial de desenvolvimento e deploy:
 1. Auditoria Externa (P0)
 2. Integração Pós-Quântica (PQ)
 3. Cofre Pós-Quântico (PQ-Vault)
 4. **Satélites B2B (RAIX Sign > RAIX Drop > Protocolo Lázaro)**
-5. Track 2 (Modelos de tração alternativos)
-6. Camadas Premium e Consultoria B2B
-7. Sentinela Digital (R&D)
+5. **Infraestrutura Privada (RAIX Drive / Self-Hosted / Sovereign Box)**
+6. Track 2 (Modelos de tração alternativos)
+7. Camadas Premium e Consultoria B2B
+8. Sentinela Digital (R&D)
