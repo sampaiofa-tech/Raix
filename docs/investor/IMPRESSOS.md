@@ -78,3 +78,26 @@ Este roadmap de 3 anos não permite atalhos arquitetônicos. O sistema está bas
 | **F9 (Premium/Consult.)** | Análise on-device e Consultoria de Privacidade. | Receita complementar: **não deve distrair o time** da plataforma core. |
 | **F10 (Sentinela - R&D)** | Monitoramento de ameaças. | Alto esforço técnico; posicionamento apenas como visão de longo prazo. |
 | **F11 (Fortaleza RAIX)** | Contra-Inteligência e RAIX Governor. | **Contra-Inteligência TRAVADA** até validação legal. Governor precisa ser 100% determinístico (NÃO usar IA). |
+
+### Prazos Estimados por Fase × Cenário (em meses, a partir de T+0)
+
+*Premissas:*
+- *T+0 = início da execução após o aporte (entrada do capital).*
+- *As durações são estimativas sequenciais de cronograma; em equipes paralelas (Cenário A/C) várias fases podem sobrepor-se.*
+- *Base de equipe: Cenário A (equipe maior/paralela), Cenário C (híbrido — recomendado), Cenário B (enxuta/sequencial).*
+- *Projeto pré-receita, AINDA SEM RECEITA: os prazos não implicam receita garantida.*
+
+| Fase | Entrega-chave | Cenário A (maior) | Cenário C (recomendado) | Cenário B (enxuto) |
+| :--- | :--- | :--- | :--- | :--- |
+| **F2 — Lojas** | Play/Apple no ar | T+1 a 2 | T+2 a 3 | T+3 a 5 |
+| **F3 — Auditoria externa (R$ 50k)** | Laudo/atestado | T+2 a 4 | T+3 a 5 | T+5 a 7 |
+| **F4 — Migração PQ** | Núcleo PQ homologado | T+4 a 7 | T+5 a 8 | T+8 a 12 |
+| **F5 — PQ-Vault** | Lançamento comercial | T+7 a 10 | T+9 a 13 | T+13 a 18 |
+| **F6 — Satélites B2B** | Sign no mercado | T+10 a 14 | T+13 a 17 | T+18 a 24 |
+| **F7 — Self-hosted** | Drive/NAS + Box | T+14 a 18 | T+17 a 22 | T+24 a 30 |
+| **F8 — Track 2 (anonimato)** | Roteamento/Tor-like | T+18 a 22 | T+22 a 26 | T+30 a 36 |
+| **F9 — Premium/Consultoria** | Análise on-device + serviço | T+16 a 20 | T+20 a 24 | T+26 a 32 |
+| **F10 — Sentinela (R&D)** | 1º protótipo on-device | T+24 a 30 | T+28 a 34 | T+36 a 42 |
+| **F11 — Fortaleza completa** | Ecossistema maduro | T+30 a 36 | T+34 a 40 | T+42 a 48 |
+
+> **Nota de Honestidade:** Prazos são estimativas de roadmap pós-rodada, sujeitos à contratação da equipe, à auditoria externa e às métricas dos pilotos. Não constituem promessa de receita. *(F0 e F1 são pré-rodada — F0 concluída; F1 pilotos em andamento).*

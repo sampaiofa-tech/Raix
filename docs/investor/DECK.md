@@ -141,6 +141,31 @@ Baseado no mix B2B realista:
 
 ---
 
+## Cronograma Estimado (T+0)
+
+<!-- _class: lead -->
+<style scoped>
+table { font-size: 0.65em; margin: 0 auto; }
+li { font-size: 0.7em; }
+</style>
+
+*Premissas: T+0 = Início da execução; Prazos são sequenciais (em equipes maiores, fases se sobrepõem); NÃO há promessa de receita.*
+
+| Fase | Entrega-chave | Cen. A | Cen. C (Rec.) | Cen. B |
+| :--- | :--- | :--- | :--- | :--- |
+| **F2 — Lojas** | Play/Apple no ar | T+1 a 2 | T+2 a 3 | T+3 a 5 |
+| **F3 — Auditoria (R$ 50k)** | Laudo/atestado | T+2 a 4 | T+3 a 5 | T+5 a 7 |
+| **F4 — Migração PQ** | Núcleo homologado | T+4 a 7 | T+5 a 8 | T+8 a 12 |
+| **F5 — PQ-Vault** | Lançamento | T+7 a 10 | T+9 a 13 | T+13 a 18 |
+| **F6 — Satélites B2B** | Sign no mercado | T+10 a 14 | T+13 a 17 | T+18 a 24 |
+| **F7 — Self-hosted** | Drive/NAS + Box | T+14 a 18 | T+17 a 22 | T+24 a 30 |
+| **F8 — Track 2** | Roteamento/Tor-like | T+18 a 22 | T+22 a 26 | T+30 a 36 |
+| **F9 — Premium** | Análise on-device | T+16 a 20 | T+20 a 24 | T+26 a 32 |
+| **F10 — Sentinela** | 1º protótipo | T+24 a 30 | T+28 a 34 | T+36 a 42 |
+| **F11 — Fortaleza** | Ecossistema maduro | T+30 a 36 | T+34 a 40 | T+42 a 48 |
+
+---
+
 ## 12. Riscos e Mitigações
 
 - **Desenvolvimento Solo com IA:** Política de agentes rigorosamente versionada, baseline congelado.
