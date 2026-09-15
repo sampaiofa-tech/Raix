@@ -24,13 +24,16 @@ style: |
 ---
 
 # RAIX
-### Privacidade forte por design.
+
+## Privacidade forte por design
+
 *Projeto pré-receita, AINDA SEM RECEITA.*
 *Solução de sigilo profissional com retenção limitada de metadados.*
 
 ---
 
 ## 1. O Problema: Passivo Oculto
+
 - **Mensageiros comuns** geram passivo LGPD e expõem metadados sensíveis.
 - **Risco legal:** Comunicação profissional (ex: advogados, médicos, executivos) traficada em servidores não auditáveis.
 - **Vazamentos de ponta a ponta:** "Criptografia E2E" em redes sociais não protege o histórico local ou metadados de rede.
@@ -38,7 +41,9 @@ style: |
 ---
 
 ## 2. A Solução RAIX
+
 **Sigilo profissional + Compliance por design.**
+
 - **Zero-knowledge de conteúdo** (servidor cego).
 - **Retenção limitada de metadados** (Logs isolados de 180 dias, Marco Civil).
 - **Dual Licensing:** AGPL-3.0 + Comercial (protege IP corporativo).
@@ -47,7 +52,9 @@ style: |
 ---
 
 ## 3. Demonstração Técnica
+
 **Privacidade real, auditável.**
+
 - **E2E DEK v1.2:** Homologada (isolamento adversarial, servidor cego).
 - **Vanish-after-read:** Mensagens destruídas localmente e remotamente.
 - **Crypto-shredding:** TTL ativo (chaves destruídas em ≤15min).
@@ -56,6 +63,7 @@ style: |
 ---
 
 ## 4. Validação de Mercado
+
 - **Pilotos Ativos:** 5 advogados operando o RAIX Messaging (~2h/dia).
 - **Feedback Chave:** Demanda por "rastreabilidade" validou a criação do **Trilho de Auditoria Local**.
 - **Percepção B2B:** Pilotos enxergam a ferramenta como monetizável e essencial para mitigar risco profissional (multas/vazamentos).
@@ -63,6 +71,7 @@ style: |
 ---
 
 ## 5. Modelo de Receita (B2B SaaS)
+
 - **Free:** Operação com custo zero.
 - **Profissional:** R$ 29–39 / mês.
 - **Escritório:** R$ 29–49 / seat / mês.
@@ -72,6 +81,7 @@ style: |
 ---
 
 ## 6. Ecossistema: Fortaleza RAIX (6 Camadas)
+
 1. **Fundação:** Core, PQ-ID, HSM.
 2. **Ativos:** PQ-Vault, Drive.
 3. **Comunicação:** Messaging, Sala, Bridge.
@@ -82,6 +92,7 @@ style: |
 ---
 
 ## 7. Custos e Disciplina Financeira
+
 - **Custo Operacional Mensal:** R$ 0,00 (Free Tier GCP/Firebase otimizado).
 - **Custo Fixo Anual:** US$ 170–240 (domínios, licenças).
 - **Pista Longa:** Produto funcionando com compliance completo sem queima de caixa.
@@ -90,13 +101,16 @@ style: |
 ---
 
 ## 8. Ponto de Equilíbrio e Lucro (Ano 1)
+
 Baseado no mix B2B realista:
+
 - **Breakeven (Empate):** ~8 instâncias Private OU (5 Privates + 100 assinantes Escritório).
 - **Lucro (Escala Inicial):** ~6 instâncias Private + 120 assinantes Escritório.
 
 ---
 
 ## 9. Cenários de Investimento
+
 - **Cenário A:** R$ 1,8–2,1M (Time máximo)
 - **Cenário B:** R$ 1,0–1,2M (Lean total)
 - **Cenário C (Recomendado):** R$ 1,4–1,6M (Abordagem Híbrida)
@@ -106,6 +120,7 @@ Baseado no mix B2B realista:
 ---
 
 ## 10. Roadmap de Crescimento (F0-F5)
+
 - **F0 Fundação:** Custos INPI/domínio pagos. *(Crítico: INPI s/ recibo definitivo).*
 - **F1 Pilotos:** Validação sem receita. *(Crítico: Backlog de QR v1.7).*
 - **F2 Lojas:** *(Crítico: D-U-N-S pendente para Play/Apple e Data Safety).*
@@ -115,7 +130,8 @@ Baseado no mix B2B realista:
 
 ---
 
-## 10. Roadmap de Crescimento (F6-F11)
+## 11. Roadmap de Crescimento (F6-F11)
+
 - **F6 Satélites B2B (Sign, Drop, Lázaro):** *(Crítico: Lázaro é premium).*
 - **F7 Self-hosted (Drive + Box):** *(Crítico: Depende de parcerias NAS).*
 - **F8 Track 2 (Anonimato):** *(Crítico: Precisa métricas reais F1).*
@@ -125,7 +141,8 @@ Baseado no mix B2B realista:
 
 ---
 
-## 11. Riscos e Mitigações
+## 12. Riscos e Mitigações
+
 - **Desenvolvimento Solo com IA:** Política de agentes rigorosamente versionada, baseline congelado.
 - **Dependência Infra (Firebase/Lojas):** Risco de D-U-N-S e política "Data Safety" já mapeados no `DATA_INVENTORY.md`.
 - **Propriedade e Marca:** Depósito INPI realizado (classes 9 e 42).
@@ -133,7 +150,8 @@ Baseado no mix B2B realista:
 
 ---
 
-## 12. O Ask
+## 13. O Ask
+
 **Captação Alvo: R$ 1,4M – R$ 1,6M (Cenário Híbrido C)**
 *Alocação inicial rigorosa: R$ 50k Auditoria Externa + Estrutura B2B.*
 
