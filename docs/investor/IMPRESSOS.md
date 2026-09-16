@@ -8,18 +8,22 @@
 ## 1. One-Pager Executivo
 
 ### O Problema
+
 O uso de mensageiros comuns em contextos profissionais (advocacia, saúde, executivos) gera um **passivo LGPD oculto**. O armazenamento contínuo de metadados, contatos e histórico não-criptografado em servidores não auditáveis ou atrelados a redes sociais compromete irreparavelmente o sigilo profissional, criando alto risco de vazamentos e multas.
 
 ### A Solução: RAIX
+
 O RAIX é uma plataforma B2B de **privacidade forte por design**. Diferente de soluções massificadas, opera com **servidor cego (zero-knowledge)** e **retenção limitada de metadados** (logs isolados por 180 dias estritamente para Marco Civil, sem mineração). Nosso compliance já nasce pronto (PP, ToU, DPA, ROPA publicados).
 
 ### Diferencial Tecnológico
+
 - **Arquitetura Zero-Knowledge & Crypto-Shredding:** Destruição ativa de chaves (TTL ≤15min) e recurso *vanish-after-read*.
 - **Pós-Quântico (PQ):** Pós-quântica híbrida (roteiro aprovado, auditoria agendada).
 - **Código Auditável & Dual Licensing:** Licença AGPL-3.0 pública, combinada com Licença Comercial, garantindo transparência sem abrir mão do controle corporativo.
 - **Infraestrutura Otimizada:** Mensageiro rodando sobre GCP/Firebase com custo operacional atual de **R$ 0,00/mês**.
 
 ### Tração Atual & Métricas
+
 - **Pilotos em uso ativo:** 5 advogados operando o sistema de ponta a ponta (~2h/dia).
 - **Testes rigorosos:** >200 testes automatizados (backend, Android, desktop) e auditoria de sanitização concluída (7 fases).
 - **Demanda validada:** Pilotos solicitaram o "Trilho de Auditoria Local" (já inserido no roadmap).
@@ -38,6 +42,7 @@ O RAIX é uma plataforma B2B de **privacidade forte por design**. Diferente de s
 ### Alocação Detalhada por Cenário
 
 **CENÁRIO A — RODADA MAIOR (R$ 1,8–2,1M; equipe Ano 1: 5 pessoas; custo ~R$ 102k/mês):**
+
 - Salários ~80% (~R$ 1,52M sobre médio R$ 1,9M)
 - Infraestrutura/nuvem ~5% (~R$ 95k)
 - Licenças/ferramentas ~3% (~R$ 57k)
@@ -47,6 +52,7 @@ O RAIX é uma plataforma B2B de **privacidade forte por design**. Diferente de s
 - Reserva operacional ~4% (~R$ 76k)
 
 **CENÁRIO B — ESCALONADO (R$ 1,0–1,2M; equipe Ano 1: 3 pessoas; custo ~R$ 56k/mês):**
+
 - Salários ~80% (~R$ 880k sobre médio R$ 1,1M)
 - Infra/nuvem ~4% (~R$ 44k)
 - Licenças ~3% (~R$ 33k)
@@ -56,6 +62,7 @@ O RAIX é uma plataforma B2B de **privacidade forte por design**. Diferente de s
 - Reserva ~3% (~R$ 33k)
 
 **CENÁRIO C — HÍBRIDO, RECOMENDADO (R$ 1,4–1,6M; equipe Ano 1: 4 pessoas; custo ~R$ 81k/mês):**
+
 - Salários ~82% (~R$ 1,23M sobre médio R$ 1,5M)
 - Infra/nuvem ~4% (~R$ 60k)
 - Licenças ~3% (~R$ 45k)
@@ -67,6 +74,7 @@ O RAIX é uma plataforma B2B de **privacidade forte por design**. Diferente de s
 > **PONTO-CHAVE:** Nos 3 cenários, a maior parte do capital vai para salários (o ativo mais valioso). Infra + licenças + equipamentos < 10%. A única despesa de capital relevante é a auditoria (R$ 50k), que destrava o B2B. O que diferencia os cenários é a velocidade de montagem do time: A = contrata rápido (mais queima/diluição), B = cresce devagar (disciplina, menos velocidade), C = núcleo crítico + expansão conforme receita.
 
 ### Recomendação Estratégica: Cenário C (Híbrido)
+
 O Cenário C garante capital suficiente para atravessar a primeira grande despesa de capital (**Auditoria Externa - R$ 50k**) e construir a base de clientes B2B (Escritórios) antes de expandir P&D de forma irresponsável.
 **Evolução do Pró-labore do Fundador (atrelada à receita/estabilidade):**
 R$ 10k (A1) → R$ 25k (A2) → R$ 40k (A3) → R$ 50k (A4).
@@ -78,6 +86,7 @@ R$ 10k (A1) → R$ 25k (A2) → R$ 40k (A3) → R$ 50k (A4).
 O RAIX ataca o B2B utilizando uma precificação elástica, permitindo que pequenos escritórios e grandes contas sustentem a operação GCP.
 
 **Estrutura de Planos (B2B):**
+
 - **Profissional:** R$ 29–39 / mês
 - **Escritório:** R$ 29–49 / seat / mês
 - **Private:** Ticket premium, 100% customizável (previsto 2026)
@@ -113,6 +122,7 @@ Este roadmap de 3 anos não permite atalhos arquitetônicos. O sistema está bas
 ### Prazos Estimados por Fase × Cenário (em meses, a partir de T+0)
 
 *Premissas:*
+
 - *T+0 = início da execução após o aporte (entrada do capital).*
 - *As durações são estimativas sequenciais de cronograma; em equipes paralelas (Cenário A/C) várias fases podem sobrepor-se.*
 - *Base de equipe: Cenário A (equipe maior/paralela), Cenário C (híbrido — recomendado), Cenário B (enxuta/sequencial).*

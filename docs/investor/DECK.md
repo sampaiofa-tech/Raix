@@ -118,12 +118,15 @@ h3 { font-size: 0.8em; margin-bottom: 5px; color: #D4AF37; }
 </style>
 
 ### **Cenário A: Rodada Maior (R$ 1,8–2,1M \| 5 pessoas)**
+
 Salários: ~80% \| Infra/Lic/Eq: ~10% \| Auditoria (R$ 50k): ~3% \| Outros: ~7%
 
 ### **Cenário C: Híbrido/Recomendado (R$ 1,4–1,6M \| 4 pessoas)**
+
 Salários: ~82% \| Infra/Lic/Eq: ~9% \| Auditoria (R$ 50k): ~3% \| Outros: ~6%
 
 ### **Cenário B: Escalonado (R$ 1,0–1,2M \| 3 pessoas)**
+
 Salários: ~80% \| Infra/Lic/Eq: ~9% \| Auditoria (R$ 50k): ~5% \| Outros: ~6%
 
 > **PONTO-CHAVE:** Nos 3 cenários, a maior parte do capital vai para salários (ativo mais valioso). Infra + licenças + equipamentos < 10%. A única despesa de capital relevante é a auditoria (R$ 50k), que destrava o B2B. A diferença é a velocidade de montagem do time: A (rápido, mais queima), B (devagar, disciplina), C (núcleo crítico + expansão c/ receita).
@@ -169,12 +172,12 @@ p { font-size: 0.65em; }
 | **F3 — Auditoria (R$ 50k)** | Laudo/atestado | T+2–4 | T+3–5 | T+5–7 |
 | **F4 — Migração PQ** | Núcleo PQ homologado | T+4–7 | T+5–8 | T+8–12 |
 | **F5 — PQ-Vault** | Lançamento comercial | T+7–10 | T+9–13 | T+13–18 |
-| **F6 — Satélites B2B** | Sign no mercado (Sign/Drop/Lázaro)| T+10–14 | T+13–17 | T+18–24 |
-| **F7 — Self-hosted** | Drive/NAS + Box (após parceria)| T+14–18 | T+17–22 | T+24–30 |
-| **F8 — Track 2 (anonimato)**| Roteamento/Tor-like | T+18–22 | T+22–26 | T+30–36 |
-| **F9 — Feature premium**| Análise on-device + serviço| T+16–20 (paralela)| T+20–24 | T+26–32 |
-| **F10 — Sentinela (R&D)**| 1º protótipo on-device | T+24–30 | T+28–34 | T+36–42 |
-| **F11 — Fortaleza completa**| Ecossistema maduro | T+30–36 | T+34–40 | T+42–48 |
+| **F6 — Satélites B2B** | Sign no mercado (Sign/Drop/Lázaro) | T+10–14 | T+13–17 | T+18–24 |
+| **F7 — Self-hosted** | Drive/NAS + Box (após parceria) | T+14–18 | T+17–22 | T+24–30 |
+| **F8 — Track 2 (anonimato)** | Roteamento/Tor-like | T+18–22 | T+22–26 | T+30–36 |
+| **F9 — Feature premium** | Análise on-device + serviço | T+16–20 (paralela) | T+20–24 | T+26–32 |
+| **F10 — Sentinela (R&D)** | 1º protótipo on-device | T+24–30 | T+28–34 | T+36–42 |
+| **F11 — Fortaleza completa** | Ecossistema maduro | T+30–36 | T+34–40 | T+42–48 |
 
 ---
 
