@@ -22,6 +22,7 @@ style: |
     color: #2ECC40;
   }
 ---
+<!-- markdownlint-disable MD033 -->
 
 # RAIX
 
