@@ -1,0 +1,5 @@
+# Autoritativo: Hashes SHA-256 dos Artefatos Oficiais de Distribuicao (v1.6.0)
+# Formato padrao coreutils: <hash>  <filename>
+34c58c953ce5d7a708f9ed1d1a47c65e85dc1d48a4df85dbd3009e2c898fb4e8  composeApp-release.apk
+69db74d7ee1058fa05bbb39214d8b5266a196e31b63b72302c3a989b002c81e9  composeApp-release.aab
+d719e8c61ccf1888a0b7c89aeab6fb1d19bb48bd3d0b14999124dbfe8e1da7f4  Raix-1.6.0.msi

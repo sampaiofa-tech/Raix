@@ -221,16 +221,26 @@ Os satélites complementares ingressam na camada de Ativos (Camada 2) e Comunica
 2. **RAIX Drop (P2):** Sistema efêmero para transferência de arquivos (*Low-Assurance*), focado em compartilhamento ágil e pontual. Modelo de aquisição Freemium/Pro.
 3. **Protocolo Lázaro (P3):** Solução premium de continuidade da semente (Mnemônico) baseada no esquema SLIP-0039 (*Shamir's Secret Sharing*). Endereçado aos segmentos Private/Enterprise.
 
-### 7.3 Bloco C: Infraestrutura Privada e RAIX Drive (Self-Hosted)
+### 7.3 Bloco C: Infraestrutura Privada, Sovereign Overlay e Plano Bridge (RAIX Drive)
 
-Extensão da camada de Ativos (Camada 2), a ser priorizada após o PQ-Vault e os satélites B2B. O RAIX Drive adapta a arquitetura para modelos de infraestrutura sob controle físico do cliente corporativo ou premium.
+Extensão da camada de Ativos (Camada 2), a ser priorizada após o PQ-Vault e os satélites B2B. O RAIX Drive adapta a arquitetura para atuar como uma camada de soberania universal. A porta de entrada para o RAIX Drive será o **Plano Bridge**, visando um mercado muito maior que a adoção de hardware dedicado (NAS).
 
-- **Conceito e Soberania:** O **RAIX Drive** permanece um cliente zero-knowledge estrito. A única mudança arquitetural é o roteamento do backend: em vez da nuvem RAIX, o sistema aponta para um servidor/NAS local do cliente. Processamento e cifragem ocorrem 100% *on-device*. O NAS atua meramente como "depósito cego de bits" (armazenando apenas fragmentos criptografados, sem chaves).
-- **Modelos de Negócio e Precificação:**
-  - **SaaS (Padrão):** Hospedagem na infraestrutura RAIX. Precificação via **assinatura mensal**.
-  - **Self-Hosted:** O cliente hospeda no próprio NAS. Precificação via **licença única** + **consultoria de setup** + **suporte opcional**.
-  - **Sovereign Box:** Kit premium *plug-and-play* (requer parceria de hardware). Precificação premium em pacote único: **hardware + licença + setup + assinatura de suporte**.
-- **Sinergia:** Este bloco impulsiona a vertical de Consultoria ("engenharia de infraestrutura privada"), elevando significativamente o ticket médio B2B.
+- **CONCEITO (Sovereign Overlay):** RAIX Drive atua como uma camada de soberania (*Sovereign Overlay*) sobre qualquer meio de armazenamento (NAS local, nuvens de terceiros, ou Sovereign Box). Remove a barreira de adoção, pois o cliente não precisa migrar seus dados de provedor.
+- **MODELOS TÉCNICOS:**
+  - **Drivers de nuvem (API):** O conteúdo é cifrado localmente (*zero-knowledge*) antes do upload para a nuvem de terceiros. Isolamento de domínio HD aplicado por driver.
+  - **Migração pontual "Vacuum":** One-way com consentimento e adequação LGPD para APIs restritas (ex: iCloud).
+  - **Portabilidade de saída:** Capacidade de descriptografar localmente, exportar em claro e apagar da infraestrutura (*anti-lock-in* = diferencial de confiança).
+- **PLANO BRIDGE:**
+  - Assinatura mensal recorrente (R$ 19–29/mês), posicionada abaixo do plano Escritório.
+  - O cliente já paga o armazenamento; o RAIX adiciona a camada de soberania/*zero-knowledge*.
+  - Ancoragem: "Sua nuvem atual, agora invisível às Big Techs."
+- **TIERS POR SENSIBILIDADE (Recurso Premium):**
+  - **Tier 1 (Local):** Dados altamente sensíveis armazenados localmente.
+  - **Tier 2 (Nuvem Cega):** Sincronização cifrada via Sovereign Overlay.
+  - **Tier 3 (Arquivo Barato):** Armazenamento de baixo custo e longo prazo cifrado.
+- **PRIORIZAÇÃO:** Execução da expansão da camada de Ativos após PQ-Vault e satélites B2B. O Bridge = porta de entrada do RAIX Drive.
+- **MARCA/PRECISÃO:** A frase comercial "invisível às Big Techs" deve **sempre** vir acompanhada da precisão técnica — o RAIX garante conteúdo matematicamente ilegível para quem armazena (por design), NÃO "esconde" nada. A linguagem oficial deve ser inegociavelmente mantida.
+
 
 ### 7.4 Priorização Integrada do Pipeline
 
