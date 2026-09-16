@@ -71,3 +71,35 @@ Conforme auditoria executada em `functions/`:
 - **Vulnerabilidades Altas (High)**: 0
 - **Vulnerabilidades Moderadas**: 13 (todas em dependências transitivas profundas de bibliotecas Google Cloud como `teeny-request`, `gaxios` e `retry-request`).
 - **Diretriz**: Nenhuma dependência maior ou com breaking change deve ser forçada antes da conclusão e homologação do deploy em produção.
+
+---
+
+## Fluxo de Tratamento de Feedback (Governança de Produto)
+
+**Data de Aprovação:** 22/05/2024
+**Status:** Processo Congelado (Baseline)
+
+Este fluxo define a triagem e priorização obrigatória de feedbacks de usuários, garantindo que nenhum feedback vire escopo não aprovado sem passar pela análise estruturada. 
+
+### 1. Classificação (Triagem Obrigatória)
+Todo feedback recebido deve ser classificado em uma das seguintes categorias antes de qualquer ação:
+- **Críticos:** Bugs que impedem o uso, problemas de segurança, perda de dados ou falha no *vanish* → **Prioridade Máxima**.
+- **UX/Responsividade:** Dificuldade de uso, interface confusa, responsividade quebrada → **Alta Prioridade (Retenção)**.
+- **Sugestões de melhoria:** Avaliados sob a ótica de *valor × custo × essência*.
+- **Diferenciais:** Pedidos que reforçam a promessa central (sigilo, rastreabilidade, trilho de auditoria) → **Oportunidade de produto**.
+
+### 2. Priorização (5 Critérios Fixos)
+1. **Alinhamento com a promessa** central.
+2. **Custo** de implementação × Caixa disponível.
+3. **Prazo** (reunião/pilotos).
+4. **Posicionamento** de mercado.
+5. **Governança** (somente entra se houver ciclo autorizado ou estiver no roadmap).
+
+### 3. Roteamento e Execução
+- **Críticos:** Direcionados imediatamente ao Analista + Executor (via Analista), com urgência.
+- **UX:** Inseridos no ciclo autorizado e priorizados.
+- **Essência:** Adicionados ao roadmap pós-rodada.
+- **Não-alinhados:** Registrados apenas como consideração (arquivados).
+- **Segurança/Arquitetura:** Acionamento obrigatório do Guru (via Analista) antes de qualquer ação.
+
+> **Regra de Ouro:** Nenhum feedback se torna escopo não aprovado. Tudo deve passar pela triagem e pelo roteamento adequado antes de qualquer modificação no produto. Nada de escopo novo sem aprovação (baseline congelado).
