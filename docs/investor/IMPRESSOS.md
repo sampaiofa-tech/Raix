@@ -35,6 +35,37 @@ O RAIX é uma plataforma B2B de **privacidade forte por design**. Diferente de s
 | **B** | **1,0M – 1,2M** | **Lean Total** (Foco exclusivo no core) | Extrema disciplina financeira; pista de voo estendida. | Limita a expansão B2B e retarda muito as ferramentas Satélite (Sign, Drop). |
 | **C (Híbrido)** | **1,4M – 1,6M** | **Equilibrada (Foco no B2B)** | **Pista segura para o B2B; absorve R$ 50k da auditoria; forma time de base.** | **Requer forte gestão financeira para não assumir os custos de A.** |
 
+### Alocação Detalhada por Cenário
+
+**CENÁRIO A — RODADA MAIOR (R$ 1,8–2,1M; equipe Ano 1: 5 pessoas; custo ~R$ 102k/mês):**
+- Salários ~80% (~R$ 1,52M sobre médio R$ 1,9M)
+- Infraestrutura/nuvem ~5% (~R$ 95k)
+- Licenças/ferramentas ~3% (~R$ 57k)
+- Equipamentos (uma vez) ~2% (~R$ 38k)
+- Auditoria externa (R$ 50k) ~3% (~R$ 57k)
+- Contador/jurídico ~3% (~R$ 57k)
+- Reserva operacional ~4% (~R$ 76k)
+
+**CENÁRIO B — ESCALONADO (R$ 1,0–1,2M; equipe Ano 1: 3 pessoas; custo ~R$ 56k/mês):**
+- Salários ~80% (~R$ 880k sobre médio R$ 1,1M)
+- Infra/nuvem ~4% (~R$ 44k)
+- Licenças ~3% (~R$ 33k)
+- Equipamentos ~2% (~R$ 22k)
+- Auditoria (R$ 50k) ~5% (~R$ 55k)
+- Contador/jurídico ~3% (~R$ 33k)
+- Reserva ~3% (~R$ 33k)
+
+**CENÁRIO C — HÍBRIDO, RECOMENDADO (R$ 1,4–1,6M; equipe Ano 1: 4 pessoas; custo ~R$ 81k/mês):**
+- Salários ~82% (~R$ 1,23M sobre médio R$ 1,5M)
+- Infra/nuvem ~4% (~R$ 60k)
+- Licenças ~3% (~R$ 45k)
+- Equipamentos ~2% (~R$ 30k)
+- Auditoria (R$ 50k) ~3% (~R$ 45k)
+- Contador/jurídico ~3% (~R$ 45k)
+- Reserva ~3% (~R$ 45k)
+
+> **PONTO-CHAVE:** Nos 3 cenários, a maior parte do capital vai para salários (o ativo mais valioso). Infra + licenças + equipamentos < 10%. A única despesa de capital relevante é a auditoria (R$ 50k), que destrava o B2B. O que diferencia os cenários é a velocidade de montagem do time: A = contrata rápido (mais queima/diluição), B = cresce devagar (disciplina, menos velocidade), C = núcleo crítico + expansão conforme receita.
+
 ### Recomendação Estratégica: Cenário C (Híbrido)
 O Cenário C garante capital suficiente para atravessar a primeira grande despesa de capital (**Auditoria Externa - R$ 50k**) e construir a base de clientes B2B (Escritórios) antes de expandir P&D de forma irresponsável.
 **Evolução do Pró-labore do Fundador (atrelada à receita/estabilidade):**
@@ -87,17 +118,17 @@ Este roadmap de 3 anos não permite atalhos arquitetônicos. O sistema está bas
 - *Base de equipe: Cenário A (equipe maior/paralela), Cenário C (híbrido — recomendado), Cenário B (enxuta/sequencial).*
 - *Projeto pré-receita, AINDA SEM RECEITA: os prazos não implicam receita garantida.*
 
-| Fase | Entrega-chave | Cenário A (maior) | Cenário C (recomendado) | Cenário B (enxuto) |
+| Fase | Entrega-chave | A | C (rec.) | B |
 | :--- | :--- | :--- | :--- | :--- |
-| **F2 — Lojas** | Play/Apple no ar | T+1 a 2 | T+2 a 3 | T+3 a 5 |
-| **F3 — Auditoria externa (R$ 50k)** | Laudo/atestado | T+2 a 4 | T+3 a 5 | T+5 a 7 |
-| **F4 — Migração PQ** | Núcleo PQ homologado | T+4 a 7 | T+5 a 8 | T+8 a 12 |
-| **F5 — PQ-Vault** | Lançamento comercial | T+7 a 10 | T+9 a 13 | T+13 a 18 |
-| **F6 — Satélites B2B** | Sign no mercado | T+10 a 14 | T+13 a 17 | T+18 a 24 |
-| **F7 — Self-hosted** | Drive/NAS + Box | T+14 a 18 | T+17 a 22 | T+24 a 30 |
-| **F8 — Track 2 (anonimato)** | Roteamento/Tor-like | T+18 a 22 | T+22 a 26 | T+30 a 36 |
-| **F9 — Premium/Consultoria** | Análise on-device + serviço | T+16 a 20 | T+20 a 24 | T+26 a 32 |
-| **F10 — Sentinela (R&D)** | 1º protótipo on-device | T+24 a 30 | T+28 a 34 | T+36 a 42 |
-| **F11 — Fortaleza completa** | Ecossistema maduro | T+30 a 36 | T+34 a 40 | T+42 a 48 |
+| **F2 — Lojas** | Play/Apple no ar | T+1–2 | T+2–3 | T+3–5 |
+| **F3 — Auditoria (R$ 50k)** | Laudo/atestado | T+2–4 | T+3–5 | T+5–7 |
+| **F4 — Migração PQ** | Núcleo PQ homologado | T+4–7 | T+5–8 | T+8–12 |
+| **F5 — PQ-Vault** | Lançamento comercial | T+7–10 | T+9–13 | T+13–18 |
+| **F6 — Satélites B2B** | Sign no mercado (Sign/Drop/Lázaro) | T+10–14 | T+13–17 | T+18–24 |
+| **F7 — Self-hosted** | Drive/NAS + Box (após parceria) | T+14–18 | T+17–22 | T+24–30 |
+| **F8 — Track 2 (anonimato)** | Roteamento/Tor-like | T+18–22 | T+22–26 | T+30–36 |
+| **F9 — Feature premium + Consultoria** | Análise on-device + serviço | T+16–20 (paralela) | T+20–24 | T+26–32 |
+| **F10 — Sentinela (R&D)** | 1º protótipo on-device | T+24–30 | T+28–34 | T+36–42 |
+| **F11 — Fortaleza completa** | Ecossistema maduro | T+30–36 | T+34–40 | T+42–48 |
 
-> **Nota de Honestidade:** Prazos são estimativas de roadmap pós-rodada, sujeitos à contratação da equipe, à auditoria externa e às métricas dos pilotos. Não constituem promessa de receita. *(F0 e F1 são pré-rodada — F0 concluída; F1 pilotos em andamento).*
+> **Nota de Honestidade:** Prazos são estimativas de roadmap pós-rodada, sujeitas à contratação da equipe, auditoria externa e métricas dos pilotos. Não constituem promessa de receita. *(F0 e F1 são pré-rodada — F0 concluída; F1 pilotos em andamento).*

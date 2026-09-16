@@ -109,13 +109,24 @@ Baseado no mix B2B realista:
 
 ---
 
-## 9. Cenários de Investimento
+## 9. Cenários de Investimento e Alocação
 
-- **Cenário A:** R$ 1,8–2,1M (Time máximo)
-- **Cenário B:** R$ 1,0–1,2M (Lean total)
-- **Cenário C (Recomendado):** R$ 1,4–1,6M (Abordagem Híbrida)
-  - Equilibra runway com time focado em segurança e B2B.
-  - Pró-labore Fundador progride com receita (R$ 10k → R$ 25k → R$ 40k → R$ 50k).
+<!-- _class: lead -->
+<style scoped>
+p { font-size: 0.65em; margin: 0px; }
+h3 { font-size: 0.8em; margin-bottom: 5px; color: #D4AF37; }
+</style>
+
+### **Cenário A: Rodada Maior (R$ 1,8–2,1M \| 5 pessoas)**
+Salários: ~80% \| Infra/Lic/Eq: ~10% \| Auditoria (R$ 50k): ~3% \| Outros: ~7%
+
+### **Cenário C: Híbrido/Recomendado (R$ 1,4–1,6M \| 4 pessoas)**
+Salários: ~82% \| Infra/Lic/Eq: ~9% \| Auditoria (R$ 50k): ~3% \| Outros: ~6%
+
+### **Cenário B: Escalonado (R$ 1,0–1,2M \| 3 pessoas)**
+Salários: ~80% \| Infra/Lic/Eq: ~9% \| Auditoria (R$ 50k): ~5% \| Outros: ~6%
+
+> **PONTO-CHAVE:** Nos 3 cenários, a maior parte do capital vai para salários (ativo mais valioso). Infra + licenças + equipamentos < 10%. A única despesa de capital relevante é a auditoria (R$ 50k), que destrava o B2B. A diferença é a velocidade de montagem do time: A (rápido, mais queima), B (devagar, disciplina), C (núcleo crítico + expansão c/ receita).
 
 ---
 
@@ -147,22 +158,23 @@ Baseado no mix B2B realista:
 <style scoped>
 table { font-size: 0.65em; margin: 0 auto; }
 li { font-size: 0.7em; }
+p { font-size: 0.65em; }
 </style>
 
-*Premissas: T+0 = Início da execução; Prazos são sequenciais (em equipes maiores, fases se sobrepõem); NÃO há promessa de receita.*
+*Prazos são estimativas de roadmap pós-rodada, sujeitas à contratação da equipe, auditoria externa e métricas dos pilotos. Não constituem promessa de receita. F0 concluída; F1 pilotos em andamento.*
 
-| Fase | Entrega-chave | Cen. A | Cen. C (Rec.) | Cen. B |
+| Fase | Entrega-chave | A | C (rec.) | B |
 | :--- | :--- | :--- | :--- | :--- |
-| **F2 — Lojas** | Play/Apple no ar | T+1 a 2 | T+2 a 3 | T+3 a 5 |
-| **F3 — Auditoria (R$ 50k)** | Laudo/atestado | T+2 a 4 | T+3 a 5 | T+5 a 7 |
-| **F4 — Migração PQ** | Núcleo homologado | T+4 a 7 | T+5 a 8 | T+8 a 12 |
-| **F5 — PQ-Vault** | Lançamento | T+7 a 10 | T+9 a 13 | T+13 a 18 |
-| **F6 — Satélites B2B** | Sign no mercado | T+10 a 14 | T+13 a 17 | T+18 a 24 |
-| **F7 — Self-hosted** | Drive/NAS + Box | T+14 a 18 | T+17 a 22 | T+24 a 30 |
-| **F8 — Track 2** | Roteamento/Tor-like | T+18 a 22 | T+22 a 26 | T+30 a 36 |
-| **F9 — Premium** | Análise on-device | T+16 a 20 | T+20 a 24 | T+26 a 32 |
-| **F10 — Sentinela** | 1º protótipo | T+24 a 30 | T+28 a 34 | T+36 a 42 |
-| **F11 — Fortaleza** | Ecossistema maduro | T+30 a 36 | T+34 a 40 | T+42 a 48 |
+| **F2 — Lojas** | Play/Apple no ar | T+1–2 | T+2–3 | T+3–5 |
+| **F3 — Auditoria (R$ 50k)** | Laudo/atestado | T+2–4 | T+3–5 | T+5–7 |
+| **F4 — Migração PQ** | Núcleo PQ homologado | T+4–7 | T+5–8 | T+8–12 |
+| **F5 — PQ-Vault** | Lançamento comercial | T+7–10 | T+9–13 | T+13–18 |
+| **F6 — Satélites B2B** | Sign no mercado (Sign/Drop/Lázaro)| T+10–14 | T+13–17 | T+18–24 |
+| **F7 — Self-hosted** | Drive/NAS + Box (após parceria)| T+14–18 | T+17–22 | T+24–30 |
+| **F8 — Track 2 (anonimato)**| Roteamento/Tor-like | T+18–22 | T+22–26 | T+30–36 |
+| **F9 — Feature premium**| Análise on-device + serviço| T+16–20 (paralela)| T+20–24 | T+26–32 |
+| **F10 — Sentinela (R&D)**| 1º protótipo on-device | T+24–30 | T+28–34 | T+36–42 |
+| **F11 — Fortaleza completa**| Ecossistema maduro | T+30–36 | T+34–40 | T+42–48 |
 
 ---
 
