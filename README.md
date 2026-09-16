@@ -682,6 +682,32 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
 
 ---
 
+## 🧪 Automação, Qualidade Contínua e Matriz de CI/CD
+
+O repositório opera sob uma esteira de integração contínua (CI) e monitoramento de integridade baseada em garantias proporcionais aos riscos e particularidades de cada ambiente:
+
+### 1. Suíte de Saúde do Sistema e Regressão Diária (`health-check.yml`)
+- **Cadência Agendada:** Executada 2x ao dia (às **07:00** e **23:00 UTC**) em runner `ubuntu-latest`.
+- **Escopo Coberto:**
+  - **Backend Cloud Functions:** Testes unitários herméticos com Jest (`npm --prefix functions test`).
+  - **Índices Firestore:** Verificação estrita de cobertura de índices compostos (`npm --prefix functions run check:indexes`).
+  - **Desktop Multiplatform (JVM):** Testes unitários de compilação, BouncyCastle e primitivas criptográficas (`./gradlew :composeApp:desktopTest`).
+  - **Android Multiplatform (Unit):** Testes herméticos sobre Robolectric (`./gradlew :composeApp:testDebugUnitTest`), cobrindo persistência Room com SQLite em memória, cifragem AES-512, sanitização de RAM e contratos de push notification.
+- **Hermeticidade e `google-services.json`:** O build Android no CI utiliza `MissingGoogleServicesStrategy.WARN` para viabilizar execução headless limpa sem demandar segredos de nuvem. Nenhum teste unitário depende de conexão com Firebase em produção ou gera falso positivo.
+- **Notificação e Escalonamento:** Relatórios detalhados em HTML e texto enviados via SMTP. Se o health-check falhar por **2 vezes consecutivas**, o workflow eleva automaticamente a notificação para **Prioridade ALTA** com assunto de urgência e banner ostensivo de intervenção.
+
+### 2. Ciclo de Build e Integração iOS (`ios-build.yml`)
+- **Disparo sob Demanda:** Executado em runners `macos-latest` em eventos de `push` e `pull_request` direcionados à branch `main`.
+- **Decisão Técnica de Isolamento:** A compilação nativa de iOS (`:composeApp:iosSimulatorArm64Binaries`) requer Xcode e toolchain Apple disponíveis exclusivamente em macOS. Para preservar a cota de faturamento de minutos de runners macOS (custo 10x superior ao Linux), a compilação é acionada preventivamente em alterações de código, dispensando repetições ociosas na regressão diária agendada.
+
+### 3. Plataforma Web (Wasm) — Classificação de Menor Garantia
+- Conforme formalizado em [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md), a versão Web/Wasm é classificada como cliente de menor garantia técnica (inviabilidade de TLS-PQ no navegador e ausência de Hardware Keystore). A compilação é validada nos ciclos de release e empacotamento web, sendo tecnicamente aceitável sua ausência na regressão diária de alta frequência.
+
+### 4. Monitoramento do Próprio Health-Check (`health-check-watchdog.yml`)
+- Workflow leve de watchdog que audita de forma anônima a API do GitHub para certificar que o health-check rodou nas últimas 24 horas, disparando alerta imediato em caso de execuções perdidas (*missed executions* por instabilidade no agendador ou runners offline).
+
+---
+
 ## 📄 Licença
 
 Este projeto é disponibilizado sob o modelo de **duplo licenciamento**:

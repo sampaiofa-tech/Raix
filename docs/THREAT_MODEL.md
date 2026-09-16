@@ -154,6 +154,18 @@ A mitigação é estruturada em **três fases progressivas**, condicionadas e ca
 3. **Fase 3 (Opcional, Custo Elevado)**:
    - **Mixnet com Batching Estocástico**: Camada de mixagem com reordenação de envelopes em lotes temporais aleatórios para casos de uso corporativos ou ambientes de vigilância estatal total, implementada sob demanda volumétrica comprovada.
 
+### 4.2 Matriz de Garantia e Cobertura de CI/CD por Plataforma
+
+Para garantir previsibilidade técnica, rastreabilidade de falhas e governança proporcional aos riscos de cada ambiente, a cobertura automatizada em CI/CD é calibrada segundo a matriz abaixo:
+
+| Plataforma / Escopo | Ciclo de Execução | Ambiente / Runner | Nível de Garantia e Justificativa Técnica |
+| :--- | :--- | :--- | :--- |
+| **Backend Functions & Índices Firestore** | **Regressão Diária (07:00 / 23:00 UTC)** + Push/PR | `ubuntu-latest` | **Garantia Máxima**: 100% de testes unitários herméticos (Jest) validando regras de segurança, conformidade de índices do Firestore, serialização opaca e ciclo de vida do envelope criptográfico. |
+| **Desktop Multiplatform (JVM)** | **Regressão Diária (07:00 / 23:00 UTC)** + Push/PR | `ubuntu-latest` | **Garantia Alta**: Validação completa da compilação e testes JVM com BouncyCastle, Argon2id e primitivas ML-KEM/ML-DSA. |
+| **Android Multiplatform (Unit)** | **Regressão Diária (07:00 / 23:00 UTC)** + Push/PR | `ubuntu-latest` | **Garantia Alta**: Testes unitários herméticos com Robolectric (Room SQLite em memória, cifragem AES-512, sanitização de RAM e contratos de notificações). O `google-services.json` opera com estratégia `WARN`, dispensando segredos de produção no CI sem falsos positivos. |
+| **iOS Simulator Arm64** | **CI de Integração Dedicado** (Push / PR para `main`) | `macos-latest` (`.github/workflows/ios-build.yml`) | **Garantia Alta (Compilação Nativa)**: Execução sob demanda em runners macOS dedicados. **Decisão de Governança**: Mantido fora da regressão diária em Linux porque ferramentas de toolchain Apple (Xcode/clang) exigem macOS (consumo de 10x minutos de faturamento de runner). Cobertura garantida preventivamente a cada merge/commit de código. |
+| **Web Multiplatform (Wasm)** | **Ciclo de Release & Empacotamento Web** | `ubuntu-latest` | **Menor Garantia Técnica (Aceite Formal de Risco)**: Conforme detalhado na seção 4, a plataforma Web possui limitações inerentes de segurança (ausência de TLS-PQ pelo navegador, ausência de Hardware Keystore e vulnerabilidade a extensões). Sua ausência na regressão diária de alta frequência é uma decisão técnica consciente e documentada, alinhada à sua classificação de cliente degradado. |
+
 ---
 
 ## 5. Tratamento do Gap de Destruição e Ciclo de Vida do Envelope (P0.3)

@@ -1,7 +1,16 @@
 const { execSync } = require("child_process");
 
-const diff = execSync("git diff HEAD", { encoding: "utf8" });
-const addedLines = diff.split("\n").filter(l => l.startsWith("+") && !l.startsWith("+++"));
+let diffText = "";
+try {
+  diffText += execSync("git diff HEAD", { encoding: "utf8" }) + "\n";
+  diffText += execSync("git diff --cached", { encoding: "utf8" }) + "\n";
+  diffText += execSync("git log -p -5", { encoding: "utf8" }) + "\n";
+} catch (e) {
+  // Fallback se git falhar
+  console.warn("Aviso ao extrair diffs do git:", e.message);
+}
+
+const addedLines = diffText.split("\n").filter(l => l.startsWith("+") && !l.startsWith("+++"));
 
 const patterns = [
   { name: "GitHub Token (gho_)", regex: /gho_[A-Za-z0-9_]+/ },

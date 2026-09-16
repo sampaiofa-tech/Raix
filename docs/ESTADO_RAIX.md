@@ -1,19 +1,22 @@
 # ESTADO_RAIX.md — Documento-Mestre do Projeto
-Versão: 2.0 | Atualizado: 2024-05-22  
+
+Versão: 2.0 | Atualizado: 2024-05-22
 Propósito: Preservar o estado do projeto fora da memória de qualquer agente. Fonte única de verdade. Atualizado pelo Analista a cada ciclo.
 
-> **DOCUMENTO-MESTRE:** Fonte única de verdade do projeto RAIX adotada por todos os agentes.  
-> **DOCUMENTOS RELACIONADOS:**  
-> - [`MASTER_PLAN.md`](MASTER_PLAN.md) — Master Plan do Ecossistema Fortaleza RAIX (2024–2027)  
-> - [`ARQUITETURA_ECOSSISTEMA.md`](ARQUITETURA_ECOSSISTEMA.md) — Arquitetura do Ecossistema e Núcleo Criptográfico Compartilhado  
+> **DOCUMENTO-MESTRE:** Fonte única de verdade do projeto RAIX adotada por todos os agentes.
+> **DOCUMENTOS RELACIONADOS:**
+>
+> - [`MASTER_PLAN.md`](MASTER_PLAN.md) — Master Plan do Ecossistema Fortaleza RAIX (2024–2027)
+> - [`ARQUITETURA_ECOSSISTEMA.md`](ARQUITETURA_ECOSSISTEMA.md) — Arquitetura do Ecossistema e Núcleo Criptográfico Compartilhado
 
 ---
 
 ## 1. IDENTIDADE
+
 - **Produto:** RAIX (plataforma de privacidade digital)
 - **Marca:** RAIX depositada no INPI (classes 9 e 42) + RPC
 - **Domínios:** raixtech.com + raixtech.com.br
-- **E-mail oficial:** contato@raixtech.com
+- **E-mail oficial:** <contato@raixtech.com>
 - **Repositório:** sampaiofa-tech/Raix (AGPL-3.0, dual licensing)
 - **Empresa:** Cat Tech (CNPJ 67.497.085/0001-36)
 - **Posicionamento:** "privacidade forte por design, com retenção limitada de metadados" (honesto, sem overclaim)
@@ -21,6 +24,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 2. PRODUTOS (status)
+
 - **RAIX Messaging:** EM OPERAÇÃO (Android, Windows, Web; iOS em homologação) — v1.6, zero-knowledge de conteúdo, pós-quântica híbrida (ML-KEM-768 + ML-DSA-65)
 - **Cartilhas:** publicadas (Android + iOS + Brasil/LGPD)
 - **Landing page:** publicada (redesign com 8 correções)
@@ -37,6 +41,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 3. SEGURANÇA (núcleo)
+
 - **E2E DEK v1.2** homologada com 3 provas (servidor cego, round-trip, isolamento adversarial)
 - **Pós-quântica híbrida:** ML-KEM-768 + X25519 (KEM), ML-DSA-65 + Ed25519 (assinatura)
 - **Crypto-shredding:** destruição de DEKs ≤15min + TTL + vanish-after-read
@@ -52,6 +57,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 4. COMPLIANCE
+
 - **LGPD:** PP v3, ToU v3, DPA, ROPA publicados (raixtech.com)
 - **Marco Civil:** logs 180 dias isolados
 - **Licenciamento:** AGPL-3.0 + licença comercial (dual licensing) + CLA
@@ -61,6 +67,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 5. VALIDAÇÃO DE MERCADO
+
 - **5 advogados em uso ativo** (~2h/dia cada)
 - Pediram "rastreabilidade" → Trilho de Auditoria Local
 - Veem o app como monetizável
@@ -70,6 +77,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 6. NÚMEROS-CHAVE
+
 - **Custo operacional:** R$ 0,00/mês (free tier)
 - **Custos fixos anuais:** US$ 170–240
 - **Captação:** 3 cenários (A: R$ 1,8–2,1M / B: R$ 1,0–1,2M / C: R$ 1,4–1,6M) — recomendação: **C (Híbrido)**
@@ -81,6 +89,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 7. ROADMAP PÓS-RODADA (priorização)
+
 1. Auditoria externa (R$ 50k)
 2. Migração PQ (TLS-PQ + Double Ratchet)
 3. PQ-Vault (nova receita)
@@ -94,6 +103,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 8. MASTER PLAN (Fortaleza RAIX — 3 anos, 6 camadas)
+
 - **6 camadas:** Fundação (core, HSM, PQ-ID), Ativos (Vault, Drive, Testamento), Comunicação (Messaging, Sala, Bridge), Defesa (Eraser, Selo, Sentinela), Contra-Inteligência (RFI, Custódia, Coerção), Governança (Hive, Governor, Maestro). Detalhamento integral em [`MASTER_PLAN.md`](MASTER_PLAN.md).
 - **Blindagens obrigatórias:** Panic PIN (isca), Tokens Hardware (recovery offline), Secure Guest Bridge (Low-Assurance), RAIX Governor (NÃO-IA, kill-switch), Contra-Inteligência (travada).
 - **Soberania:** processamento on-device + armazenamento híbrido.
@@ -103,6 +113,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ---
 
 ## 9. EQUIPE (Cenário C — Híbrido)
+
 - **Ano 1:** Fundador + Eng. Segurança + Backend + UX
 - **Ano 2:** + Mobile + Eng. IA/ML + QA
 - **Ano 3:** + DevOps + Business Dev + PM
@@ -117,7 +128,22 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 
 ---
 
-## 10. PENDÊNCIAS ATUAIS
+## 10. OPERAÇÃO E RECUPERAÇÃO DE DESASTRES
+
+- **Rotina de Backup:** Automática a cada 8 horas (via Agendador de Tarefas do Windows: `RaixBackupAutomatico`).
+- **Destino do Backup:** Google Drive (`G:\Meu Drive\Raix`). Sincronizado para a nuvem automaticamente.
+- **Escopo do Backup:** Código fonte (`C:\Dev\Pmsg`) e backups locais (`C:\Pmsg-Backups`).
+- **Exclusões de Segurança:** Segredos, chaves (`.keystore`, `google-services.json`, `.env`) e diretórios de build não são copiados para a nuvem. O backup de keystores requer decisão/aprovação e gestão manual.
+- **Fluxo de Recuperação (Disaster Recovery):**
+  1. Instalar o Google Drive for Desktop no novo PC e logar na conta correta.
+  2. Restaurar o conteúdo de `G:\Meu Drive\Raix\Pmsg` para `C:\Dev\Pmsg`.
+  3. Restaurar o conteúdo de `G:\Meu Drive\Raix\Pmsg-Backups` para `C:\Pmsg-Backups`.
+  4. Recuperar chaves/segredos sensíveis (não enviados à nuvem) de backup frio/físico do administrador.
+
+---
+
+## 11. PENDÊNCIAS ATUAIS
+
 - [ ] Desfecho da reunião com o investidor (3 cenários)
 - [ ] Métricas reais dos pilotos F1 (para dimensionar Track 2)
 - [ ] Recibo do INPI (número de processo real)
@@ -128,7 +154,8 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 
 ---
 
-## 11. REGRAS DE GOVERNANÇA
+## 12. REGRAS DE GOVERNANÇA
+
 - **Baseline congelado.** Nada de escopo novo sem aprovação.
 - **Analista é o ÚNICO canal para o Executor.**
 - **Assessor → Guru:** só com "Guru vamo em frente".

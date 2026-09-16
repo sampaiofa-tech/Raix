@@ -31,11 +31,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: functions/package-lock.json
 
-      - name: Setup Java 17
+      - name: Setup Java 21 (Required for Gradle & Firestore Emulator)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -46,14 +46,16 @@ jobs:
       - name: Install Functions Dependencies
         run: npm ci --prefix functions
 
-      - name: Restore Last Health Check Commit Cache
+      - name: Restore Last Health Check State Cache
         uses: actions/cache/restore@v4
-        id: last-commit-cache
+        id: last-state-cache
         with:
-          path: .health_check_last_commit
-          key: health-check-last-commit-${{ runner.os }}-
+          path: |
+            .health_check_last_commit
+            .health_check_consecutive_failures
+          key: health-check-state-${{ runner.os }}-
           restore-keys: |
-            health-check-last-commit-${{ runner.os }}-
+            health-check-state-${{ runner.os }}-
 
       - name: Inspect Code Changes
         id: git_diff
@@ -106,7 +108,32 @@ jobs:
         continue-on-error: true
         run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
 
-      - name: Generate Health Check Reports (HTML & TXT)
+      - name: Run Integrity Audit (Artifact Hashes, SBOM & Config)
+        id: test_integrity
+        continue-on-error: true
+        run: node scripts/verify_integrity.mjs
+
+      - name: Run Vulnerability Scan (CVEs - npm audit)
+        id: test_cve
+        continue-on-error: true
+        run: npm audit --prefix functions --audit-level=high
+
+      - name: Run Secret Leak Scan (verify_secrets)
+        id: test_secrets
+        continue-on-error: true
+        run: node scripts/verify_secrets.cjs
+
+      - name: Run Firestore Adversarial Rules (Emulator Suite)
+        id: test_rules_emulator
+        continue-on-error: true
+        run: npx -y firebase-tools@latest emulators:exec --only firestore "npm --prefix functions run test:emulator"
+
+      - name: Run Hosting & Network Latency Monitor
+        id: test_hosting
+        continue-on-error: true
+        run: node scripts/monitor_hosting.mjs
+
+      - name: Generate Consolidated Health Check Reports (HTML & TXT)
         id: report
         if: always()
         run: |
@@ -114,19 +141,53 @@ jobs:
           STATUS_INDEXES="${{ steps.test_indexes.outcome }}"
           STATUS_DESKTOP="${{ steps.test_desktop.outcome }}"
           STATUS_ANDROID="${{ steps.test_android.outcome }}"
+          STATUS_INTEGRITY="${{ steps.test_integrity.outcome }}"
+          STATUS_CVE="${{ steps.test_cve.outcome }}"
+          STATUS_SECRETS="${{ steps.test_secrets.outcome }}"
+          STATUS_EMULATOR="${{ steps.test_rules_emulator.outcome }}"
+          STATUS_HOSTING="${{ steps.test_hosting.outcome }}"
+
+          PREV_FAILURES=0
+          if [ -f ".health_check_consecutive_failures" ]; then
+            PREV_FAILURES=$(tr -d '[:space:]' < .health_check_consecutive_failures)
+            if ! [[ "$PREV_FAILURES" =~ ^[0-9]+$ ]]; then
+              PREV_FAILURES=0
+            fi
+          fi
+
+          # Auditoria/fallback via API pública do GitHub caso o cache tenha sido evicto
+          LATEST_RUN_CONCLUSION=$(curl -s -H "User-Agent: HealthCheck" "https://api.github.com/repos/${{ github.repository }}/actions/workflows/health-check.yml/runs?status=completed&per_page=1" | jq -r '.workflow_runs[0].conclusion // empty' 2>/dev/null || echo "")
+          if [ "$PREV_FAILURES" -eq 0 ] && [ "$LATEST_RUN_CONCLUSION" = "failure" ]; then
+            PREV_FAILURES=1
+          fi
 
           OVERALL_STATUS="SUCCESS"
           STATUS_ICON="✅"
           HEADER_COLOR="#059669"
           BADGE_BG="#d1fae5"
           BADGE_COLOR="#065f46"
+          CONSECUTIVE_FAILURES=0
 
-          if [ "$STATUS_BACKEND" != "success" ] || [ "$STATUS_INDEXES" != "success" ] || [ "$STATUS_DESKTOP" != "success" ] || [ "$STATUS_ANDROID" != "success" ]; then
+          if [ "$STATUS_BACKEND" != "success" ] || [ "$STATUS_INDEXES" != "success" ] || [ "$STATUS_DESKTOP" != "success" ] || [ "$STATUS_ANDROID" != "success" ] || [ "$STATUS_INTEGRITY" != "success" ] || [ "$STATUS_CVE" != "success" ] || [ "$STATUS_SECRETS" != "success" ] || [ "$STATUS_EMULATOR" != "success" ] || [ "$STATUS_HOSTING" != "success" ]; then
             OVERALL_STATUS="FAILURE"
             STATUS_ICON="❌"
             HEADER_COLOR="#dc2626"
             BADGE_BG="#fee2e2"
             BADGE_COLOR="#991b1b"
+            CONSECUTIVE_FAILURES=$((PREV_FAILURES + 1))
+          fi
+
+          # Escalonamento de falha: se falhar 2x seguidas, eleva para prioridade ALTA
+          if [ "$CONSECUTIVE_FAILURES" -ge 2 ]; then
+            EMAIL_PRIORITY="high"
+            EMAIL_SUBJECT="🚨 [URGENTE - ESCALONAMENTO #${CONSECUTIVE_FAILURES}] Saúde do Sistema: ${OVERALL_STATUS} (${{ github.ref_name }})"
+            ESCALATION_BANNER_HTML="<div style=\"background-color: #fee2e2; border: 2px solid #dc2626; border-radius: 8px; padding: 16px; margin-bottom: 20px;\"><h3 style=\"color: #991b1b; margin: 0 0 6px 0; font-size: 15px;\">🚨 ALERTA DE ESCALONAMENTO DE PRIORIDADE ALTA</h3><p style=\"color: #7f1d1d; margin: 0; font-size: 13px;\">O health-check do sistema falhou por <strong>${CONSECUTIVE_FAILURES} execuções consecutivas</strong>. Intervenção técnica imediata requerida.</p></div>"
+            ESCALATION_BANNER_TXT="**************************************************\n🚨 ALERTA DE ESCALONAMENTO DE PRIORIDADE ALTA!\nFalha consecutiva #${CONSECUTIVE_FAILURES} detectada no health-check.\nIntervenção técnica imediata requerida.\n**************************************************\n\n"
+          else
+            EMAIL_PRIORITY="normal"
+            EMAIL_SUBJECT="[Pmsg Health] ${STATUS_ICON} Saúde do Sistema: ${OVERALL_STATUS} (${{ github.ref_name }})"
+            ESCALATION_BANNER_HTML=""
+            ESCALATION_BANNER_TXT=""
           fi
 
           get_html_badge() {
@@ -153,11 +214,21 @@ jobs:
           BADGE_INDEXES=$(get_html_badge "$STATUS_INDEXES")
           BADGE_DESKTOP=$(get_html_badge "$STATUS_DESKTOP")
           BADGE_ANDROID=$(get_html_badge "$STATUS_ANDROID")
+          BADGE_INTEGRITY=$(get_html_badge "$STATUS_INTEGRITY")
+          BADGE_CVE=$(get_html_badge "$STATUS_CVE")
+          BADGE_SECRETS=$(get_html_badge "$STATUS_SECRETS")
+          BADGE_EMULATOR=$(get_html_badge "$STATUS_EMULATOR")
+          BADGE_HOSTING=$(get_html_badge "$STATUS_HOSTING")
 
           PLAIN_BACKEND=$(get_plain_status "$STATUS_BACKEND")
           PLAIN_INDEXES=$(get_plain_status "$STATUS_INDEXES")
           PLAIN_DESKTOP=$(get_plain_status "$STATUS_DESKTOP")
           PLAIN_ANDROID=$(get_plain_status "$STATUS_ANDROID")
+          PLAIN_INTEGRITY=$(get_plain_status "$STATUS_INTEGRITY")
+          PLAIN_CVE=$(get_plain_status "$STATUS_CVE")
+          PLAIN_SECRETS=$(get_plain_status "$STATUS_SECRETS")
+          PLAIN_EMULATOR=$(get_plain_status "$STATUS_EMULATOR")
+          PLAIN_HOSTING=$(get_plain_status "$STATUS_HOSTING")
 
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           EXEC_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
@@ -166,23 +237,26 @@ jobs:
           COMMITS_HTML=$(sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' commits_raw.txt)
           COMMITS_PLAIN=$(cat commits_raw.txt)
 
-          # Gerar report.html
+          HOSTING_HTML_SNIPPET=$(cat hosting_table.html 2>/dev/null || echo "<p>Monitoramento de hospedagem não disponível.</p>")
+          HOSTING_TXT_SNIPPET=$(cat hosting_table.txt 2>/dev/null || echo "Monitoramento de hospedagem não disponível.")
+
+          # Gerar report.html consolidado
           cat <<EOF > report.html
           <!DOCTYPE html>
           <html lang="pt-BR">
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Relatório de Saúde do Sistema - Pmsg</title>
+            <title>Relatório Consolidado de Saúde do Sistema - Raix</title>
             <style>
               body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 24px; line-height: 1.5; }
-              .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); max-width: 680px; margin: 0 auto; overflow: hidden; border: 1px solid #e2e8f0; }
+              .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); max-width: 720px; margin: 0 auto; overflow: hidden; border: 1px solid #e2e8f0; }
               .header { background-color: ${HEADER_COLOR}; color: #ffffff; padding: 24px; }
               .header h2 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; }
               .header p { margin: 0; font-size: 13px; opacity: 0.92; }
               .content { padding: 24px; }
               .status-badge { display: inline-block; padding: 6px 14px; border-radius: 9999px; font-weight: 700; font-size: 13px; background-color: ${BADGE_BG}; color: ${BADGE_COLOR}; margin-bottom: 20px; }
-              h3 { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 20px; margin-bottom: 12px; }
+              h3 { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 24px; margin-bottom: 12px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; }
               table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
               th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
               th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
@@ -195,17 +269,18 @@ jobs:
           <body>
             <div class="card">
               <div class="header">
-                <h2>${STATUS_ICON} Relatório de Saúde do Sistema - Pmsg</h2>
+                <h2>${STATUS_ICON} Relatório Consolidado de Saúde do Sistema - Raix</h2>
                 <p>Executado em ${EXEC_DATE}</p>
               </div>
               <div class="content">
-                <div class="status-badge">Resultado Geral: ${OVERALL_STATUS}</div>
+                <div class="status-badge">Resultado Geral Consolidado: ${OVERALL_STATUS}</div>
+                ${ESCALATION_BANNER_HTML}
 
-                <h3>🧪 Suítes de Testes de Regressão</h3>
+                <h3>🧪 1. Suítes de Testes de Regressão</h3>
                 <table>
                   <thead>
                     <tr>
-                      <th>Escopo / Componente</th>
+                      <th>Componente / Escopo</th>
                       <th>Comando</th>
                       <th>Status</th>
                     </tr>
@@ -234,7 +309,75 @@ jobs:
                   </tbody>
                 </table>
 
-                <h3>📝 Mudanças de Código / Commits Recentes</h3>
+                <h3>🛡️ 2. Integridade de Artefatos & Dependências (A.1)</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Verificação de Integridade</th>
+                      <th>Evidência / Critério</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Hashes de Artefatos Oficiais</strong></td>
+                      <td>SHA-256 fixados em <code>docs/release-checksums.sha256</code> (APK, AAB, MSI)</td>
+                      <td>${BADGE_INTEGRITY}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Dependências Criptográficas</strong></td>
+                      <td>SHA-256 verificado em <code>gradle/verification-metadata.xml</code> (Bouncy Castle)</td>
+                      <td>${BADGE_INTEGRITY}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>SBOM CycloneDX v1.5</strong></td>
+                      <td>Sincronizado e intocado em <code>docs/sbom/</code></td>
+                      <td>${BADGE_INTEGRITY}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Configurações de Governança</strong></td>
+                      <td><code>firestore.rules</code>, <code>indexes</code> e <code>gradle.properties</code> intocados</td>
+                      <td>${BADGE_INTEGRITY}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3>🔒 3. Testes de Fragilidade de Segurança (A.2)</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Vetores de Fragilidade</th>
+                      <th>Mecanismo / Ferramenta</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Varredura de CVEs (Nível Alto/Crítico)</strong></td>
+                      <td><code>npm audit --prefix functions --audit-level=high</code></td>
+                      <td>${BADGE_CVE}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Varredura de Segredos e Chaves</strong></td>
+                      <td><code>node scripts/verify_secrets.cjs</code> (Diffs e Commits)</td>
+                      <td>${BADGE_SECRETS}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Regras Firestore Adversariais</strong></td>
+                      <td>Suíte P0.2 no Emulador (Deny-by-default, isolamento)</td>
+                      <td>${BADGE_EMULATOR}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Criptografia & Zero-Knowledge</strong></td>
+                      <td>Primitivas PQC ML-KEM/ML-DSA, Argon2id, RAM zeroization</td>
+                      <td>${BADGE_DESKTOP}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                ${HOSTING_HTML_SNIPPET}
+
+                <h3>📝 5. Mudanças de Código / Commits Recentes</h3>
                 <div class="commits-box">${COMMITS_HTML}</div>
 
                 <div class="footer">
@@ -243,7 +386,7 @@ jobs:
                     <strong>Commit:</strong> <code>${{ github.sha }}</code> &bull; 
                     <strong>Disparo:</strong> ${{ github.event_name }}
                   </div>
-                  <a href="${RUN_URL}" class="btn">Visualizar Execução no GitHub Actions</a>
+                  <a href="${RUN_URL}" class="btn">Visualizar Execução Completa no GitHub Actions</a>
                 </div>
               </div>
             </div>
@@ -251,21 +394,35 @@ jobs:
           </html>
           EOF
 
-          # Gerar report.txt (plain text fallback)
+          # Gerar report.txt (plain text fallback consolidado)
           cat <<EOF > report.txt
           ==================================================
-          PMSG - RELATÓRIO DE SAÚDE DO SISTEMA
+          RAIX - RELATÓRIO CONSOLIDADO DE SAÚDE DO SISTEMA
           Resultado Geral: ${OVERALL_STATUS} ${STATUS_ICON}
           Data: ${EXEC_DATE}
           ==================================================
-
-          SUÍTES DE TESTES:
+          $(printf '%b' "${ESCALATION_BANNER_TXT}")
+          1. SUÍTES DE TESTES DE REGRESSÃO:
           - Backend Functions (Jest): ${PLAIN_BACKEND}
           - Firestore Indexes Coverage: ${PLAIN_INDEXES}
           - Desktop Multiplatform (JVM): ${PLAIN_DESKTOP}
           - Android Multiplatform (Unit): ${PLAIN_ANDROID}
 
-          MUDANÇAS DE CÓDIGO / COMMITS:
+          2. INTEGRIDADE DE ARTEFATOS & DEPENDÊNCIAS (A.1):
+          - Hashes de Artefatos v1.6.0 (APK/AAB/MSI): ${PLAIN_INTEGRITY}
+          - Verification Metadata (Bouncy Castle SHA-256): ${PLAIN_INTEGRITY}
+          - SBOM CycloneDX v1.5: ${PLAIN_INTEGRITY}
+          - Status Geral de Integridade: ${PLAIN_INTEGRITY}
+
+          3. TESTES DE FRAGILIDADE DE SEGURANÇA (A.2):
+          - Varredura de CVEs (npm audit high/critical): ${PLAIN_CVE}
+          - Varredura de Segredos: ${PLAIN_SECRETS}
+          - Regras Firestore Adversariais (Emulador): ${PLAIN_EMULATOR}
+          - Criptografia & Zero-Knowledge: ${PLAIN_DESKTOP}
+
+          4. ${HOSTING_TXT_SNIPPET}
+
+          5. MUDANÇAS DE CÓDIGO / COMMITS:
           ${COMMITS_PLAIN}
 
           INFORMAÇÕES DA EXECUÇÃO:
@@ -278,6 +435,9 @@ jobs:
 
           echo "overall_status=$OVERALL_STATUS" >> $GITHUB_OUTPUT
           echo "status_icon=$STATUS_ICON" >> $GITHUB_OUTPUT
+          echo "email_subject=$EMAIL_SUBJECT" >> $GITHUB_OUTPUT
+          echo "email_priority=$EMAIL_PRIORITY" >> $GITHUB_OUTPUT
+          echo "consecutive_failures=$CONSECUTIVE_FAILURES" >> $GITHUB_OUTPUT
 
       - name: Send Health Check Email Report
         if: always()
@@ -287,22 +447,27 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USER }}
           password: ${{ secrets.SMTP_PASS }}
-          subject: "[Pmsg Health] ${{ steps.report.outputs.status_icon }} Saúde do Sistema: ${{ steps.report.outputs.overall_status }} (${{ github.ref_name }})"
+          subject: ${{ steps.report.outputs.email_subject }}
+          priority: ${{ steps.report.outputs.email_priority }}
           to: ${{ secrets.SMTP_TO }}
           from: "Pmsg Health Monitor <${{ secrets.SMTP_USER }}>"
           html_body: file://report.html
           body: file://report.txt
 
-      - name: Prepare Last Commit State for Cache
+      - name: Prepare State for Cache
         if: always()
-        run: echo "${{ github.sha }}" > .health_check_last_commit
+        run: |
+          echo "${{ github.sha }}" > .health_check_last_commit
+          echo "${{ steps.report.outputs.consecutive_failures }}" > .health_check_consecutive_failures
 
-      - name: Save Health Check Commit Cache
+      - name: Save Health Check State Cache
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: .health_check_last_commit
-          key: health-check-last-commit-${{ runner.os }}-${{ github.run_id }}
+          path: |
+            .health_check_last_commit
+            .health_check_consecutive_failures
+          key: health-check-state-${{ runner.os }}-${{ github.run_id }}
 
       - name: Enforce Overall Job Status
         if: always()

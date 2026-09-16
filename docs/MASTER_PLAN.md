@@ -1,12 +1,13 @@
 # Master Plan do Ecossistema Fortaleza RAIX (2024–2027)
+
 ## Rumo ao Estado Digital Soberano: Arquitetura Estratégica em 6 Camadas
 
-> **STATUS:** Referência Estratégica Oficial / Visão Sistêmica de 3 Anos  
-> **BASELINE:** Congelado — Nenhuma alteração ou escopo de código novo neste ciclo  
-> **DATA DO CONSENSO:** 22 de Maio de 2024 (Registro Formal e Definitivo)  
-> **CHANCELA:** Consenso Técnico Conjunto (Guru Criptográfico ↔ Futuro/Arquitetura) + Validação Executiva (Assessor de Investimentos)  
-> **CLASSIFICAÇÃO:** Documento Estratégico Diretor (Sem mais discussões pendentes)  
-> **DOCUMENTO-MESTRE:** [ESTADO_RAIX.md](ESTADO_RAIX.md) (Fonte Única de Verdade do Projeto v2.0)  
+> **STATUS:** Referência Estratégica Oficial / Visão Sistêmica de 3 Anos
+> **BASELINE:** Congelado — Nenhuma alteração ou escopo de código novo neste ciclo
+> **DATA DO CONSENSO:** 22 de Maio de 2024 (Registro Formal e Definitivo)
+> **CHANCELA:** Consenso Técnico Conjunto (Guru Criptográfico ↔ Futuro/Arquitetura) + Validação Executiva (Assessor de Investimentos)
+> **CLASSIFICAÇÃO:** Documento Estratégico Diretor (Sem mais discussões pendentes)
+> **DOCUMENTO-MESTRE:** [ESTADO_RAIX.md](ESTADO_RAIX.md) (Fonte Única de Verdade do Projeto v2.0)
 
 ---
 
@@ -17,7 +18,9 @@ A evolução do ecossistema RAIX no horizonte de três anos projeta a transiçã
 Em um cenário geopolítico e tecnológico marcado pela vigilância estatal onipresente, quebra algorítmica iminente de cifras clássicas pela computação quântica (*Harvest Now, Decrypt Later*) e monetização predatória de metadados por corporações centralizadas, a **Fortaleza RAIX** ergue-se sob a premissa de que a soberania digital não é concedida por terceiros, mas matematicamente garantida por infraestrutura própria e verificável.
 
 ### 1.1 O Epicentro Gravitacional: `raix-crypto-core`
+
 Todo o ecossistema orbita um núcleo criptográfico unificado, modular e hermético: o **`raix-crypto-core`**.
+
 - **Raiz de Confiança Determinística:** O mnemônico BIP-39 (12 palavras, 128 bits de entropia) funciona como a "Chave-Mestra da Soberania".
 - **Separação Rígida de Domínios:** Derivações hierárquicas endurecidas (BIP-32/BIP-44) garantem que nenhum segredo ou chave seja reutilizado entre diferentes produtos ou camadas.
 - **Criptografia Pós-Quântica (PQC) Híbrida:** Adoção mandatória das normas do NIST (FIPS 203 ML-KEM-768 pareado com X25519; FIPS 204 ML-DSA-65 pareado com Ed25519), combinadas a cifras simétricas autenticadas (ChaCha20-Poly1305 / AES-256-GCM) e algoritmos KDF resistentes a hardware dedicado (Argon2id).
@@ -29,7 +32,7 @@ Todo o ecossistema orbita um núcleo criptográfico unificado, modular e hermét
 
 A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e interdependentes**, organizadas hierarquicamente da base criptográfica fundamental até a governança autônoma:
 
-```
+```text
                       ┌────────────────────────────────────────┐
                       │        CAMADA 6: GOVERNANÇA            │
                       │    (Consenso, Atestação, Federação)    │
@@ -59,9 +62,9 @@ A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e in
                       │         CAMADA 1: FUNDAÇÃO             │
                       │  (raix-crypto-core, BIP-39, Hardware)  │
                       └────────────────────────────────────────┘
-```
-
+```text
 ### 2.1 Camada 1: Fundação (A Base Criptográfica)
+
 - **Status:** Base consolidada / Núcleo em fase de amadurecimento e abstração modular.
 - **Papel:** Provedor absoluto de entropia, derivação determinística e encapsulamento pós-quântico para todas as camadas superiores.
 - **Atributos Principais:**
@@ -71,6 +74,7 @@ A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e in
   - Sanitização obrigatória de memória RAM (`zeroize` / destruição imediata de material sensível pós-uso).
 
 ### 2.2 Camada 2: Ativos (PQ-Vault — A Próxima Alavanca de Receita)
+
 - **Status:** Próxima frente de desenvolvimento e monetização pós-estabilização do mensageiro.
 - **Papel:** Cofre pós-quântico de credenciais, identidades, chaves privadas, certificados e dados confidenciais com arquitetura Zero-Knowledge estrita.
 - **Modelo de Negócio e Sustentabilidade:**
@@ -79,6 +83,7 @@ A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e in
   - Canal direto de monetização de curto prazo (planos individuais e corporativos B2B), gerando o fluxo de caixa que financiará o desenvolvimento das camadas de P&D (R&D) de longo prazo.
 
 ### 2.3 Camada 3: Comunicação (RAIX Messaging — O Core em Operação)
+
 - **Status:** Base do sistema em consolidação operacional (v1.x).
 - **Papel:** Mensageria segura ponta a ponta com privacidade matemática absoluta.
 - **Atributos Principais:**
@@ -88,6 +93,7 @@ A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e in
   - Destruição determinística de mensagens e expiração criptográfica no cliente e relays.
 
 ### 2.4 Camada 4: Defesa (Sentinela Digital — R&D)
+
 - **Status:** Linha de Pesquisa e Desenvolvimento (R&D) de longo prazo (sem alocação de código no ciclo atual).
 - **Papel:** Agente de defesa ativa e higiene cibernética executado estritamente *on-device*.
 - **Atributos Principais:**
@@ -96,6 +102,7 @@ A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e in
   - Atestação criptográfica de modelos locais de linguagem (LLM Attestation) para resguardar a integridade das respostas contra adulterações em trânsito.
 
 ### 2.5 Camada 5: Contra-Inteligência (R&D Travado Legalmente — Cadeia de Custódia RFI Pronta)
+
 - **Status:** R&D com Módulo de Cadeia de Custódia concluído; travamento legal permanente.
 - **Papel:** Prova pericial forense imutável e proteção contra interceptações hostis e ataques avançados.
 - **Atributos Principais:**
@@ -103,6 +110,7 @@ A arquitetura da Fortaleza RAIX é estruturada em **6 camadas concêntricas e in
   - **Travamento Legal Estrito:** As capacidades de contra-inteligência são formal e juridicamente restritas à defesa cibernética local e preservação probatória em conformidade com o Marco Civil da Internet, LGPD e normas internacionais de perícia digital (ISO/IEC 27037). Proibição expressa de qualquer mecanismo de vigilância ofensiva, espionagem ou monitoramento invasivo de terceiros.
 
 ### 2.6 Camada 6: Governança (R&D Institucional)
+
 - **Status:** Linha de Pesquisa e Desenvolvimento (R&D) de longo prazo.
 - **Papel:** Coordenação descentralizada, consenso de integridade do ecossistema e federação soberana.
 - **Atributos Principais:**
@@ -143,7 +151,7 @@ Para garantir a invulnerabilidade da Fortaleza mesmo sob condições extremas de
 
 A execução do Master Plan segue uma **cascata sequencial estrita**, onde a maturidade de cada etapa e a geração de receita de curto prazo financiam a pesquisa e expansão de longo prazo:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                       CASCATA ESTRATÉGICA DE 3 ANOS                         │
 └──────────────────────────────────────┬──────────────────────────────────────┘
@@ -175,9 +183,9 @@ A execução do Master Plan segue uma **cascata sequencial estrita**, onde a mat
 │ • Ativação do RAIX Governor determinístico com kill-switch de hardware.     │
 │ • Estrutura de Governança e Federação Soberana.                             │
 └─────────────────────────────────────────────────────────────────────────────┘
-```
-
+```text
 ### 5.1 Dinâmica Econômica de Financiamento
+
 - **Pilotos Institucionais → Lojas Oficiais:** Validação empírica e tração inicial do mensageiro, consolidando reputação de confiabilidade e primeiros fluxos comerciais.
 - **Lançamento do PQ-Vault:** Entrada no mercado global de gerenciadores de senhas com o diferencial competitivo de imunidade pós-quântica zero-knowledge. O fluxo de caixa gerado por assinaturas corporativas financia a expansão da infraestrutura e o laboratório de R&D.
 - **Autonomia Estratégica e Financeira:** A capacidade de autofinanciamento via produtos de alto valor agregado garante que o ecossistema preserve integralmente sua integridade ética e arquitetural, dispensando concessões a interesses de terceiros.
@@ -201,17 +209,20 @@ A execução do Master Plan segue uma **cascata sequencial estrita**, onde a mat
 Conforme consenso estabelecido em 22 de Maio de 2024, fica registrado neste Master Plan o escopo complementar de endurecimento (Bloco A) e os satélites de monetização B2B (Bloco B), que comporão o roadmap pós-rodada. Este registro atua estritamente como referência documental, respeitando a regra de **Baseline Congelado** (nenhuma inclusão de código ou escopo novo no ciclo atual).
 
 ### 7.1 Bloco A: Endurecimento da Fortaleza (Hardening)
+
 - **Padding de Tráfego:** Ofuscação e calibração de padrões de rede com injeção de pacotes (calibrado com piloto, Track 2).
 - **Isolamento Wasm/Rust em Clientes Web:** Garantia de execução protegida da lógica de chaves no navegador com limpezas rigorosas via `zeroize` na memória volátil.
 - **Contra-Inteligência:** O escopo do módulo RFI (Raix Forensic Intelligence) fica estritamente documentado sob o status mandatório `LOCKED_PENDING_LEGAL_REVIEW`.
 
 ### 7.2 Bloco B: Satélites B2B e Continuidade
+
 Os satélites complementares ingressam na camada de Ativos (Camada 2) e Comunicação (Camada 3), estruturados como propulsores de monetização sucessores do PQ-Vault:
 1. **RAIX Sign (P1 - Prioridade Máxima):** Plataforma de assinatura digital B2B. Reutiliza as primitivas do `raix-crypto-core` (ML-DSA-65). Estratégia de precificação transacional por documento/assinatura corporativa.
 2. **RAIX Drop (P2):** Sistema efêmero para transferência de arquivos (*Low-Assurance*), focado em compartilhamento ágil e pontual. Modelo de aquisição Freemium/Pro.
 3. **Protocolo Lázaro (P3):** Solução premium de continuidade da semente (Mnemônico) baseada no esquema SLIP-0039 (*Shamir's Secret Sharing*). Endereçado aos segmentos Private/Enterprise.
 
 ### 7.3 Bloco C: Infraestrutura Privada e RAIX Drive (Self-Hosted)
+
 Extensão da camada de Ativos (Camada 2), a ser priorizada após o PQ-Vault e os satélites B2B. O RAIX Drive adapta a arquitetura para modelos de infraestrutura sob controle físico do cliente corporativo ou premium.
 
 - **Conceito e Soberania:** O **RAIX Drive** permanece um cliente zero-knowledge estrito. A única mudança arquitetural é o roteamento do backend: em vez da nuvem RAIX, o sistema aponta para um servidor/NAS local do cliente. Processamento e cifragem ocorrem 100% *on-device*. O NAS atua meramente como "depósito cego de bits" (armazenando apenas fragmentos criptografados, sem chaves).
@@ -222,6 +233,7 @@ Extensão da camada de Ativos (Camada 2), a ser priorizada após o PQ-Vault e os
 - **Sinergia:** Este bloco impulsiona a vertical de Consultoria ("engenharia de infraestrutura privada"), elevando significativamente o ticket médio B2B.
 
 ### 7.4 Priorização Integrada do Pipeline
+
 A alocação de recursos e introdução das novas features respeitará inegociavelmente a seguinte ordem sequencial de desenvolvimento e deploy:
 1. Auditoria Externa (P0)
 2. Integração Pós-Quântica (PQ)
