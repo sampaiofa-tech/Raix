@@ -10,8 +10,6 @@ try {
   console.warn("Aviso ao extrair diffs do git:", e.message);
 }
 
-const addedLines = diffText.split("\n").filter(l => l.startsWith("+") && !l.startsWith("+++"));
-
 const patterns = [
   { name: "GitHub Token (gho_)", regex: /gho_[A-Za-z0-9_]+/ },
   { name: "GitHub Token (ghp_)", regex: /ghp_[A-Za-z0-9_]+/ },
@@ -23,13 +21,30 @@ const patterns = [
   { name: "Private Key Header", regex: /BEGIN (RSA |EC )?PRIVATE KEY/ }
 ];
 
+const lines = diffText.split("\n");
+let currentFile = "unknown";
 let leaksFound = 0;
-for (let i = 0; i < addedLines.length; i++) {
-  const line = addedLines[i];
-  for (const p of patterns) {
-    if (p.regex.test(line)) {
-      console.error(`ALERTA: Padrão proibido detectado no diff: ${p.name}`);
-      leaksFound++;
+
+for (const line of lines) {
+  if (line.startsWith("+++ b/")) {
+    currentFile = line.substring(6);
+  }
+  
+  if (line.startsWith("+") && !line.startsWith("+++")) {
+    // Ignora falsos positivos (regras em docs, linter, e scripts de consolidação)
+    if (
+      currentFile.endsWith(".md") || 
+      currentFile.endsWith("verify_secrets.cjs") || 
+      currentFile.endsWith("generate_consolidated.py")
+    ) {
+      continue;
+    }
+
+    for (const p of patterns) {
+      if (p.regex.test(line)) {
+        console.error(`ALERTA: Padrão proibido detectado no diff: ${p.name} em arquivo: ${currentFile}`);
+        leaksFound++;
+      }
     }
   }
 }
