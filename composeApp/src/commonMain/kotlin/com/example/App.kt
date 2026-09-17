@@ -22,6 +22,7 @@ import com.example.data.repository.ContactRepositoryProvider
 import com.example.security.consent.LegalConsentManager
 import com.example.ui.screens.AddContactModelAScreen
 import com.example.ui.screens.AgeGateScreen
+import com.example.ui.screens.AppLockGate
 import com.example.ui.screens.BlockedContactsScreen
 import com.example.ui.screens.ContactChatScreen
 import com.example.ui.screens.ContactsScreen
@@ -30,6 +31,7 @@ import com.example.ui.screens.IdentityScreen
 import com.example.ui.screens.SafetyNumberScreen
 
 sealed interface AppDestination {
+    data object AppLock : AppDestination
     data object AgeGate : AppDestination
     data object Contacts : AppDestination
     data object BlockedContacts : AppDestination
@@ -60,7 +62,7 @@ fun App() {
     val isConsentValid = remember { LegalConsentManager.isConsentValid() }
     var currentDestination by remember {
         mutableStateOf<AppDestination>(
-            if (isConsentValid) AppDestination.Contacts else AppDestination.AgeGate
+            if (isConsentValid) AppDestination.AppLock else AppDestination.AgeGate
         )
     }
 
@@ -76,10 +78,18 @@ fun App() {
                 label = "app_navigation_transition"
             ) { destination ->
                 when (destination) {
+                    is AppDestination.AppLock -> {
+                        AppLockGate(
+                            onUnlocked = {
+                                currentDestination = AppDestination.Contacts
+                            }
+                        )
+                    }
+
                     is AppDestination.AgeGate -> {
                         AgeGateScreen(
                             onConsentAccepted = {
-                                currentDestination = AppDestination.Contacts
+                                currentDestination = AppDestination.AppLock
                             }
                         )
                     }
