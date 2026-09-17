@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD033 MD041 -->
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -67,7 +68,7 @@
 
 # RAIX — Planilha Financeira e Portfólio de Produtos
 
-Bem-vindo ao ecossistema **RAIX** — um Estado Digital Soberano fundado no princípio inegociável de **privacidade forte por design, com retenção limitada de metadados**. 
+Bem-vindo ao ecossistema **RAIX** — um Estado Digital Soberano fundado no princípio inegociável de **privacidade forte por design, com retenção limitada de metadados**.
 
 Este documento apresenta nosso portfólio de produtos em linguagem acessível e detalha as projeções financeiras (estimativas) projetadas para os próximos 4 anos de operação.
 
@@ -128,7 +129,7 @@ Com base em um cenário realista e nos tickets praticados pelo mercado, apresent
 | **Ano 1** | 100 a 300 Escritórios + 5 a 8 contas Private | R$ 6.000 a R$ 62.000 / mês |
 | **Ano 2** | 160 a 300 Escritórios + 10 a 20 contas Private | R$ 0 a R$ 139.000 / mês (conforme variação na faixa) |
 
-*(Nota: "Escritórios" englobam assinaturas B2B multi-assento, enquanto "Private" representa o ticket de alta exclusividade e serviços consultivos associados.)*
+<em>(Nota: "Escritórios" englobam assinaturas B2B multi-assento, enquanto "Private" representa o ticket de alta exclusividade e serviços consultivos associados.)</em>
 
 <div class="page-break"></div>
 
