@@ -19,7 +19,7 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 #### B. Bases Legais para Tratamento (Art. 7º e Art. 10)
 
 * **O que a lei exige:** O tratamento de dados pessoais somente poderá ser realizado mediante o enquadramento em uma das bases legais previstas (consentimento, obrigação legal, execução de contrato, legítimo interesse, etc.).
-* **Como o RAIX cumpre:** 
+* **Como o RAIX cumpre:**
   * **Obrigação Legal (Art. 7º, II):** Guarda de registros de acesso a aplicações de internet por 180 dias, em atendimento ao Art. 15 do Marco Civil da Internet.
   * **Execução de Contrato (Art. 7º, V):** Operações necessárias para a prestação do serviço e faturamento nos planos pagos (profissionais/Premium).
   * **Legítimo Interesse (Art. 10):** Tratamento de dados telemáticos e de diagnóstico estritamente necessários para a segurança, prevenção à fraude e integridade da rede.
