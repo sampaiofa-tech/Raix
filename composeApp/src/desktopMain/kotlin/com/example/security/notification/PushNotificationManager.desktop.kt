@@ -44,7 +44,7 @@ actual object PushNotificationManager {
                 ${'$'}textNodes.Item(0).AppendChild(${'$'}template.CreateTextNode('$escapedTitle')) > ${'$'}null
                 ${'$'}textNodes.Item(1).AppendChild(${'$'}template.CreateTextNode('$escapedBody')) > ${'$'}null
                 ${'$'}toast = [Windows.UI.Notifications.ToastNotification]::new(${'$'}template)
-                [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Raix').Show(${'$'}toast)
+                [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe').Show(${'$'}toast)
             """.trimIndent()
 
             val process = ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", script)

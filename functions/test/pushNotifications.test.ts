@@ -117,10 +117,6 @@ describe("Push Notifications (v1.6) - Unit Tests", () => {
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
           token: "fcm_bob_device_token_xyz",
-          notification: {
-            title: "Raix",
-            body: "Nova mensagem efêmera recebida.",
-          },
           data: expect.objectContaining({
             type: "new_message",
             messageId: "msg_push_01",

@@ -102,10 +102,6 @@ export const storeMessageKey = onCall(async (request) => {
         const clampedTtlSeconds = Math.max(1, Math.floor(clampedTtl / 1000));
         await admin.messaging().send({
           token: pushToken,
-          notification: {
-            title: "Raix",
-            body: "Nova mensagem efêmera recebida.",
-          },
           data: {
             type: "new_message",
             messageId: data.messageId,
@@ -114,10 +110,6 @@ export const storeMessageKey = onCall(async (request) => {
           android: {
             priority: "high",
             ttl: clampedTtlSeconds * 1000,
-            notification: {
-              channelId: "new_conversations_channel",
-              sound: "default",
-            },
           },
           apns: {
             headers: {
