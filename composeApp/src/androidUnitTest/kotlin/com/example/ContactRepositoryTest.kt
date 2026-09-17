@@ -34,6 +34,10 @@ class ContactRepositoryTest {
             .allowMainThreadQueries()
             .build()
         repository = AndroidContactRepository(db.contactDao(), db.blockedContactDao())
+        
+        com.example.security.identity.IdentityStorage.initialize(context)
+        com.example.security.identity.IdentityManager.clearIdentity()
+        com.example.security.identity.IdentityManager.getOrGenerateIdentity()
     }
 
     @After
@@ -58,8 +62,8 @@ class ContactRepositoryTest {
         val rawEntity = db.contactDao().getContactByFingerprint(contact.fingerprint)
         assertNotNull(rawEntity)
         assertTrue(
-            "Raw database displayName must be encrypted, got: ${rawEntity!!.displayNameEncrypted}",
-            rawEntity.displayNameEncrypted.startsWith("ENC")
+            "Raw database displayName must be encrypted and longer than 12 bytes IV, got: ${rawEntity!!.displayNameEncrypted}",
+            rawEntity.displayNameEncrypted.length > 16
         )
         assertFalse(
             "Raw database must NEVER contain plaintext contact name!",

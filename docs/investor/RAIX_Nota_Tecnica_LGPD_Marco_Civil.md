@@ -13,7 +13,7 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 #### A. Minimização de Dados (Art. 6º, III)
 
 * **O que a lei exige:** Os dados pessoais tratados devem ser limitados ao mínimo necessário para a realização de suas finalidades.
-* **Como o RAIX cumpre:** O RAIX opera sob a premissa de *zero-knowledge*. O servidor não coleta Informações Pessoalmente Identificáveis (PII), tais como e-mail, telefone, nome, CPF ou lista de contatos. Não há processo de cadastro tradicional; a identidade criptográfica do usuário é derivada exclusivamente de um mnemônico local (BIP-39) sob a guarda exclusiva do titular.
+* **Como o RAIX cumpre:** O RAIX opera sob a premissa de *zero-knowledge*. O servidor não realiza coleta direta de dados cadastrais (nome, CPF, e-mail, telefone), limitando o tratamento a identificadores técnicos, registros de acesso a aplicações (art. 15 MCI) e metadados minimizados (pseudonimização). Não há processo de cadastro tradicional; a identidade criptográfica do usuário é derivada exclusivamente de um mnemônico local (BIP-39) sob a guarda exclusiva do titular.
 * **Evidência:** Arquivo `DATA_INVENTORY.md` documenta que apenas dados estritos de transporte e metadados de roteamento são retidos pelo tempo máximo de 24 horas. Nenhum dado pessoal é vinculado ou associável ao conteúdo da mensagem.
 
 #### B. Bases Legais para Tratamento (Art. 7º e Art. 10)
@@ -22,25 +22,25 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 * **Como o RAIX cumpre:**
   * **Obrigação Legal (Art. 7º, II):** Guarda de registros de acesso a aplicações de internet por 180 dias, em atendimento ao Art. 15 do Marco Civil da Internet.
   * **Execução de Contrato (Art. 7º, V):** Operações necessárias para a prestação do serviço e faturamento nos planos pagos (profissionais/Premium).
-  * **Legítimo Interesse (Art. 10):** Tratamento de dados telemáticos e de diagnóstico estritamente necessários para a segurança, prevenção à fraude e integridade da rede.
+  * **Legítimo Interesse (Art. 10):** Tratamento de dados telemáticos e de diagnóstico estritamente necessários para a segurança, prevenção à fraude e integridade da rede, submetido ao LIA (Legitimate Interests Assessment) — teste de finalidade, necessidade e balanceamento.
 * **Evidência:** O Registro das Operações de Tratamento de Dados Pessoais (ROPA) documenta e mapeia exaustivamente cada operação de tratamento e sua respectiva base legal.
 
-#### C. Direitos do Titular (Art. 18)
+#### C. Direitos do Titular (Art. 20)
 
 * **O que a lei exige:** O titular tem direito de obter do controlador confirmação, acesso, correção, anonimização, portabilidade, eliminação, informação e revisão de decisões automatizadas.
-* **Como o RAIX cumpre:** O atendimento aos direitos dos titulares ocorre mediante o canal formal `contato@raixtech.com`, com tempo de resposta e execução previsto para até 15 dias corridos.
+* **Como o RAIX cumpre:** O atendimento aos direitos dos titulares ocorre mediante o canal formal `contato@raixtech.com`, com prazos escalonados conforme o Art. 19 (resposta simplificada imediata; declaração completa em até 15 dias).
 * **Evidência:** Arquivo `DSR_RUNBOOK.md` formaliza as rotinas e fluxos: Fluxo A (para dados de transporte sob controle direto da Raix Tech) e Fluxo B (para conteúdo profissional e contatos, onde o profissional/empresa atua como controlador e a Raix Tech como operadora).
 
 #### D. Encarregado pelo Tratamento de Dados (DPO) (Art. 41)
 
 * **O que a lei exige:** O controlador deverá indicar encarregado pelo tratamento de dados pessoais, com identidade e informações de contato divulgadas de forma clara e objetiva.
-* **Como o RAIX cumpre:** O contato formal `contato@raixtech.com` está publicamente designado como o canal direto de comunicação com o Encarregado (DPO).
+* **Como o RAIX cumpre:** O RAIX mantém ato formal de nomeação do Encarregado (DPO), documentando sua identidade, atribuições e divulgando de forma clara o canal de comunicação direto (`contato@raixtech.com`).
 * **Evidência:** Expressamente designado e divulgado na Política de Privacidade (PP) e no ROPA.
 
 #### E. Segurança da Informação (Art. 46)
 
 * **O que a lei exige:** Adoção de medidas de segurança, técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas.
-* **Como o RAIX cumpre:** A criptografia de ponta-a-ponta (E2E) é o pilar da plataforma. Utiliza cifra AES-256-GCM com uma Data Encryption Key (DEK) única por mensagem. O servidor atua "cego" e o ciclo de vida da informação abrange o expurgo criptográfico (*crypto-shredding*), o padrão *vanish-after-read* (autodestruição) e a proteção por chaves respaldadas por hardware local.
+* **Como o RAIX cumpre:** A criptografia de ponta-a-ponta (E2E) é o pilar da plataforma. Utiliza cifra AES-256-GCM com uma Data Encryption Key (DEK) única por mensagem. As operações de cifragem e decifragem ocorrem exclusivamente no cliente (endpoints); a infraestrutura de backend apenas transmite e armazena temporariamente pacotes cifrados, sem chaves de descriptografia. O ciclo de vida da informação abrange o expurgo criptográfico (*crypto-shredding*), o padrão *vanish-after-read* (autodestruição) e a proteção por chaves respaldadas por hardware local.
 * **Evidência:** Homologação E2E validada mediante três provas criptográficas de produção: Prova de Servidor Cego, Prova de Round-Trip Real e Prova de Isolamento Adversarial, atestando a Cadeia de Custódia ininterrupta de ponta a ponta.
 
 #### F. Responsabilização e Prestação de Contas (Art. 6º, X e Art. 37)
@@ -61,6 +61,12 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 * **Como o RAIX cumpre:** O princípio *zero-knowledge* reduz materialmente o risco a um potencial de impacto residual, dado que vazamentos de bancos de dados da plataforma não expõem PII legíveis ou conteúdo de mensagens.
 * **Evidência:** Política de Resposta a Incidentes documentada, estipulando notificação à ANPD no prazo máximo de 3 (três) dias úteis nos casos aplicáveis, conforme Resolução CD/ANPD nº 15/2024.
 
+#### I. Faturamento e Monetização
+
+* **O que a lei exige:** O tratamento de dados financeiros para cumprimento de contratos e obrigações requer segurança adequada e minimização de riscos aos titulares.
+* **Como o RAIX cumpre:** As transações são processadas por gateway terceiro independente, com segregação de bases, sem correlação com os dados de mensageria cifrados.
+* **Evidência:** Arquitetura de segregação onde o módulo de assinatura (billing) opera de maneira logicamente e fisicamente isolada.
+
 ---
 
 ### PARTE II — Marco Civil da Internet (MCI)
@@ -71,7 +77,7 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 * **Como o RAIX cumpre:** O sistema retém accessLogs isolados por 180 dias (prazo legal mínimo de 6 meses), com expurgo automático imediato ao término do prazo, sem prorrogação, via TTL + shredder. Os campos capturados restringem-se ao necessário para transporte telemático: IP de origem, timestamp em UTC, porta lógica e função (*function*). Não há associação destes dados ao conteúdo, chaves de criptografia ou mnemônico do usuário.
 * **Evidência:** Mecanismo arquitetural de expurgo por *Time-to-Live* (TTL) associado a *shredder*, que oblitera irrecuperavelmente os *logs* isolados ao atingir o prazo de 180 dias.
 
-#### B. Disponibilização Judicial de Registros (Art. 10 e Art. 13)
+#### B. Disponibilização Judicial de Registros (Art. 10 e Art. 15)
 
 * **O que a lei exige:** O fornecimento de registros de acesso deve ser feito mediante ordem judicial, respeitando a privacidade e a proteção de dados.
 * **Como o RAIX cumpre:** A empresa adota uma postura de estrita cooperação com as autoridades legais. Cumpre-se a entrega daquilo que materialmente existe (os logs isolados de conexão telemática).
