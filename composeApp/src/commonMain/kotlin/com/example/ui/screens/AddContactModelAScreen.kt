@@ -79,6 +79,12 @@ import com.example.ui.components.isQrScannerSupported
 import kotlinx.coroutines.launch
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import com.example.data.network.FirestoreRestClient
+import com.example.data.network.KeyStoreClient
+import com.example.security.identity.AesGcm
+import com.example.security.identity.SealedBox
+import kotlin.random.Random
+import com.example.data.model.FirestoreMessage
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalEncodingApi::class)
 @Composable
@@ -475,6 +481,7 @@ fun AddContactModelAScreen(
                                     
                                     coroutineScope.launch {
                                         contactRepository.saveContact(newContact)
+                                        sendAutoHandshake(newContact, myUri)
                                         onContactCreated(newContact)
                                     }
                                 } else {
@@ -580,6 +587,7 @@ fun AddContactModelAScreen(
 
                             coroutineScope.launch {
                                 contactRepository.saveContact(newContact)
+                                sendAutoHandshake(newContact, myUri)
                                 onContactCreated(newContact)
                             }
                         },
@@ -1009,5 +1017,56 @@ fun AddContactModelAScreen(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+suspend fun sendAutoHandshake(contact: ContactItem, myUri: String) {
+    if (myUri.isBlank()) return
+    try {
+        val (myUid, myIdToken) = com.example.security.DeviceAuthManager.ensureAuthenticated()
+        val recipientPubKey = Base64.decode(contact.pubKey)
+        val dek = ByteArray(32).also { Random.nextBytes(it) }
+        val iv = ByteArray(12).also { Random.nextBytes(it) }
+
+        val handshakePayload = "[AUTO-HANDSHAKE] $myUri"
+        val cipherBytes = AesGcm.encrypt(
+            plaintext = handshakePayload.encodeToByteArray(),
+            key = dek,
+            iv = iv
+        )
+        val ciphertextB64 = Base64.encode(cipherBytes)
+        val ivB64 = Base64.encode(iv)
+
+        val envelope = SealedBox.seal(dek = dek, recipientPubKey = recipientPubKey)
+        val now = PlatformEnvironment.currentTimeMillis()
+        val expiresAt = now + 60_000L // 1 minuto de TTL para o handshake
+
+        val localMsgId = "msg_handshake_${now}_${Random.nextInt(1000, 9999)}"
+
+        val storeKeyResult = KeyStoreClient.storeMessageKey(
+            messageId = localMsgId,
+            senderId = myUid,
+            recipientId = contact.currentAuthUid,
+            ephemeralPubKey = envelope.ephemeralPubKeyHex,
+            wrappedDek = envelope.wrappedDekBase64,
+            expiresAtMillis = expiresAt,
+            idToken = myIdToken
+        )
+
+        if (storeKeyResult.success) {
+            val firestoreMsg = FirestoreMessage(
+                id = localMsgId,
+                ciphertext = ciphertextB64,
+                iv = ivB64,
+                senderId = myUid,
+                recipientId = contact.currentAuthUid,
+                expiresAt = expiresAt
+            )
+            FirestoreRestClient.createMessage(firestoreMsg, myIdToken)
+        }
+    } catch (e: Exception) {
+        // Falhas no auto-handshake são silenciosas para não interromper a UI
+        println("Auto-handshake falhou: ${e.message}")
     }
 }

@@ -66,6 +66,10 @@ import androidx.compose.material.icons.filled.Block
 import com.example.data.model.ContactItem
 import com.example.data.repository.ContactRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,6 +157,73 @@ fun ContactsScreen(
         },
         containerColor = Color(0xFF0A0E17)
     ) { paddingValues ->
+
+        @OptIn(ExperimentalEncodingApi::class)
+        LaunchedEffect(Unit) {
+            while (true) {
+                try {
+                    val authManager = com.example.security.DeviceAuthManager
+                    val myToken = authManager.getIdToken()
+                    val myUid = authManager.getUserId()
+                    
+                    if (myToken != null) {
+                        val pendingResult = com.example.data.network.FirestoreRestClient.fetchPendingMessages(myUid, myToken)
+                        if (pendingResult.isSuccess) {
+                            val pending = pendingResult.getOrThrow()
+                            for (msg in pending) {
+                                val keyResult = com.example.data.network.KeyStoreClient.getMessageKey(msg.id, myToken)
+                                if (keyResult.success && keyResult.ephemeralPubKey != null && keyResult.wrappedDek != null) {
+                                    val myPrivKey = com.example.security.identity.IdentityManager.getIdentity()?.privateKey
+                                    if (myPrivKey != null) {
+                                        val env = com.example.security.identity.SealedBoxEnvelope(
+                                            ephemeralPubKeyHex = keyResult.ephemeralPubKey,
+                                            wrappedDekBase64 = keyResult.wrappedDek
+                                        )
+                                        val dek = com.example.security.identity.SealedBox.unseal(env, myPrivKey)
+                                        val cipherBytes = Base64.decode(msg.ciphertext)
+                                        val ivBytes = Base64.decode(msg.iv)
+                                        val decryptedBytes = com.example.security.identity.AesGcm.decrypt(cipherBytes, dek, ivBytes)
+                                        val decryptedText = decryptedBytes.decodeToString()
+                                        
+                                        if (decryptedText.startsWith("[AUTO-HANDSHAKE] ")) {
+                                            val uri = decryptedText.substringAfter("[AUTO-HANDSHAKE] ").trim()
+                                            val parseRes = com.example.security.identity.IdentityManager.parseContactUri(uri)
+                                            if (parseRes.isSuccess) {
+                                                val contactData = parseRes.getOrThrow()
+                                                val existing = contactRepository.getContact(contactData.fingerprintHex)
+                                                if (existing == null) {
+                                                    val myIdentity = com.example.security.identity.IdentityManager.getIdentity()
+                                                    val pairSafetyNumber = com.example.security.identity.IdentityCryptoManager.computePairSafetyNumber(
+                                                        myPubKey = myIdentity!!.publicKey,
+                                                        peerPubKey = contactData.publicKeyBytes
+                                                    )
+                                                    val newContact = ContactItem(
+                                                        fingerprint = contactData.fingerprintHex,
+                                                        pubKey = contactData.publicKeyBase64,
+                                                        currentAuthUid = contactData.authUid,
+                                                        displayName = "Contato_${contactData.fingerprintHex.take(6)}",
+                                                        securityNumber = pairSafetyNumber,
+                                                        verified = false,
+                                                        addedAt = com.example.data.network.PlatformEnvironment.currentTimeMillis()
+                                                    )
+                                                    contactRepository.saveContact(newContact)
+                                                }
+                                                // Exclui a mensagem (Vanish-after-read)
+                                                com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Fail silently to not disrupt the UI
+                }
+                delay(10000L) // Verifica a cada 10s
+            }
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -30,10 +30,13 @@ import com.example.ui.screens.ContactsScreen
 import com.example.ui.screens.DataPrivacyScreen
 import com.example.ui.screens.IdentityScreen
 import com.example.ui.screens.SafetyNumberScreen
+import com.example.ui.screens.RecoverySeedScreen
+import com.example.security.identity.IdentityManager
 
 sealed interface AppDestination {
     data object AppLock : AppDestination
     data object AgeGate : AppDestination
+    data object RecoverySeed : AppDestination
     data object Contacts : AppDestination
     data object BlockedContacts : AppDestination
     data class Chat(val contact: ContactItem) : AppDestination
@@ -61,9 +64,12 @@ private val RaixDarkColors = darkColorScheme(
 fun App() {
     val contactRepository = remember { ContactRepositoryProvider.get() }
     val isConsentValid = remember { LegalConsentManager.isConsentValid() }
+    val hasIdentity = remember { IdentityManager.hasIdentity() }
     var currentDestination by remember {
         mutableStateOf<AppDestination>(
-            if (isConsentValid) AppDestination.AppLock else AppDestination.AgeGate
+            if (!isConsentValid) AppDestination.AgeGate
+            else if (!hasIdentity) AppDestination.RecoverySeed
+            else AppDestination.AppLock
         )
     }
 
@@ -90,6 +96,14 @@ fun App() {
                     is AppDestination.AgeGate -> {
                         AgeGateScreen(
                             onConsentAccepted = {
+                                currentDestination = if (!hasIdentity) AppDestination.RecoverySeed else AppDestination.AppLock
+                            }
+                        )
+                    }
+
+                    is AppDestination.RecoverySeed -> {
+                        RecoverySeedScreen(
+                            onSeedSaved = {
                                 currentDestination = AppDestination.AppLock
                             }
                         )

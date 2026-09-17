@@ -8,8 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backspace
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.LockPerson
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,22 +20,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.security.MasterPasswordManager
 
 @Composable
-fun PinLockScreen(
-    onVerifyPin: (String) -> Boolean = { it == "1234" },
-    onUnlocked: () -> Unit
+fun MasterPasswordSetupScreen(
+    onSetupComplete: () -> Unit
 ) {
     var pinInput by remember { mutableStateOf("") }
-    var authError by remember { mutableStateOf<String?>(null) }
+    var firstPin by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(pinInput) {
         if (pinInput.length == 4) {
-            if (onVerifyPin(pinInput)) {
-                onUnlocked()
-            } else {
-                authError = "PIN Incorreto"
+            if (firstPin == null) {
+                firstPin = pinInput
                 pinInput = ""
+            } else {
+                if (firstPin == pinInput) {
+                    MasterPasswordManager.setMasterPassword(pinInput)
+                    onSetupComplete()
+                } else {
+                    error = "Os PINs não coincidem. Tente novamente."
+                    firstPin = null
+                    pinInput = ""
+                }
             }
         }
     }
@@ -56,20 +63,18 @@ fun PinLockScreen(
                 .padding(24.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Lock,
+                imageVector = Icons.Default.LockPerson,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(56.dp)
             )
             Spacer(modifier = Modifier.height(14.dp))
-            Text(text = "RAIX", fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = "CRIAR SENHA MESTRA", fontSize = 20.sp, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "APLICATIVO BLOQUEADO",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                letterSpacing = 1.5.sp
+                text = "Proteja seu aplicativo no Windows",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -83,16 +88,16 @@ fun PinLockScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Digite o PIN de Segurança",
+                    text = if (firstPin == null) "Digite um PIN de 4 dígitos" else "Confirme seu PIN",
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 15.sp
                 )
 
-                if (authError != null) {
+                if (error != null) {
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = authError ?: "",
+                        text = error ?: "",
                         color = Color.Red,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
@@ -143,6 +148,7 @@ fun PinLockScreen(
                                     .background(if (key == "Del") MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant)
                                     .border(0.8.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                     .clickable {
+                                        error = null
                                         when (key) {
                                             "Del" -> if (pinInput.isNotEmpty()) pinInput = pinInput.dropLast(1)
                                             else -> if (pinInput.length < 4) pinInput += key
