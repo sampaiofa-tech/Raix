@@ -541,31 +541,40 @@ fun IdentityScreen(
     // Initial Provisioning Dialog with 3-word random confirmation
     if (showProvisioningDialog && provisionedDraft != null) {
         val draft = provisionedDraft!!
-        var step by remember { mutableStateOf(1) } // 1: show words, 2: test 3 words
+        var step by remember { mutableStateOf(0) } // 0: AVISO, 1..12: Posições, 13: Revisão
         var acknowledgedIrreversibleLoss by remember { mutableStateOf(false) }
 
-        // Pick 3 distinct random indices for verification (1-based: 1..12)
-        val testIndices = remember(draft) {
-            val list = (1..12).shuffled(Random(draft.mnemonic.hashCode())).take(3).sorted()
-            list
+        // Generate 5 options (1 correct, 4 distractors) for each position
+        val positionOptions = remember(draft) {
+            draft.mnemonic.map { correctWord ->
+                val distractors = generateSequence { com.example.security.identity.Bip39Portuguese.WORDS.random() }
+                    .filter { it != correctWord }
+                    .distinct()
+                    .take(4)
+                    .toList()
+                (distractors + correctWord).shuffled(Random(draft.mnemonic.hashCode() + correctWord.hashCode()))
+            }
         }
 
-        var inputWord1 by remember { mutableStateOf("") }
-        var inputWord2 by remember { mutableStateOf("") }
-        var inputWord3 by remember { mutableStateOf("") }
         var verificationError by remember { mutableStateOf<String?>(null) }
 
         AlertDialog(
             onDismissRequest = { /* Modal: cannot dismiss without completing or canceling */ },
             title = {
-                Text(if (step == 1) "🔒 Provisionamento de Identidade" else "Verificação do Mnemônico")
+                Text(
+                    when (step) {
+                        0 -> "🔒 Provisionamento de Identidade"
+                        in 1..12 -> "Palavra $step de 12"
+                        else -> "Revisão Final do Mnemônico"
+                    }
+                )
             },
             text = {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    if (step == 1) {
+                    if (step == 0) {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color(0xFF2D1600)),
                             modifier = Modifier
@@ -592,7 +601,7 @@ fun IdentityScreen(
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        "Os servidores do Raix operam sob arquitetura Zero-Knowledge e NÃO possuem cópia, backup ou mecanismo de recuperação deste mnemônico. A perda dessas 12 palavras acarreta a perda definitiva e irreversível da sua identidade e de todos os seus contatos criptográficos. Anote-as fisicamente em papel e guarde em cofre seguro.",
+                                        "Os servidores do Raix operam sob arquitetura Zero-Knowledge e NÃO possuem cópia, backup ou mecanismo de recuperação deste mnemônico. A perda dessas 12 palavras acarreta a perda definitiva e irreversível da sua identidade e de todos os seus contatos criptográficos. Anote-as fisicamente em papel (ou aço) OFFLINE e guarde em cofre seguro. NUNCA tire fotos ou salve na nuvem.",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = Color(0xFFFFE0B2)
                                     )
@@ -600,8 +609,95 @@ fun IdentityScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { acknowledgedIrreversibleLoss = !acknowledgedIrreversibleLoss }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = acknowledgedIrreversibleLoss,
+                                onCheckedChange = { acknowledgedIrreversibleLoss = it },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = Color(0xFF00FFC2),
+                                    checkmarkColor = Color.Black
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Estou ciente da perda irreversível caso perca o mnemônico. Estou pronto para anotar as 12 palavras (uma a uma).",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White
+                            )
+                        }
+                    } else if (step in 1..12) {
+                        val wordIndex = step - 1
+                        val correctWord = draft.mnemonic[wordIndex]
+                        
+                        Text(
+                            "Anote a palavra correta para esta posição no seu backup físico, e em seguida identifique-a abaixo para avançar:",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF22312C))
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = correctWord,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp,
+                                color = Color(0xFF00FFC2)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            "Identifique a palavra que fará parte da sua frase nesta posição:",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFAAAAAA)
+                        )
+
+                        positionOptions[wordIndex].forEach { option ->
+                            OutlinedButton(
+                                onClick = {
+                                    if (option == correctWord) {
+                                        verificationError = null
+                                        step++
+                                    } else {
+                                        verificationError = "Palavra incorreta. Você selecionou '$option' em vez de '$correctWord'."
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(option)
+                            }
+                        }
+
+                        if (verificationError != null) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = verificationError ?: "",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    } else {
+                        // step == 13: Final Review
+                        Text(
+                            "Revisão Final: Confira suas anotações antes de salvar permanentemente.",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        
                         FlowRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -627,92 +723,27 @@ fun IdentityScreen(
                                 }
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { acknowledgedIrreversibleLoss = !acknowledgedIrreversibleLoss }
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = acknowledgedIrreversibleLoss,
-                                onCheckedChange = { acknowledgedIrreversibleLoss = it },
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = Color(0xFF00FFC2),
-                                    checkmarkColor = Color.Black
-                                )
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Estou ciente de que os servidores Raix operam em arquitetura Zero-Knowledge, não possuem cópia deste mnemônico e que a perda dessas 12 palavras acarretará a perda definitiva e irreversível da minha identidade criptográfica e contatos.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White
-                            )
-                        }
-                    } else {
-                        Text(
-                            "Para confirmar que você anotou, informe as 3 palavras solicitadas abaixo:",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        OutlinedTextField(
-                            value = inputWord1,
-                            onValueChange = { inputWord1 = it.trim().lowercase() },
-                            label = { Text("Palavra #${testIndices[0]}") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        OutlinedTextField(
-                            value = inputWord2,
-                            onValueChange = { inputWord2 = it.trim().lowercase() },
-                            label = { Text("Palavra #${testIndices[1]}") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        OutlinedTextField(
-                            value = inputWord3,
-                            onValueChange = { inputWord3 = it.trim().lowercase() },
-                            label = { Text("Palavra #${testIndices[2]}") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        if (verificationError != null) {
-                            Text(
-                                text = verificationError ?: "",
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
                     }
                 }
             },
             confirmButton = {
-                if (step == 1) {
+                if (step == 0) {
                     Button(
-                        onClick = { step = 2 },
+                        onClick = { step = 1 },
                         enabled = acknowledgedIrreversibleLoss
                     ) {
-                        Text("Já Anotei, Continuar")
+                        Text("Iniciar Onboarding")
                     }
-                } else {
+                } else if (step == 13) {
                     Button(
                         onClick = {
-                            val expected1 = draft.mnemonic[testIndices[0] - 1]
-                            val expected2 = draft.mnemonic[testIndices[1] - 1]
-                            val expected3 = draft.mnemonic[testIndices[2] - 1]
-
-                            if (inputWord1 == expected1 && inputWord2 == expected2 && inputWord3 == expected3) {
-                                IdentityManager.confirmAndSaveIdentity(draft)
-                                identity = draft.keyPair
-                                showProvisioningDialog = false
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Identidade provisionada com sucesso! 🛡️")
-                                }
-                                onProvisioned()
-                            } else {
-                                verificationError = "Palavras incorretas. Verifique suas anotações."
+                            IdentityManager.confirmAndSaveIdentity(draft)
+                            identity = draft.keyPair
+                            showProvisioningDialog = false
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Identidade provisionada com sucesso! 🛡️")
                             }
+                            onProvisioned()
                         }
                     ) {
                         Text("Confirmar e Salvar")
@@ -720,11 +751,7 @@ fun IdentityScreen(
                 }
             },
             dismissButton = {
-                if (step == 2) {
-                    TextButton(onClick = { step = 1; verificationError = null }) {
-                        Text("Voltar e Rever")
-                    }
-                } else {
+                if (step == 0) {
                     TextButton(onClick = {
                         showProvisioningDialog = false
                         inputRestoreMnemonic = ""
@@ -732,6 +759,13 @@ fun IdentityScreen(
                         showRestoreDialog = true
                     }) {
                         Text("Já possuo 12 palavras (Restaurar)", color = Color(0xFF00FFC2), fontSize = 12.sp)
+                    }
+                } else {
+                    TextButton(onClick = {
+                        step = 0
+                        verificationError = null
+                    }) {
+                        Text("Reiniciar", color = Color.Gray, fontSize = 12.sp)
                     }
                 }
             }
