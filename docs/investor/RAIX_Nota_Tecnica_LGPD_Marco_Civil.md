@@ -38,7 +38,7 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 
 #### F. Responsabilização e Prestação de Contas (Art. 6º, X e Art. 37)
 * **O que a lei exige:** Demonstração da adoção de medidas eficazes para o cumprimento da lei e manutenção de registros de tratamento.
-* **Como o RAIX cumpre:** O RAIX adota governança proativa e transparência operacional contínua por meio de extensa documentação pública e auditorável.
+* **Como o RAIX cumpre:** O RAIX adota governança proativa e transparência operacional contínua por meio de extensa documentação pública e auditorável. As medidas de segurança e conformidade são revisadas continuamente por meio de rotinas de health-check operacional, garantindo a responsabilização proativa prevista no Art. 6º, X da LGPD.
 * **Evidência:** Documentos publicados (Política de Privacidade [PP], Termos de Uso [ToU], Data Processing Agreement [DPA] e ROPA), inventário de dados, *runbook* de Data Subject Requests (DSR) e rotinas contínuas de *health-check* operacional.
 
 #### G. Operadores e Suboperadores (Art. 39)
@@ -57,7 +57,7 @@ O presente documento atesta o posicionamento de conformidade do RAIX em relaçã
 
 #### A. Guarda de Registros de Acesso a Aplicações (Art. 15)
 * **O que a lei exige:** O provedor de aplicações de internet deve manter os respectivos registros de acesso de forma sigilosa, em ambiente controlado e seguro, pelo prazo de 6 (seis) meses.
-* **Como o RAIX cumpre:** O sistema retém `accessLogs` restritos, isolados lógicamente da camada de aplicação de mensagens. Os campos capturados restringem-se ao necessário para transporte telemático: IP de origem, timestamp em UTC, porta lógica e função (*function*). Não há associação destes dados ao conteúdo, chaves de criptografia ou mnemônico do usuário.
+* **Como o RAIX cumpre:** O sistema retém accessLogs isolados por 180 dias (prazo legal mínimo de 6 meses), com expurgo automático imediato ao término do prazo, sem prorrogação, via TTL + shredder. Os campos capturados restringem-se ao necessário para transporte telemático: IP de origem, timestamp em UTC, porta lógica e função (*function*). Não há associação destes dados ao conteúdo, chaves de criptografia ou mnemônico do usuário.
 * **Evidência:** Mecanismo arquitetural de expurgo por *Time-to-Live* (TTL) associado a *shredder*, que oblitera irrecuperavelmente os *logs* isolados ao atingir o prazo de 180 dias.
 
 #### B. Disponibilização Judicial de Registros (Art. 10 e Art. 13)
