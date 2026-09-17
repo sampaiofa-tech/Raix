@@ -145,6 +145,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ## 11. PENDÊNCIAS ATUAIS
 
 - [x] Ciclo de Feedback (9 Itens): IMPLEMENTADO
+- [x] Due diligence LGPD/Marco Civil CONCLUÍDA (nota técnica PDF + 4 evidências aprovadas — DFD/matriz de correlação, isolamento faturamento, crypto-shredding/PITR com janela de 7 dias, auditoria de SDKs). Liberação externa autorizada. AdversarialCorrelationTest pendente de inclusão na suíte de CI (item técnico, não bloqueante).
 - [ ] Desfecho da reunião com o investidor (3 cenários)
 - [ ] Métricas reais dos pilotos F1 (para dimensionar Track 2)
 - [ ] Recibo do INPI (número de processo real)
