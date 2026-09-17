@@ -6,7 +6,11 @@ import com.example.data.model.BlockedContact
 import com.example.data.model.BlockedContactEntity
 import com.example.data.model.Contact
 import com.example.data.model.ContactItem
-import com.example.util.security.CryptoManager
+import com.example.security.identity.AddressBookCrypto
+import com.example.security.identity.IdentityManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,13 +27,26 @@ class AndroidContactRepository(
 
     override fun getContacts(): Flow<List<ContactItem>> {
         return contactDao.getAllContacts().map { list ->
-            list.map { contact ->
+            val now = System.currentTimeMillis()
+            val ttlMillis = 48L * 60 * 60 * 1000L
+            val validList = list.filter { (now - it.addedAt) < ttlMillis }
+            
+            val expired = list.filter { (now - it.addedAt) >= ttlMillis }
+            if (expired.isNotEmpty()) {
+                // Launch deletion without blocking the flow map
+                kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
+                    expired.forEach { contactDao.deleteContact(it.fingerprint) }
+                }
+            }
+            
+            validList.map { contact ->
                 val decryptedName = try {
-                    CryptoManager.decrypt(contact.displayNameEncrypted)
+                    val key = IdentityManager.getAddressBookKey()
+                    if (key != null) AddressBookCrypto.decrypt(contact.displayNameEncrypted, key) else "Contato Desconhecido"
                 } catch (_: Throwable) {
                     "Contato Desconhecido"
                 }
-                contact.toItem(decryptedName)
+                contact.toItem(if (decryptedName.isNotBlank()) decryptedName else "Contato Desconhecido")
             }
         }
     }
@@ -37,15 +54,17 @@ class AndroidContactRepository(
     override suspend fun getContact(fingerprint: String): ContactItem? = withContext(Dispatchers.IO) {
         val contact = contactDao.getContactByFingerprint(fingerprint) ?: return@withContext null
         val decryptedName = try {
-            CryptoManager.decrypt(contact.displayNameEncrypted)
+            val key = IdentityManager.getAddressBookKey()
+            if (key != null) AddressBookCrypto.decrypt(contact.displayNameEncrypted, key) else "Contato Desconhecido"
         } catch (_: Throwable) {
             "Contato Desconhecido"
         }
-        contact.toItem(decryptedName)
+        contact.toItem(if (decryptedName.isNotBlank()) decryptedName else "Contato Desconhecido")
     }
 
     override suspend fun saveContact(contact: ContactItem) = withContext(Dispatchers.IO) {
-        val encryptedName = CryptoManager.encrypt(contact.displayName)
+        val key = IdentityManager.getAddressBookKey() ?: return@withContext
+        val encryptedName = AddressBookCrypto.encrypt(contact.displayName, key)
         val entity = Contact(
             fingerprint = contact.fingerprint,
             pubKey = contact.pubKey,

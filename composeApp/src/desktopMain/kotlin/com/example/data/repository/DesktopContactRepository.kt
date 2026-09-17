@@ -10,6 +10,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
+import com.example.security.identity.IdentityManager
+import com.example.security.identity.AddressBookCrypto
 
 class DesktopContactRepository : ContactRepository {
 
@@ -47,9 +49,22 @@ class DesktopContactRepository : ContactRepository {
             if (storageFile.exists()) {
                 val content = storageFile.readText()
                 if (content.isNotBlank()) {
-                    val list = json.decodeFromString<List<ContactItem>>(content)
-                    contactsFlow.value = list.associateBy { it.fingerprint }
-                    return
+                    val key = IdentityManager.getAddressBookKey() ?: return
+                    val decrypted = AddressBookCrypto.decrypt(content, key)
+                    if (decrypted.isNotBlank()) {
+                        val list = json.decodeFromString<List<ContactItem>>(decrypted)
+                        
+                        // TTL Enforcement (48 hours)
+                        val now = System.currentTimeMillis()
+                        val ttlMillis = 48L * 60 * 60 * 1000L
+                        val validList = list.filter { (now - it.addedAt) < ttlMillis }
+                        
+                        contactsFlow.value = validList.associateBy { it.fingerprint }
+                        if (validList.size != list.size) {
+                            saveToDisk() // Persist TTL evictions
+                        }
+                        return
+                    }
                 }
             }
             contactsFlow.value = emptyMap()
@@ -59,9 +74,11 @@ class DesktopContactRepository : ContactRepository {
 
     private fun saveToDisk() {
         try {
+            val key = IdentityManager.getAddressBookKey() ?: return
             val list = contactsFlow.value.values.toList()
             val text = json.encodeToString(list)
-            storageFile.writeText(text)
+            val encrypted = AddressBookCrypto.encrypt(text, key)
+            storageFile.writeText(encrypted)
         } catch (_: Throwable) {}
     }
 
@@ -70,8 +87,12 @@ class DesktopContactRepository : ContactRepository {
             if (blockedFile.exists()) {
                 val content = blockedFile.readText()
                 if (content.isNotBlank()) {
-                    val list = json.decodeFromString<List<BlockedContact>>(content)
-                    blockedFlow.value = list.associateBy { it.fingerprint }
+                    val key = IdentityManager.getAddressBookKey() ?: return
+                    val decrypted = AddressBookCrypto.decrypt(content, key)
+                    if (decrypted.isNotBlank()) {
+                        val list = json.decodeFromString<List<BlockedContact>>(decrypted)
+                        blockedFlow.value = list.associateBy { it.fingerprint }
+                    }
                 }
             }
         } catch (_: Throwable) {}
@@ -79,9 +100,11 @@ class DesktopContactRepository : ContactRepository {
 
     private fun saveBlockedToDisk() {
         try {
+            val key = IdentityManager.getAddressBookKey() ?: return
             val list = blockedFlow.value.values.toList()
             val text = json.encodeToString(list)
-            blockedFile.writeText(text)
+            val encrypted = AddressBookCrypto.encrypt(text, key)
+            blockedFile.writeText(encrypted)
         } catch (_: Throwable) {}
     }
 

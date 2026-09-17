@@ -13,7 +13,13 @@ actual object ContactRepositoryProvider {
 
     private val repository = object : ContactRepository {
         override fun getContacts(): Flow<List<ContactItem>> =
-            contactsFlow.map { it.values.sortedByDescending { c -> c.addedAt } }
+            contactsFlow.map { map ->
+                val now = System.currentTimeMillis()
+                val ttlMillis = 48L * 60 * 60 * 1000L
+                map.values
+                    .filter { (now - it.addedAt) < ttlMillis }
+                    .sortedByDescending { c -> c.addedAt }
+            }
 
         override suspend fun getContact(fingerprint: String): ContactItem? =
             contactsFlow.value[fingerprint]

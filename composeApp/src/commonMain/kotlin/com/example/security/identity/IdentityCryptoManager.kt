@@ -90,6 +90,7 @@ object IdentityCryptoManager {
     private val SIGNING_SALT = "pmsg-v1-identity-signing".encodeToByteArray()
     private val MLDSA_SALT = "raix-v2-identity-mldsa-seed".encodeToByteArray()
     private val MLKEM_SALT = "raix-v2-identity-mlkem-seed".encodeToByteArray()
+    private val ADDRESS_BOOK_SALT = "raix-v2-address-book-seed".encodeToByteArray()
 
     const val MIN_SECURITY_LEVEL_HYBRID = "HYBRID_PQC"
     const val SUITE_HYBRID = "hybrid-v1"
@@ -349,5 +350,16 @@ object IdentityCryptoManager {
             result[i] = ((high shl 4) or low).toByte()
         }
         return result
+    }
+
+    /**
+     * Derives a separate key specifically for Address Book Zero-Knowledge encryption.
+     * Uses Argon2 over the BIP-39 entropy to generate a 32-byte key.
+     */
+    fun deriveAddressBookKey(entropy: ByteArray): ByteArray {
+        val seed = Sha256Digest.digest(entropy)
+        val rawKey = Argon2Kmp.deriveKey(seed = seed, salt = ADDRESS_BOOK_SALT, iterations = 3, memoryKiB = 32768, parallelism = 1, outputLength = 32)
+        MemorySanitizer.zeroize(seed)
+        return rawKey
     }
 }

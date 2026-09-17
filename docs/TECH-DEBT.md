@@ -103,3 +103,12 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 - **Segurança/Arquitetura:** Acionamento obrigatório do Guru (via Analista) antes de qualquer ação.
 
 > **Regra de Ouro:** Nenhum feedback se torna escopo não aprovado. Tudo deve passar pela triagem e pelo roteamento adequado antes de qualquer modificação no produto. Nada de escopo novo sem aprovação (baseline congelado).
+
+---
+
+## Histórico de Resolução de Feedback (Ciclo Maio/2024)
+
+| Item | Status | Descrição da Resolução |
+|---|---|---|
+| **Phase 1** | **Concluído** | **2024-05-22 — Limpeza do Build Desktop:** Remoção dos contatos mock hardcoded (`defaultSeed`) em `DesktopContactRepository`. Banco inicializa vazio e reativo corretamente. |
+| **Phase 2** | **Concluído** | **2024-05-22 — Address Book Zero-Knowledge:** Isolamento do repositório de contatos via nova derivação de chave Argon2 a partir do mnemônico (BIP-39). Cifra AES-GCM-256 aplicada no JSON (`AddressBookCrypto`). Lógica de TTL (48h) inserida nas streams de UI e carregamento, preservando isolamento da base. |

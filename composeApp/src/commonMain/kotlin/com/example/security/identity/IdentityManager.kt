@@ -152,6 +152,15 @@ object IdentityManager {
         return Bip39Portuguese.entropyToMnemonic(entropy)
     }
 
+    fun getAddressBookKey(): ByteArray? {
+        val stored = IdentityStorage.getIdentity() ?: return null
+        val entropy = IdentityCryptoManager.envelopeDecrypt(stored.encryptedEntropy)
+        if (entropy.size != 16) return null
+        val key = IdentityCryptoManager.deriveAddressBookKey(entropy)
+        MemorySanitizer.zeroize(entropy)
+        return key
+    }
+
     fun clearIdentity() {
         IdentityStorage.clearIdentity()
     }
