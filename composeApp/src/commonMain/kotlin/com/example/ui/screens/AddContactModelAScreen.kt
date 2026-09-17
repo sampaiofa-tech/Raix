@@ -102,7 +102,7 @@ fun AddContactModelAScreen(
     var inputName by remember { mutableStateOf("") }
     var inputUri by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isScanningCameraTab1 by remember { mutableStateOf(false) }
+    var isScanningCameraTab1 by remember { mutableStateOf(isQrScannerSupported) }
 
     // State for Modelo C Remote Invites
     val clipboardSensivel = remember { ClipboardSensivel() }
@@ -114,7 +114,7 @@ fun AddContactModelAScreen(
     var remoteInviteError by remember { mutableStateOf<String?>(null) }
     var remoteInviteSuccess by remember { mutableStateOf<String?>(null) }
     var showQrInviteTab2 by remember { mutableStateOf(true) }
-    var isScanningCameraTab2 by remember { mutableStateOf(false) }
+    var isScanningCameraTab2 by remember { mutableStateOf(isQrScannerSupported) }
 
     LaunchedEffect(Unit) {
         val identity = IdentityManager.getOrGenerateIdentity()
@@ -455,6 +455,27 @@ fun AddContactModelAScreen(
                                     val contactData = parseResult.getOrThrow()
                                     if (inputName.isBlank()) {
                                         inputName = "Contato_${contactData.fingerprintHex.take(6)}"
+                                    }
+                                    
+                                    val myIdentity = IdentityManager.getOrGenerateIdentity()
+                                    val pairSafetyNumber = IdentityCryptoManager.computePairSafetyNumber(
+                                        myPubKey = myIdentity.publicKey,
+                                        peerPubKey = contactData.publicKeyBytes
+                                    )
+                                    
+                                    val newContact = ContactItem(
+                                        fingerprint = contactData.fingerprintHex,
+                                        pubKey = contactData.publicKeyBase64,
+                                        currentAuthUid = contactData.authUid,
+                                        displayName = inputName.trim(),
+                                        securityNumber = pairSafetyNumber,
+                                        verified = false,
+                                        addedAt = PlatformEnvironment.currentTimeMillis()
+                                    )
+                                    
+                                    coroutineScope.launch {
+                                        contactRepository.saveContact(newContact)
+                                        onContactCreated(newContact)
                                     }
                                 } else {
                                     errorMessage = parseResult.exceptionOrNull()?.message

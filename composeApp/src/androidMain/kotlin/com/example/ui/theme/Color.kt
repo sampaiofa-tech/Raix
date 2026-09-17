@@ -12,18 +12,18 @@ val PmsgBorder = Color(0xFF26282E)          // Borda Refinada (#26282E)
 val PmsgCardBg = Color(0xFF181A1F)          // Superfície Elevada (#181A1F)
 
 // =========================================================================
-// Harmonious Obsidian & Titanium Semantic Tokens
+// Harmonious Executive Semantic Tokens (Fase 5)
 // =========================================================================
-val ObsidianBlack = Color(0xFF0D0E11)
-val ObsidianSurface = Color(0xFF14161A)
-val ObsidianCard = Color(0xFF191B20)
-val ObsidianCardElevated = Color(0xFF21242B)
-val ObsidianBorder = Color(0xFF282B33)
-val ObsidianBorderSubtle = Color(0x18FFFFFF)
+val ObsidianBlack = Color(0xFF0A1128) // Raix Navy Blue Background
+val ObsidianSurface = Color(0xFF0B1430)
+val ObsidianCard = Color(0xFF043927) // Raix Emerald Green
+val ObsidianCardElevated = Color(0xFF064D35)
+val ObsidianBorder = Color(0x33D4AF37) // Subtle Gold Border
+val ObsidianBorderSubtle = Color(0x18D4AF37)
 
-val TitaniumPrimary = Color(0xFFE4E4E7)
-val TitaniumSecondary = Color(0xFFA1A1AA)
-val TitaniumMuted = Color(0xFF71717A)
+val TitaniumPrimary = Color(0xFFD4AF37) // Raix Gold Accent
+val TitaniumSecondary = Color(0xFFE2C873)
+val TitaniumMuted = Color(0xFF8A92A6)
 
 val SecurityEmerald = Color(0xFF10B981)
 val SecurityEmeraldContainer = Color(0xFF064E3B)
@@ -33,10 +33,10 @@ val IncinerateCrimson = Color(0xFFEF4444)
 val IncinerateCrimsonBg = Color(0xFF2C1316)
 
 // Chat Bubbles
-val BubbleUser = Color(0xFF23262E)
-val BubbleUserBorder = Color(0xFF333742)
-val BubbleContact = Color(0xFF17191E)
-val BubbleContactBorder = Color(0xFF24272F)
+val BubbleUser = Color(0xFF043927) // Emerald Green for user
+val BubbleUserBorder = Color(0x33D4AF37) // Subtle Gold
+val BubbleContact = Color(0xFF0D183B) // Slightly lighter Navy Blue
+val BubbleContactBorder = Color(0xFF14224D)
 
 // =========================================================================
 // Immersive UI Palette (Maintained for total backward compatibility)

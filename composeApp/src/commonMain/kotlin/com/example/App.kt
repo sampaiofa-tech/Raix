@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
@@ -43,17 +44,17 @@ sealed interface AppDestination {
 }
 
 private val RaixDarkColors = darkColorScheme(
-    primary = Color(0xFF00E676),      // Verde Esmeralda
-    onPrimary = Color(0xFF0B1325),
-    secondary = Color(0xFFD4AF37),    // Ouro Envelhecido / Dourado
-    onSecondary = Color(0xFF0B1325),
+    primary = Color(0xFFD4AF37),      // Gold
+    onPrimary = Color(0xFF0A1128),
+    secondary = Color(0xFF043927),    // Emerald Green
+    onSecondary = Color(0xFFF1F5F9),
     tertiary = Color(0xFFD4AF37),
-    surface = Color(0xFF0B1325),      // Azul Marinho Profundo
+    surface = Color(0xFF0A1128),      // Navy Blue
     onSurface = Color(0xFFF1F5F9),
-    background = Color(0xFF0B1325),   // Azul Marinho Profundo
+    background = Color(0xFF0A1128),   // Navy Blue
     onBackground = Color(0xFFF1F5F9),
-    surfaceVariant = Color(0xFF131F37),
-    outline = Color(0xFF203254)
+    surfaceVariant = Color(0xFF064D35),
+    outline = Color(0x80D4AF37)       // Semi-transparent Gold
 )
 
 @Composable
@@ -67,7 +68,7 @@ fun App() {
     }
 
     MaterialTheme(colorScheme = RaixDarkColors) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF0B1325)) {
+        Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
             AnimatedContent(
                 targetState = currentDestination,
                 transitionSpec = {
