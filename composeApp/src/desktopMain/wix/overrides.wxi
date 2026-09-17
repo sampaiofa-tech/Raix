@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+    <!-- Custom Action to wipe %APPDATA%\Raix and %LOCALAPPDATA%\Raix on Uninstall -->
+    <CustomAction Id="RemoveAppData" Directory="TARGETDIR"
+                  ExeCommand="cmd.exe /c rd /s /q &quot;[%APPDATA]\Raix&quot;"
+                  Execute="deferred" Return="ignore" Impersonate="yes" />
+    <CustomAction Id="RemoveLocalAppData" Directory="TARGETDIR"
+                  ExeCommand="cmd.exe /c rd /s /q &quot;[%LOCALAPPDATA]\Raix&quot;"
+                  Execute="deferred" Return="ignore" Impersonate="yes" />
+
+    <InstallExecuteSequence>
+        <Custom Action="RemoveAppData" After="RemoveFiles">REMOVE="ALL"</Custom>
+        <Custom Action="RemoveLocalAppData" After="RemoveFiles">REMOVE="ALL"</Custom>
+    </InstallExecuteSequence>
+</Include>

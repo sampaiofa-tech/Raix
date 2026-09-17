@@ -158,6 +158,8 @@ fun ContactsScreen(
         containerColor = Color(0xFF0A0E17)
     ) { paddingValues ->
 
+        val notifiedMessages = remember { mutableSetOf<String>() }
+
         @OptIn(ExperimentalEncodingApi::class)
         LaunchedEffect(Unit) {
             while (true) {
@@ -210,6 +212,15 @@ fun ContactsScreen(
                                                 }
                                                 // Exclui a mensagem (Vanish-after-read)
                                                 com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
+                                            }
+                                        } else {
+                                            // É uma mensagem normal (provavelmente recebida em 2º plano no desktop)
+                                            if (notifiedMessages.add(msg.id)) {
+                                                com.example.security.notification.PushNotificationManager.showLocalNotification(
+                                                    title = "RAIX",
+                                                    body = "Nova mensagem recebida",
+                                                    messageId = msg.id
+                                                )
                                             }
                                         }
                                     }

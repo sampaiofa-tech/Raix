@@ -190,6 +190,55 @@ fun DataPrivacyScreen(
                 }
             }
 
+            // Cartão de Aviso: Limitação de Notificações em Background (App-Kill)
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF111827)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFF1F2937), RoundedCornerShape(12.dp))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFFB74D).copy(alpha = 0.15f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Security,
+                                contentDescription = null,
+                                tint = Color(0xFFFFB74D),
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "Notificações em Background",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = "Limitações do Sistema Android",
+                                color = Color(0xFF9CA3AF),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Devido a restrições do sistema operacional, forçar a parada do aplicativo (App-Kill) suspende a sincronização em segundo plano. Nestas condições, as notificações (blind-push) podem não ser recebidas até a próxima abertura do aplicativo.",
+                        color = Color(0xFFD1D5DB),
+                        fontSize = 13.sp,
+                        lineHeight = 19.sp
+                    )
+                }
+            }
+
             // Meu Fingerprint Criptográfico
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF111827)),

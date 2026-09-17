@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -231,6 +232,12 @@ fun ContactChatScreen(
 
                                         // Vanish-after-read: delete doc immediately from Firestore (triggers onDeleteMessage shredder)
                                         FirestoreRestClient.deleteMessage(msg.id, myToken)
+
+                                        com.example.security.notification.PushNotificationManager.showLocalNotification(
+                                            title = "RAIX",
+                                            body = "Nova mensagem recebida",
+                                            messageId = msg.id
+                                        )
 
                                         val now = PlatformEnvironment.currentTimeMillis()
                                         val remainingTtl = (msg.expiresAt - now).coerceAtLeast(10_000L)
@@ -473,6 +480,7 @@ fun ContactChatScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .imePadding()
         ) {
             // Blocked Contact Banner
             if (isBlocked) {

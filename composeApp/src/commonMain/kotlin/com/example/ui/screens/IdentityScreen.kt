@@ -667,19 +667,24 @@ fun IdentityScreen(
                             color = Color(0xFFAAAAAA)
                         )
 
-                        positionOptions[wordIndex].forEach { option ->
-                            OutlinedButton(
-                                onClick = {
-                                    if (option == correctWord) {
-                                        verificationError = null
-                                        step++
-                                    } else {
-                                        verificationError = "Palavra incorreta. Você selecionou '$option' em vez de '$correctWord'."
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            positionOptions[wordIndex].forEach { option ->
+                                OutlinedButton(
+                                    onClick = {
+                                        if (option == correctWord) {
+                                            verificationError = null
+                                            step++
+                                        } else {
+                                            verificationError = "Palavra incorreta. Você selecionou '$option' em vez de '$correctWord'."
+                                        }
                                     }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(option)
+                                ) {
+                                    Text(option)
+                                }
                             }
                         }
 

@@ -110,6 +110,10 @@ export const storeMessageKey = onCall(async (request) => {
           android: {
             priority: "high",
             ttl: clampedTtlSeconds * 1000,
+            notification: {
+              title: "RAIX",
+              body: "Nova mensagem recebida",
+            }
           },
           apns: {
             headers: {

@@ -58,6 +58,7 @@ class MainActivity : FragmentActivity() {
       WindowManager.LayoutParams.FLAG_SECURE
     )
     com.example.util.AndroidContextHolder.appContext = applicationContext
+    com.example.security.consent.LegalConsentStorage.initialize(applicationContext)
     enableEdgeToEdge()
 
     // Initialize notification channels

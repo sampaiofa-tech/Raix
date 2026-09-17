@@ -44,6 +44,7 @@ sealed interface AppDestination {
     data object DataPrivacy : AppDestination
     data object AddModelA : AppDestination
     data class SafetyNumber(val contact: ContactItem) : AppDestination
+    data object QrHandshake : AppDestination
 }
 
 private val RaixDarkColors = darkColorScheme(
@@ -196,6 +197,17 @@ fun App() {
                                 currentDestination = AppDestination.Contacts
                             },
                             onVerifiedComplete = {
+                                currentDestination = AppDestination.Contacts
+                            }
+                        )
+                    }
+
+                    is AppDestination.QrHandshake -> {
+                        com.example.ui.screens.QrHandshakeScreen(
+                            onHandshakeSuccess = {
+                                currentDestination = AppDestination.Contacts
+                            },
+                            onBack = {
                                 currentDestination = AppDestination.Contacts
                             }
                         )

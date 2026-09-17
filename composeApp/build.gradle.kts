@@ -4,6 +4,7 @@ import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesS
 import java.io.FileInputStream
 import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -170,8 +171,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.6.0"
+        versionCode = 7
+        versionName = "1.6.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -263,7 +264,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.6.0"
+            packageVersion = "1.6.1"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"
@@ -278,6 +279,10 @@ secrets {
     propertiesFileName = ".env"
     defaultPropertiesFileName = ".env.example"
     ignoreList.add("FIREBASE_APPCHECK_DEBUG_TOKEN")
+}
+
+tasks.withType<AbstractJPackageTask>().configureEach {
+    freeArgs.addAll(listOf("--resource-dir", project.file("src/desktopMain/wix").absolutePath))
 }
 
 googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.WARN }
