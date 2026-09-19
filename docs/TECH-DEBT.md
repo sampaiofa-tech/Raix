@@ -228,3 +228,10 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 ## Conformidade Legal e Regulatória (Adicionado em 18/09/2026)
 
 - **Correção de conformidade:** retenção do IP real (cifrado) em coleção isolada `accessLogsRaw`, TTL 180 dias, chave no Secret Manager, para atendimento ao Art. 15 do MCI. **Prioridade alta.** Ciclo: próximo build, após contenção de segurança.
+
+## Pendências de Segurança e Infraestrutura (Incidente de Chaves)
+
+- **Rotação do Segredo GEMINI_API_KEY:** A rotação para a versão 3 (devido ao vazamento do valor em logs) não pôde ser executada em virtude do congelamento do baseline (ausência de deploy liberado). Deve ser executada logo que o deploy for desbloqueado para não gerar indisponibilidade.
+- **Separação da Browser key (Web × Desktop):** Atualmente, os clientes Desktop e Web compartilham a "Browser key". É necessário separar e criar chaves dedicadas: uma para Web (com restrições de HTTP Referrer) e outra para Desktop (isolada).
+- **SHA-1 da Play App Signing:** Pendente adicionar o SHA-1 gerado pelo Google Play Console (Play App Signing) nas credenciais da chave Android e no Firebase.
+

@@ -46,6 +46,11 @@
 - **Decisão:** shredder a cada 15 min (idempotente) + TTL nativo (≤24h) + vanish-after-read. PITR desabilitado.
 - **Marcos:** incidente P0 resolvido (índice collectionGroup + isolamento transacional); health-check estendido ativo.
 
+### Incidente de Vazamento e Consolidação de Chaves
+
+- **Decisão:** Encerrar o incidente de segurança executando a consolidação das chaves: chave Android restrita a app + 5 APIs; Browser key a 3 APIs; segredo v1 no Secret Manager destruído; chave "Default" excluída; "Gemini API Key 2" definida como canônica; senha do keystore local trocada.
+- **Marco:** Incidente encerrado em setembro de 2026.
+
 ---
 
 ## 3. COMPLIANCE & NEGÓCIO

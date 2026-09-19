@@ -61,6 +61,7 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 - **Cadeia de Custódia:** assinatura hardware-backed + hash chaining
 - **Contra-Inteligência:** TRAVADA (R&D sob revisão legal)
 - **Repo público:** mantido (auditoria de sanitização concluída, risco gerenciável)
+- **Incidente de Chaves (Set/2026):** RESOLVIDO (chave Android restrita a app + 5 APIs; Browser key a 3 APIs; segredo v1 destruído; "Default" excluída; canônica = Gemini API Key 2; senha do keystore trocada).
 
 ---
 
