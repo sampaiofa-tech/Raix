@@ -171,8 +171,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.6.1"
+        versionCode = 8
+        versionName = "1.6.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -264,13 +264,16 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.6.1"
+            packageVersion = "1.6.2"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"
             windows {
                 iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
             }
+        }
+        buildTypes.release.proguard {
+            isEnabled.set(false)
         }
     }
 }
@@ -291,3 +294,4 @@ dependencies {
     "kspAndroid"(libs.androidx.room.compiler)
     "kspAndroid"(libs.moshi.kotlin.codegen)
 }
+

@@ -6,6 +6,7 @@ private external fun jsDateNow(): Double
 
 actual object PlatformEnvironment {
     actual val isDebug: Boolean = false
+    actual val webApiKey: String = "NOT_IMPLEMENTED"
     actual fun getEnv(name: String): String? = null
     actual fun currentTimeMillis(): Long = jsDateNow().toLong()
 }

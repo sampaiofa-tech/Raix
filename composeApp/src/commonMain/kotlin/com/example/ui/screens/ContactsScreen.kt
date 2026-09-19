@@ -96,7 +96,7 @@ fun ContactsScreen(
                         Icon(
                             imageVector = Icons.Default.Security,
                             contentDescription = null,
-                            tint = Color(0xFF00FFC2),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -126,27 +126,27 @@ fun ContactsScreen(
                         Icon(
                             imageVector = Icons.Default.Shield,
                             contentDescription = "Sobre seus dados (LGPD)",
-                            tint = Color(0xFF00FFC2)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     IconButton(onClick = onOpenIdentity) {
                         Icon(
                             imageVector = Icons.Default.Fingerprint,
                             contentDescription = "Minha Identidade",
-                            tint = Color(0xFF00FFC2)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0D1B2A),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddContactModelA,
-                containerColor = Color(0xFF00FFC2),
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color(0xFF0A1128)
             ) {
                 Icon(
@@ -155,7 +155,7 @@ fun ContactsScreen(
                 )
             }
         },
-        containerColor = Color(0xFF0A0E17)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
 
         val notifiedMessages = remember { mutableSetOf<String>() }
@@ -388,7 +388,7 @@ fun QuickActionBar(
                 label = { Text("+ Modelo A", fontSize = 12.sp) },
                 colors = SuggestionChipDefaults.suggestionChipColors(
                     containerColor = Color(0xFF1E293B),
-                    labelColor = Color(0xFF00FFC2)
+                    labelColor = MaterialTheme.colorScheme.primary
                 )
             )
 
@@ -417,7 +417,7 @@ fun ContactRowItem(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF131B2A)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -436,7 +436,7 @@ fun ContactRowItem(
             ) {
                 Text(
                     text = contact.displayName.take(1).uppercase(),
-                    color = if (contact.verified) Color(0xFF00FFC2) else Color.White,
+                    color = if (contact.verified) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )
@@ -451,7 +451,7 @@ fun ContactRowItem(
                         text = contact.displayName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -562,13 +562,13 @@ fun EmptyContactsView(
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF131B2A)),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = null,
-                tint = Color(0xFF00FFC2),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(40.dp)
             )
         }
@@ -579,7 +579,7 @@ fun EmptyContactsView(
             text = "Nenhum Contato Criptografado",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -595,7 +595,7 @@ fun EmptyContactsView(
 
         ElevatedCard(
             onClick = onAddContactModelA,
-            colors = CardDefaults.elevatedCardColors(containerColor = Color(0xFF00FFC2)),
+            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
             Row(
@@ -619,7 +619,8 @@ fun EmptyContactsView(
         Spacer(modifier = Modifier.height(12.dp))
 
         TextButton(onClick = onOpenIdentity) {
-            Text("Ver Minha Identidade e Chave Pública", color = Color(0xFF00FFC2))
+            Text("Ver Minha Identidade e Chave Pública", color = MaterialTheme.colorScheme.primary)
         }
     }
 }
+

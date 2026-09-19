@@ -14,7 +14,7 @@ const patterns = [
   { name: "GitHub Token (gho_)", regex: /gho_[A-Za-z0-9_]+/ },
   { name: "GitHub Token (ghp_)", regex: /ghp_[A-Za-z0-9_]+/ },
   { name: "GitHub PAT (github_pat_)", regex: /github_pat_[A-Za-z0-9_]+/ },
-  { name: "Google API Key (AIzaSy)", regex: /AIzaSy[A-Za-z0-9_-]{33}/ },
+  { name: "Google API Key (AIzaSy)", regex: /AIza[0-9A-Za-z\-_]{35}/ },
   { name: "Password Parameter", regex: /password\s*=\s*["'][^\s"']+["']/i },
   { name: "Refresh Token", regex: /refresh_token\s*[:=]\s*["'][^\s"']+["']/i },
   { name: "Client Email Credential", regex: /client_email\s*[:=]\s*["'][^\s"']+["']/i },

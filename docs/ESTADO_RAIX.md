@@ -1,6 +1,6 @@
 # ESTADO_RAIX.md — Documento-Mestre do Projeto
 
-Versão: 2.0 | Atualizado: 2024-05-22
+Versão: 2.0 | Atualizado: 2026-09-18 (fuso UTC-03:00, Brasília)
 Propósito: Preservar o estado do projeto fora da memória de qualquer agente. Fonte única de verdade. Atualizado pelo Analista a cada ciclo.
 
 > **DOCUMENTO-MESTRE:** Fonte única de verdade do projeto RAIX adotada por todos os agentes.
@@ -26,6 +26,14 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 ## 2. PRODUTOS (status)
 
 - **RAIX Messaging:** EM OPERAÇÃO (Android, Windows, Web; iOS em homologação) — v1.6, zero-knowledge de conteúdo, pós-quântica híbrida (ML-KEM-768 + ML-DSA-65)
+  - **Versão vigente:** v1.6.2 (versionCode 8), confirmada em `composeApp/build.gradle.kts` (linhas 174–175).
+  - **Data de referência do ambiente:** 2026-09-18 (fuso UTC-03:00, Brasília).
+  - **Binários autoritativos (build de 2026-09-17):**
+    - APK: `composeApp\build\outputs\apk\release\composeApp-release.apk` — 50.133.792 B — `C61E6BB8EAB124EE9DB4BCD410C204316965D4221F9B7E25F31F4A4D9A9F0B77`
+    - AAB: `composeApp\build\outputs\bundle\release\composeApp-release.aab` — 35.224.862 B — `B97600EA9AC86EC06633D5A913E48CEB1C5C603CEC6BC578D32DB8984625DE26`
+    - MSI: `composeApp\build\compose\binaries\main-release\msi\Raix-1.6.2.msi` — 116.362.834 B — `DE967C24B696AA1105CA5CB20FCB8DC22363B8F37FC1D25A916C8A4B567B36D9`
+    - Observação: caminho oficial do MSI é `binaries\main-release\msi\` (não `binaries\main\msi\`).
+  - **Nota de proveniência:** registrar pendência até a Fase 5 (binários compilados de árvore não commitada).
 - **Cartilhas:** publicadas (Android + iOS + Brasil/LGPD)
 - **Landing page:** publicada (redesign com 8 correções)
 - **Consultoria de privacidade:** registrada (pós-rodada)

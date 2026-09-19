@@ -1,0 +1,38 @@
+﻿<html><head><meta charset='UTF-8'><style>body{font-family: Arial, sans-serif; padding: 40px; line-height: 1.6;} h1{color: #2c3e50;} h2{color: #34495e;} h3{color: #7f8c8d;}</style></head><body><h1>RAIX â€” AdequaÃ§Ã£o Ã  LegislaÃ§Ã£o Brasileira (LGPD + Marco Civil), com EvidÃªncias e Preparo Global</h1><br><br><strong>Data:</strong> 18 de setembro de 2026
+<strong>Documento TÃ©cnico Formal:</strong> AdequaÃ§Ã£o regulatÃ³ria e posicionamento legal do ecossistema RAIX.<br><br><h2>PARTE I â€” ADEQUAÃ‡ÃƒO BRASILEIRA (LGPD e Marco Civil da Internet)</h2><br><br>O projeto RAIX opera sob a diretriz de "privacidade forte por design, com retenÃ§Ã£o limitada de metadados". O estÃ¡gio atual Ã© de conformidade formal com itens em formalizaÃ§Ã£o (LIA e ato de DPO). Os dados foram classificados de forma rigorosa, e implementou-se o isolamento completo da infraestrutura de faturamento em relaÃ§Ã£o aos dados de uso (zero-knowledge).<br><br><h3>AdequaÃ§Ã£o Ã  Lei Geral de ProteÃ§Ã£o de Dados (LGPD - Lei nÂº 13.709/2018)</h3><br><br><li>  <strong>Art. 7Âº e Art. 10 (Bases Legais e LegÃ­timo Interesse):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* O tratamento de metadados mÃ­nimos apoia-se estritamente na execuÃ§Ã£o de contrato (prestaÃ§Ã£o do serviÃ§o de mensageria) e no legÃ­timo interesse (seguranÃ§a do sistema e prevenÃ§Ã£o a fraudes).
+    <em>   </em>EvidÃªncia:* LIA (RelatÃ³rio de LegÃ­timo Interesse) em fase de formalizaÃ§Ã£o documental; matriz de correlaÃ§Ã£o de dados implementada.
+<li>  <strong>Art. 18 e Art. 19 (Direitos dos Titulares e Acesso):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* Os usuÃ¡rios possuem autonomia total para destruir suas prÃ³prias chaves e contas, resultando na perda irreversÃ­vel de acesso e anonimizaÃ§Ã£o efetiva da cifra em repouso.
+    <em>   </em>EvidÃªncia:* Funcionalidades nativas de crypto-shredding (Account Deletion e Vanish) implementadas e ativas no cliente.
+<li>  <strong>Art. 20 (RevisÃ£o de DecisÃµes Automatizadas):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* O sistema de seguranÃ§a e contra-inteligÃªncia nÃ£o toma decisÃµes jurÃ­dicas ou restritivas baseadas em perfis comportamentais automatizados sem possibilidade de recurso.
+    <em>   </em>EvidÃªncia:* Arquitetura do RAIX Governor (classificada como NÃƒO-IA, totalmente determinÃ­stica).
+<li>  <strong>Art. 37 e Art. 39 (Registro de OperaÃ§Ãµes e RelatÃ³rio de Impacto):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* Os fluxos de dados foram mapeados de ponta a ponta; os riscos de privacidade foram avaliados em design (DPIA genÃ©rico da arquitetura base).
+    <em>   </em>EvidÃªncia:* DFD (Data Flow Diagram) e RelatÃ³rio de AvaliaÃ§Ã£o de Impacto (em formalizaÃ§Ã£o complementar).
+<li>  <strong>Art. 41 (Encarregado pelo Tratamento - DPO):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* A governanÃ§a de dados e os papÃ©is foram definidos.
+    <em>   </em>EvidÃªncia:* Ato de nomeaÃ§Ã£o do DPO em fase de formalizaÃ§Ã£o interna.
+<li>  <strong>Art. 46 e Art. 48 (SeguranÃ§a, Sigilo e ComunicaÃ§Ã£o de Incidentes):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* Uso de criptografia ponta a ponta pÃ³s-quÃ¢ntica (hÃ­brida ML-KEM-768/ML-DSA-65) e chaves efÃªmeras. Planos de resposta a incidentes atrelados ao roadmap.
+    <em>   </em>EvidÃªncia:* Auditoria de dependÃªncias/SDKs de terceiros; rotina de Backup e Disaster Recovery (PITR janela de 7 dias com crypto-shredding automÃ¡tico) validada.<br><br><h3>AdequaÃ§Ã£o ao Marco Civil da Internet (Lei nÂº 12.965/2014)</h3><br><br><li>  <strong>Art. 7Âº (Direitos do UsuÃ¡rio):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* O aplicativo nÃ£o expÃµe dados pessoais a terceiros nem utiliza dados para publicidade (isolamento de faturamento comercial vs. uso privado).
+    <em>   </em>EvidÃªncia:* Regras restritivas do Firestore e isolamento de bases; Termos de Uso (ToU) e PolÃ­tica de Privacidade (PP).
+<li>  <strong>Art. 10 (ProteÃ§Ã£o a Registros):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* A arquitetura retÃ©m o estritamente necessÃ¡rio para prover a comunicaÃ§Ã£o e mantÃ©m logs restritos.
+    <em>   </em>EvidÃªncia:* AusÃªncia de coleta passiva nÃ£o essencial (DPIA).
+<li>  <strong>Art. 15 (Guarda de Registros de Acesso):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* Os registros de acesso a aplicaÃ§Ãµes sÃ£o mantidos por 180 dias em ambiente isolado e de acesso restrito.
+    <em>   </em>EvidÃªncia:* ConfiguraÃ§Ã£o tÃ©cnica de retenÃ§Ã£o de logs isolados (acesso interno estritamente auditado).
+<li>  <strong>Art. 22 (Fornecimento de InformaÃ§Ãµes - Ordem Judicial):</strong></li>
+    <em>   </em>Como o RAIX cumpre:* A arquitetura tÃ©cnica foi pensada para atender determinaÃ§Ãµes judiciais sem violar a criptografia das mensagens (cujo conteÃºdo matemÃ¡tico Ã© inacessÃ­vel ao provedor). O provedor entrega exclusivamente o metadado que possui retido.
+    <em>   </em>EvidÃªncia:* Desenho de banco de dados NoSQL compartimentado; logs de acesso separados do faturamento.<br><br><h2>PARTE II â€” PREPARO GLOBAL POR JURISDIÃ‡ÃƒO</h2><br><br><li>  <strong>Europa (GDPR):</strong> O projeto nÃ£o Ã© "GDPR-ready" de forma integral. A adequaÃ§Ã£o europeia estÃ¡ posicionada no roadmap estratÃ©gico, demandando, no futuro, a nomeaÃ§Ã£o formal de um representante (Art. 27), execuÃ§Ã£o de SCCs (Standard Contractual Clauses) caso o trÃ¢nsito transfronteiriÃ§o envolva suboperadores europeus, e adaptaÃ§Ãµes especÃ­ficas no DPIA.</li>
+<li>  <strong>Estados Unidos (Mosaico Estadual):</strong> RegulamentaÃ§Ãµes fragmentadas (CCPA/CPRA, VCDPA, etc.) serÃ£o analisadas sob demanda mediante crescimento da base regional. A arquitetura de minimizaÃ§Ã£o atende ao nÃºcleo de consentimento genÃ©rico.</li>
+<li>  <strong>AmÃ©rica Latina (Matriz Base):</strong> A base regulatÃ³ria se espelha predominantemente no modelo GDPR/LGPD. A matriz atual de conformidade reduz os atritos de adequaÃ§Ã£o na maioria destes paÃ­ses (roadmap regional facilitado).</li>
+<li>  <strong>RÃºssia e China:</strong> Estas jurisdiÃ§Ãµes encontram-se excluÃ­das da conformidade ordinÃ¡ria, devido a requisitos de quebra de criptografia e leis estritas de localizaÃ§Ã£o de dados do estado. A atuaÃ§Ã£o ocorrerÃ¡ apenas via modelo Sovereign Box isolado (Self-Hosted corporativo).</li><br><br><h2>PARTE III â€” POSICIONAMENTO FINAL</h2><br><br>O ecossistema RAIX encontra-se em conformidade formal completa para o territÃ³rio brasileiro, com itens menores em processo final de formalizaÃ§Ã£o (LIA e ato de DPO). Os controles tÃ©cnicos garantem uma posiÃ§Ã£o forte contra acessos indevidos e provam que o modelo de "privacidade forte por design" nÃ£o Ã© apenas marketing, mas sim arquitetura executada em cÃ³digo. JurisdiÃ§Ãµes externas constam em roadmap de maturidade progressiva.<br><br><h3>EvidÃªncias Anexadas (ReferÃªncias TÃ©cnicas)</h3>
+<li>DFD + Matriz de CorrelaÃ§Ã£o + Teste Adversarial (Validation Set).</li>
+<li>Arquitetura de Isolamento de Faturamento vs. Dados de Uso.</li>
+<li>PolÃ­tica e ExecuÃ§Ã£o de Crypto-Shredding e PITR (janela de 7 dias restrita).</li>
+<li>RelatÃ³rio de Auditoria de SDKs (Supply Chain).</li>
+</body></html>

@@ -11,6 +11,11 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,7 +79,25 @@ fun App() {
         )
     }
 
-    MaterialTheme(colorScheme = RaixDarkColors) {
+    val RaixTypography = Typography(
+        displayLarge = TextStyle(
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            letterSpacing = 0.25.sp
+        ),
+        titleLarge = TextStyle(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 22.sp,
+            letterSpacing = 0.sp
+        ),
+        bodyLarge = TextStyle(
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            letterSpacing = 0.5.sp
+        )
+    )
+
+    MaterialTheme(colorScheme = RaixDarkColors, typography = RaixTypography) {
         Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
             AnimatedContent(
                 targetState = currentDestination,
@@ -217,3 +240,4 @@ fun App() {
         }
     }
 }
+

@@ -113,6 +113,7 @@ export const storeMessageKey = onCall(async (request) => {
             notification: {
               title: "RAIX",
               body: "Nova mensagem recebida",
+              channelId: "pmsg_new_conversations_channel",
             }
           },
           apns: {

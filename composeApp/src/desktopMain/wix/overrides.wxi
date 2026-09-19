@@ -9,7 +9,7 @@
                   Execute="deferred" Return="ignore" Impersonate="yes" />
 
     <InstallExecuteSequence>
-        <Custom Action="RemoveAppData" After="RemoveFiles">REMOVE="ALL"</Custom>
-        <Custom Action="RemoveLocalAppData" After="RemoveFiles">REMOVE="ALL"</Custom>
+        <Custom Action="RemoveAppData" After="RemoveFiles">REMOVE="ALL" OR WIX_UPGRADE_DETECTED OR UPGRADINGPRODUCTCODE</Custom>
+        <Custom Action="RemoveLocalAppData" After="RemoveFiles">REMOVE="ALL" OR WIX_UPGRADE_DETECTED OR UPGRADINGPRODUCTCODE</Custom>
     </InstallExecuteSequence>
 </Include>

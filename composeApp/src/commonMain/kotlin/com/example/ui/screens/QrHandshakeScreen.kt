@@ -23,6 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.data.network.IdentityNetworkClient
+import com.example.security.identity.AesGcm
+import com.example.security.identity.IdentityCurve25519
+import com.example.security.identity.IdentityManager
 import io.github.alexzhirkevich.qrose.options.QrBallShape
 import io.github.alexzhirkevich.qrose.options.QrBrush
 import io.github.alexzhirkevich.qrose.options.QrFrameShape
@@ -31,22 +35,69 @@ import io.github.alexzhirkevich.qrose.options.circle
 import io.github.alexzhirkevich.qrose.options.roundCorners
 import io.github.alexzhirkevich.qrose.options.solid
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.random.Random
+
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun QrHandshakeScreen(
     onHandshakeSuccess: () -> Unit,
     onBack: () -> Unit
 ) {
-    // A temporary ephemeral handshake token
     var handshakeToken by remember { mutableStateOf("Generating...") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        // In a real scenario, this would generate an ephemeral key pair and register the 
-        // public key on the server to wait for the mobile device to scan and complete handshake.
-        handshakeToken = "raix-handshake-v1:ephemeral-${kotlin.random.Random.nextInt(1000, 9999)}"
+        val ephemeralPriv = ByteArray(32).apply { Random.nextBytes(this) }
+        val ephemeralPub = IdentityCurve25519.generatePublicKey(ephemeralPriv)
+        val tokenBytes = ByteArray(32).apply { Random.nextBytes(this) }
+        val tokenHex = tokenBytes.joinToString("") { it.toUByte().toString(16).padStart(2, '0') }
+        
+        val pubKeyBase64 = Base64.encode(ephemeralPub)
+        handshakeToken = "pmsg://invite?i=$tokenHex&fp=$pubKeyBase64"
+
+        while (isActive) {
+            delay(3000)
+            try {
+                val result = IdentityNetworkClient.pollHandshake(tokenHex)
+                if (result.isSuccess) {
+                    val data = result.getOrNull()
+                    if (data != null) {
+                        val peerPubKeyBase64 = data.first
+                        val encryptedPayloadBase64 = data.second
+                        
+                        val peerPubKey = Base64.decode(peerPubKeyBase64)
+                        val encryptedPayload = Base64.decode(encryptedPayloadBase64)
+                        
+                        val sharedSecret = IdentityCurve25519.computeSharedSecret(ephemeralPriv, peerPubKey)
+                        val iv = encryptedPayload.sliceArray(0 until 12)
+                        val ciphertext = encryptedPayload.sliceArray(12 until encryptedPayload.size)
+                        
+                        val decryptedWordsStr = AesGcm.decrypt(ciphertext, sharedSecret, iv).decodeToString()
+                        val words = decryptedWordsStr.split(" ")
+                        
+                        val restoreResult = IdentityManager.restoreFromMnemonic(words)
+                        if (restoreResult.isSuccess) {
+                            onHandshakeSuccess()
+                            break
+                        } else {
+                            errorMessage = "Handshake failed: Invalid identity payload."
+                        }
+                    }
+                } else {
+                    errorMessage = result.exceptionOrNull()?.message
+                }
+            } catch (e: Exception) {
+                errorMessage = e.message
+            }
+        }
     }
 
     Scaffold(
-        containerColor = Color(0xFF0A0E17) // Dark background for Raix
+        containerColor = Color(0xFF0A0E17)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -73,7 +124,6 @@ fun QrHandshakeScreen(
             
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Display QR Code using qrose
             val qrPainter = rememberQrCodePainter(handshakeToken) {
                 shapes {
                     ball = QrBallShape.circle()
@@ -97,6 +147,16 @@ fun QrHandshakeScreen(
                     painter = qrPainter,
                     contentDescription = "Handshake QR Code",
                     modifier = Modifier.fillMaxSize()
+                )
+            }
+            
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = errorMessage!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Red,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
 

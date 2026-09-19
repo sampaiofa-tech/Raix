@@ -222,3 +222,9 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 | **Phase 3** | **Concluído** | **2024-05-22 — App-Lock Local na Abertura:** Implementação do `AppLockGate` como barreira inicial de navegação (`App.kt`), utilizando Biometria/Device Credentials no Android/iOS (com liberação de Master Key). |
 | **Phase 4** | **Concluído** | **2024-05-22 — Integração de Notificações:** Adição de permissões runtime (Android 13+). Payload FCM estático limitando o vazamento de metadados (`RAIX - Nova mensagem recebida`). |
 | **Phase 5** | **Concluído** | **2024-05-22 — UX, Responsividade e Identidade:** Aplicação de insets `safeDrawingPadding`, remoção de tamanhos hardcoded (Desk/Mobile), paleta executiva aplicada (`Emerald/Gold/Navy`), e câmera auto-acionada baseada na plataforma (`isQrScannerSupported`). |
+
+---
+
+## Conformidade Legal e Regulatória (Adicionado em 18/09/2026)
+
+- **Correção de conformidade:** retenção do IP real (cifrado) em coleção isolada `accessLogsRaw`, TTL 180 dias, chave no Secret Manager, para atendimento ao Art. 15 do MCI. **Prioridade alta.** Ciclo: próximo build, após contenção de segurança.

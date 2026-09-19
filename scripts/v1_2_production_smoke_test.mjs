@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 const PROJECT_ID = 'gen-lang-client-0858445711';
 const REGION = 'us-central1';
-const WEB_API_KEY = 'AIzaSyDpVykwTzWXMqYQFpKGebyBW979nlcaL1Y';
+const WEB_API_KEY = process.env.FIREBASE_WEB_API_KEY;
 
 function httpRequest(options, postData = null) {
   return new Promise((resolve, reject) => {

@@ -13,3 +13,4 @@ export { updateIdentityRouting } from "./updateIdentityRouting";
 export { reportAbuse } from "./reportAbuse";
 export { reportAbuseWithContent } from "./reportAbuseWithContent";
 export { registerPushToken } from "./registerPushToken";
+export { submitHandshake, pollHandshake } from "./relayHandshake";

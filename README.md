@@ -601,6 +601,9 @@ O desenvolvimento técnico e a postura de segurança do **Raix** seguem um plano
 
 - 🔬 **Track 5 — Análise de Arquivos com Detecção de Rastros (Hierarquia Final de 4 Níveis — Pós-Rodada)**:
   - **Visão Geral da Funcionalidade**: Módulo forense de inspeção e sanitização de arquivos e mídias para identificação de vazamentos involuntários de privacidade e pegadas digitais (*footprint detection*), estruturado na hierarquia definitiva de 4 níveis aprovada:
+    - **Filosofia Zero-Trace**:
+      O Raix não guarda dados em nuvem. Suas chaves de criptografia e mensagens são mantidas estritamente no dispositivo.
+      > **ATENÇÃO (Wipe Automático):** Em ambientes de produção (Decisão B), qualquer atualização de versão do aplicativo (APK ou MSI) forçará um Wipe Completo dos dados locais (identidades, contatos, histórico e preferências). É obrigatório que o usuário tenha salvo o seu mnemônico (12 palavras) de forma segura em papel para restaurar sua identidade e contatos vinculados. Caso contrário, os dados serão permanentemente inacessíveis após a atualização.
     - **Nível 1 (Local Determinística — Grátis / Core — Zero-Rastro)**:
       - Extração e auditoria forense de metadados diretamente no dispositivo do usuário (*on-device*): dados EXIF, autor/proprietário, coordenadas GPS de localização, timestamps de criação/modificação, modelo de hardware e software gerador.
       - **Garantia de Isolamento**: Processamento 100% no aparelho, **ZERO-RASTRO**, custo operacional ~0, constituindo a base do modelo freemium. Zero emissão de tráfego de rede ou chamadas remotas.

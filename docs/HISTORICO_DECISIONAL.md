@@ -121,3 +121,7 @@
 
 - **Decisão:** comando "Salvem quem vocês são" → textos de 5 blocos (Identidade, Histórico, Estado, Regras, Bloco p/ Executor) persistidos em `docs/CONTINUIDADE.md`.
 - **Adicional:** preferência de comunicação do dono — respostas **sem emojis**.
+
+### Nota Técnica de Adequação (MCI / LGPD)
+
+- **Decisão (18/09/2026):** Parecer do Guru aprovado, com decisão do Assessor (Opção 1, redação corrigida, consenso fechado). Gerada versão v3.2 contemplando pseudonimização provisória no estágio atual e mapeamento formal para retenção de IP cifrado (Art. 15 MCI) no próximo ciclo.

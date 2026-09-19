@@ -313,6 +313,82 @@ object IdentityNetworkClient {
         }
     }
 
+    suspend fun submitHandshake(
+        token: String,
+        peerPubKey: String,
+        encryptedPayload: String,
+        idToken: String
+    ): Result<Unit> {
+        return try {
+            val payload = buildJsonObject {
+                put("data", buildJsonObject {
+                    put("token", token)
+                    put("peerPubKey", peerPubKey)
+                    put("encryptedPayload", encryptedPayload)
+                })
+            }
+
+            val response = ApiClient.client.post(AppEndpoints.submitHandshakeUrl) {
+                contentType(ContentType.Application.Json)
+                header("Authorization", "Bearer $idToken")
+                setBody(payload.toString())
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception(extractErrorMessage(response.bodyAsText(), response.status.value)))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun pollHandshake(token: String): Result<Pair<String, String>?> {
+        return try {
+            val payload = buildJsonObject {
+                put("data", buildJsonObject {
+                    put("token", token)
+                })
+            }
+
+            val response = ApiClient.client.post(AppEndpoints.pollHandshakeUrl) {
+                contentType(ContentType.Application.Json)
+                setBody(payload.toString())
+            }
+
+            val responseBody = response.bodyAsText()
+
+            if (response.status.isSuccess()) {
+                val parsed = json.parseToJsonElement(responseBody).jsonObject
+                val resultObj = parsed["result"]?.jsonObject
+                
+                if (resultObj == null) {
+                    return Result.failure(Exception("Resposta inválida do servidor."))
+                }
+                
+                val status = resultObj["status"]?.jsonPrimitive?.content ?: "pending"
+                if (status == "completed") {
+                    val peerPubKey = resultObj["peerPubKey"]?.jsonPrimitive?.content
+                    val encryptedPayload = resultObj["encryptedPayload"]?.jsonPrimitive?.content
+                    if (peerPubKey != null && encryptedPayload != null) {
+                        Result.success(Pair(peerPubKey, encryptedPayload))
+                    } else {
+                        Result.failure(Exception("Dados do handshake ausentes."))
+                    }
+                } else if (status == "expired") {
+                    Result.failure(Exception("O handshake expirou."))
+                } else {
+                    Result.success(null) // pending
+                }
+            } else {
+                Result.failure(Exception(extractErrorMessage(responseBody, response.status.value)))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     private fun extractErrorMessage(responseBody: String, statusCode: Int): String {
         return try {
             val parsed = json.parseToJsonElement(responseBody).jsonObject

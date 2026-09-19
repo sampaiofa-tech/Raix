@@ -15,6 +15,19 @@ class VanishApplication : Application() {
         com.example.util.AndroidContextHolder.appContext = this
 
         try {
+            val packageInfo = packageManager.getPackageInfo(packageName, 0)
+            @Suppress("DEPRECATION")
+            val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageInfo.longVersionCode.toInt()
+            } else {
+                packageInfo.versionCode
+            }
+            com.example.util.VersionMigrationManager.checkAndWipeOnUpdate(this, versionCode)
+        } catch (t: Throwable) {
+            // Ignore if package info fails
+        }
+
+        try {
             // Initialize notification channels
             NotificationHelper.createNotificationChannels(this)
         } catch (t: Throwable) {

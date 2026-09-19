@@ -9,6 +9,7 @@ package com.example.data.network
  */
 expect object PlatformEnvironment {
     val isDebug: Boolean
+    val webApiKey: String
     fun getEnv(name: String): String?
     fun currentTimeMillis(): Long
 }
