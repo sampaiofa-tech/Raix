@@ -1,4 +1,4 @@
-@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+﻿@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
 import java.io.FileInputStream
@@ -139,7 +139,7 @@ kotlin {
                         exampleFile.inputStream().use { stream -> properties.load(stream) }
                     }
                     val webApiKey = properties.getProperty("FIREBASE_DESKTOP_WEB_API_KEY") ?: ""
-                    val appVersion = "1.7.1"
+                    val appVersion = "1.7.2"
                     
                     outputFile.parentFile.mkdirs()
                     outputFile.writeText("""
@@ -203,8 +203,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 17
-        versionName = "1.7.1"
+        versionCode = 18
+        versionName = "1.7.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -298,7 +298,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.7.1"
+            packageVersion = "1.7.2"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"
