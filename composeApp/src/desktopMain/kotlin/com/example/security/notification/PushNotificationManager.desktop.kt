@@ -101,6 +101,7 @@ actual object PushNotificationManager {
                     // AUMID Registry
                     val aumidPs1 = java.io.File(pmsgDir, "setup_aumid.ps1")
                     if (!aumidPs1.exists()) {
+                        val currentExe = ProcessHandle.current().info().command().orElse(System.getProperty("java.home") + "\\bin\\javaw.exe").replace("\\", "\\\\")
                         aumidPs1.writeText("""
                             ${'$'}Code = @'
                             using System;
@@ -177,7 +178,7 @@ actual object PushNotificationManager {
                             }
                             '@
                             Add-Type -TypeDefinition ${'$'}Code
-                            [Shortcut]::Create("${'$'}env:APPDATA\Microsoft\Windows\Start Menu\Programs\Raix.lnk", (Get-Process -Id ${'$'}PID).Path, "Raix")
+                            [Shortcut]::Create("${'$'}env:APPDATA\Microsoft\Windows\Start Menu\Programs\Raix.lnk", "$currentExe", "Raix")
                         """.trimIndent())
                         ProcessBuilder("powershell", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-File", aumidPs1.absolutePath).start().waitFor()
                     }
