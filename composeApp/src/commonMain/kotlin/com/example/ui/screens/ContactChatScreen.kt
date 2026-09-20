@@ -98,6 +98,22 @@ import androidx.compose.material.icons.filled.Block
 import com.example.data.repository.ContactRepository
 import com.example.data.repository.ContactRepositoryProvider
 
+object InMemoryMessageCache {
+    val contactMessages = mutableMapOf<String, MutableList<EphemeralUiMessage>>()
+    
+    fun getMessages(fingerprint: String): MutableList<EphemeralUiMessage> {
+        return contactMessages.getOrPut(fingerprint) { mutableListOf() }
+    }
+    
+    fun saveMessages(fingerprint: String, messages: List<EphemeralUiMessage>) {
+        contactMessages[fingerprint] = messages.toMutableList()
+    }
+    
+    fun clearMessages(fingerprint: String) {
+        contactMessages.remove(fingerprint)
+    }
+}
+
 data class EphemeralUiMessage(
     val id: String,
     val senderId: String,
@@ -148,18 +164,30 @@ fun ContactChatScreen(
 
     // In-memory ephemeral message queue for this contact session
     val messages = remember {
-        mutableStateListOf(
-            EphemeralUiMessage(
-                id = "welcome_msg",
-                senderId = activeContact.fingerprint,
-                senderName = activeContact.displayName,
-                isMe = false,
-                text = "Conversa efêmera iniciada com ${activeContact.displayName}. Criptografada com chaves X25519 locais.",
-                timestamp = 0L,
-                ttlMillis = 300_000L,
-                expiresAt = 300_000L
-            )
-        )
+        mutableStateListOf<EphemeralUiMessage>().apply {
+            val cached = InMemoryMessageCache.getMessages(activeContact.fingerprint)
+            if (cached.isEmpty()) {
+                add(
+                    EphemeralUiMessage(
+                        id = "welcome_msg",
+                        senderId = activeContact.fingerprint,
+                        senderName = activeContact.displayName,
+                        isMe = false,
+                        text = "Conversa efêmera iniciada com ${activeContact.displayName}. Criptografada com chaves X25519 locais.",
+                        timestamp = 0L,
+                        ttlMillis = 300_000L,
+                        expiresAt = 300_000L
+                    )
+                )
+            } else {
+                addAll(cached)
+            }
+        }
+    }
+
+    // Sync state changes to cache
+    LaunchedEffect(messages.toList()) {
+        InMemoryMessageCache.saveMessages(activeContact.fingerprint, messages)
     }
 
     // Active real-time countdown timer tick (1 second loop)
@@ -438,7 +466,10 @@ fun ContactChatScreen(
                         )
                     }
                     IconButton(
-                        onClick = { messages.clear() }
+                        onClick = { 
+                            messages.clear() 
+                            InMemoryMessageCache.clearMessages(contact.fingerprint)
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.DeleteSweep,

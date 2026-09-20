@@ -54,12 +54,12 @@ actual object PushNotificationManager {
             val escapedTitle = escapePowerShell(title)
             val escapedBody = escapePowerShell(body)
             val script = "" +
-                "[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > \$null\n" +
-                "\$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)\n" +
-                "\$textNodes = \$template.GetElementsByTagName('text')\n" +
-                "\$textNodes.Item(0).AppendChild(\$template.CreateTextNode('$escapedTitle')) > \$null\n" +
-                "\$textNodes.Item(1).AppendChild(\$template.CreateTextNode('$escapedBody')) > \$null\n" +
-                "\$toast = [Windows.UI.Notifications.ToastNotification]::new(\$template)\n" +
+                "[void][Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime]; " +
+                "\$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02); " +
+                "\$textNodes = \$template.GetElementsByTagName('text'); " +
+                "[void]\$textNodes.Item(0).AppendChild(\$template.CreateTextNode('$escapedTitle')); " +
+                "[void]\$textNodes.Item(1).AppendChild(\$template.CreateTextNode('$escapedBody')); " +
+                "\$toast = [Windows.UI.Notifications.ToastNotification]::new(\$template); " +
                 "[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\WindowsPowerShell\\v1.0\\powershell.exe').Show(\$toast)"
 
             val process = ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
@@ -78,9 +78,17 @@ actual object PushNotificationManager {
             val tray = SystemTray.getSystemTray()
 
             if (trayIcon == null) {
-                val image = Toolkit.getDefaultToolkit().createImage(
-                    PushNotificationManager::class.java.getResource("/icon.png")
-                ) ?: java.awt.image.BufferedImage(16, 16, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+                val resource = PushNotificationManager::class.java.getResource("/icon.png")
+                val image = if (resource != null) {
+                    Toolkit.getDefaultToolkit().createImage(resource)
+                } else {
+                    val fallback = java.awt.image.BufferedImage(16, 16, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+                    val g = fallback.createGraphics()
+                    g.color = java.awt.Color.BLUE
+                    g.fillRect(0, 0, 16, 16)
+                    g.dispose()
+                    fallback
+                }
                 trayIcon = TrayIcon(image, "Raix").apply {
                     isImageAutoSize = true
                     tray.add(this)

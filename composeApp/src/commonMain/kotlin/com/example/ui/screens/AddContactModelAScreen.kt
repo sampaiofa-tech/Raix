@@ -462,7 +462,11 @@ fun AddContactModelAScreen(
                                         scanned = scanned,
                                         coroutineScope = coroutineScope,
                                         onSuccess = {
-                                            errorMessage = "Desktop vinculado com sucesso! \uD83D\uDD17"
+                                            coroutineScope.launch {
+                                                errorMessage = "Desktop vinculado com sucesso! 🔗"
+                                                kotlinx.coroutines.delay(1000)
+                                                onBack()
+                                            }
                                         },
                                         onError = { err ->
                                             errorMessage = err
@@ -473,35 +477,11 @@ fun AddContactModelAScreen(
                                 
                                 val parseResult = IdentityManager.parseContactUri(scanned.trim())
                                 if (parseResult.isSuccess) {
-                                    val contactData = parseResult.getOrThrow()
-                                    if (inputName.isBlank()) {
-                                        inputName = "Contato_${contactData.fingerprintHex.take(6)}"
-                                    }
-                                    
-                                    val myIdentity = IdentityManager.getOrGenerateIdentity()
-                                    val pairSafetyNumber = IdentityCryptoManager.computePairSafetyNumber(
-                                        myPubKey = myIdentity.publicKey,
-                                        peerPubKey = contactData.publicKeyBytes
-                                    )
-                                    
-                                    val newContact = ContactItem(
-                                        fingerprint = contactData.fingerprintHex,
-                                        pubKey = contactData.publicKeyBase64,
-                                        currentAuthUid = contactData.authUid,
-                                        displayName = inputName.trim(),
-                                        securityNumber = pairSafetyNumber,
-                                        verified = false,
-                                        addedAt = PlatformEnvironment.currentTimeMillis()
-                                    )
-                                    
-                                    coroutineScope.launch {
-                                        contactRepository.saveContact(newContact)
-                                        sendAutoHandshake(newContact, myUri)
-                                        onContactCreated(newContact)
-                                    }
+                                    // Apenas preenche o URI para permitir que o usuário nomeie o contato
+                                    // e clique no botão "Validar" manualmente.
                                 } else {
                                     errorMessage = parseResult.exceptionOrNull()?.message
-                                        ?: "QR code escaneado nÃ£o contÃ©m um link pmsg://contact vÃ¡lido."
+                                        ?: "QR code escaneado não contém um link pmsg://contact válido."
                                 }
                             },
                             onDismiss = { isScanningCameraTab1 = false },
@@ -899,7 +879,11 @@ fun AddContactModelAScreen(
                                                 scanned = scanned,
                                                 coroutineScope = coroutineScope,
                                                 onSuccess = {
-                                                    remoteInviteSuccess = "Desktop vinculado com sucesso! \uD83D\uDD17"
+                                                    coroutineScope.launch {
+                                                        remoteInviteSuccess = "Desktop vinculado com sucesso! 🔗"
+                                                        kotlinx.coroutines.delay(1000)
+                                                        onBack()
+                                                    }
                                                 },
                                                 onError = { err ->
                                                     remoteInviteError = err
