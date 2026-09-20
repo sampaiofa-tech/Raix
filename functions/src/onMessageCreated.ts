@@ -41,7 +41,8 @@ export const onMessageCreated = onDocumentCreated("messages/{messageId}", async 
         token: token,
         data: {
           type: "new_message",
-          messageId: event.params.messageId
+          messageId: event.params.messageId,
+          senderId: data.senderId || "unknown"
         },
         android: {
           priority: "high"

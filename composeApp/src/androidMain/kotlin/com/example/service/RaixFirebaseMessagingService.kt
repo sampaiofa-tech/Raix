@@ -39,6 +39,7 @@ class RaixFirebaseMessagingService : FirebaseMessagingService() {
         // Zero-Knowledge check: never rely on plaintext in push payload
         val type = remoteMessage.data["type"] ?: "new_message"
         val messageId = remoteMessage.data["messageId"] ?: "unknown"
+        val senderId = remoteMessage.data["senderId"] ?: remoteMessage.data["messageId"] ?: "unknown"
 
         // Enqueue background sync job for blind push
         com.example.data.worker.SyncMessageWorker.enqueueSync(this)
@@ -49,7 +50,7 @@ class RaixFirebaseMessagingService : FirebaseMessagingService() {
                 context = this,
                 title = "RAIX",
                 body = "Nova mensagem recebida",
-                roomId = messageId
+                roomId = senderId
             )
         }
     }

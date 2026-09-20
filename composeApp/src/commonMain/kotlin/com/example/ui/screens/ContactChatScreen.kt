@@ -285,7 +285,7 @@ fun ContactChatScreen(
                                         com.example.security.notification.PushNotificationManager.showLocalNotification(
                                             title = "RAIX",
                                             body = "Nova mensagem recebida",
-                                            messageId = msg.id
+                                            messageId = activeContact.fingerprint
                                         )
 
                                         val now = PlatformEnvironment.currentTimeMillis()

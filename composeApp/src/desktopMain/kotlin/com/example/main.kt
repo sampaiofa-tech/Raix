@@ -83,6 +83,7 @@ fun main() = application {
                 if (signalFile.exists() && signalFile.lastModified() != lastModified) {
                     lastModified = signalFile.lastModified()
                     isWindowVisible = true
+                    windowState.isMinimized = false
                 }
                 kotlinx.coroutines.delay(1000)
             }
@@ -97,6 +98,12 @@ fun main() = application {
         alwaysOnTop = true,
         visible = isWindowVisible
     ) {
+        LaunchedEffect(isWindowVisible, windowState.isMinimized) {
+            if (isWindowVisible && !windowState.isMinimized) {
+                window.toFront()
+                window.requestFocus()
+            }
+        }
         App()
     }
 }

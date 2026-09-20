@@ -199,19 +199,17 @@ fun App() {
                                 }
                             }
                         }
+                        }
+                        val clickedFingerprint = com.example.security.notification.PushNotificationManager.getClickedNotificationMessageId()
+                        if (clickedFingerprint != null) {
+                            val allContacts = contactRepository.getContacts().first()
+                            val contactToOpen = allContacts.find { it.fingerprint == clickedFingerprint || it.currentAuthUid == clickedFingerprint }
+                            if (contactToOpen != null) {
+                                currentDestination = AppDestination.Chat(contactToOpen)
+                            }
+                        }
                     }
                 }
-            }
-                
-                val clickedFingerprint = com.example.security.notification.PushNotificationManager.getClickedNotificationMessageId()
-                if (clickedFingerprint != null) {
-                    val allContacts = contactRepository.getContacts().first()
-                    val contactToOpen = allContacts.find { it.fingerprint == clickedFingerprint }
-                    if (contactToOpen != null) {
-                        currentDestination = AppDestination.Chat(contactToOpen)
-                    }
-                }
-                
             } catch (e: Exception) {
                 // Fail silently to not disrupt the UI
             }

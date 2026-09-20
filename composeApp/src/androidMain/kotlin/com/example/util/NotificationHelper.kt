@@ -87,9 +87,16 @@ object NotificationHelper {
             putExtra("SELECTED_ROOM_ID", roomId)
         }
 
+        val notifyId = if (roomId.isNotBlank()) {
+            NOTIFICATION_ID_BASE + (roomId.hashCode() and 0x3FFFFFFF)
+        } else {
+            notificationCounter = (notificationCounter + 1) % 50
+            NOTIFICATION_ID_BASE + notificationCounter
+        }
+
         val pendingIntent = PendingIntent.getActivity(
             context,
-            notificationCounter,
+            notifyId,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -130,8 +137,7 @@ object NotificationHelper {
 
         try {
             val notificationManager = NotificationManagerCompat.from(context)
-            notificationCounter = (notificationCounter + 1) % 50
-            notificationManager.notify(NOTIFICATION_ID_BASE + notificationCounter, notification)
+            notificationManager.notify(notifyId, notification)
         } catch (e: Throwable) {
             // Handled safely across all OEM implementations
         }
@@ -154,9 +160,16 @@ object NotificationHelper {
             putExtra("SELECTED_ROOM_ID", roomId)
         }
 
+        val notifyId = if (roomId.isNotBlank()) {
+            NOTIFICATION_ID_BASE + (roomId.hashCode() and 0x3FFFFFFF)
+        } else {
+            notificationCounter = (notificationCounter + 1) % 50
+            NOTIFICATION_ID_BASE + notificationCounter
+        }
+
         val pendingIntent = PendingIntent.getActivity(
             context,
-            notificationCounter,
+            notifyId,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -174,8 +187,7 @@ object NotificationHelper {
 
         try {
             val notificationManager = NotificationManagerCompat.from(context)
-            notificationCounter = (notificationCounter + 1) % 50
-            notificationManager.notify(NOTIFICATION_ID_BASE + notificationCounter, notification)
+            notificationManager.notify(notifyId, notification)
         } catch (_: Throwable) {
         }
     }
