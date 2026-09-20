@@ -19,6 +19,7 @@ actual object PushNotificationManager {
     }
 
     actual fun showLocalNotification(title: String, body: String, messageId: String?) {
+        println("[PushNotificationManager] showLocalNotification chamado. title: $title, body: $body")
         scope.launch {
             showSystemTrayNotification(title, body)
         }
@@ -29,8 +30,12 @@ actual object PushNotificationManager {
     }
 
     private fun showSystemTrayNotification(title: String, body: String) {
+        println("[PushNotificationManager] showSystemTrayNotification invocado. title=$title")
         try {
-            if (!SystemTray.isSupported()) return
+            if (!SystemTray.isSupported()) {
+                println("[PushNotificationManager] SystemTray não é suportado!")
+                return
+            }
             val tray = SystemTray.getSystemTray()
 
             val iconToUse = sharedTrayIcon ?: run {
