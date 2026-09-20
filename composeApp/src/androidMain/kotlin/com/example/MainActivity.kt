@@ -194,13 +194,22 @@ class MainActivity : FragmentActivity() {
     handleIncomingRoomIntent(intent)
   }
 
+  private var pendingRoomId: String? = null
+
   private fun handleIncomingRoomIntent(intent: Intent?) {
-    val roomId = intent?.getStringExtra("SELECTED_ROOM_ID")
+    val roomId = intent?.getStringExtra("SELECTED_ROOM_ID") ?: intent?.getStringExtra("messageId")
     if (!roomId.isNullOrBlank()) {
-      val channel = viewModel.channels.value.find { it.id == roomId }
-      if (channel != null) {
-        viewModel.selectChannel(channel)
-      }
+      pendingRoomId = roomId
+      trySelectPendingRoom()
+    }
+  }
+
+  internal fun trySelectPendingRoom() {
+    val roomId = pendingRoomId ?: return
+    val channel = viewModel.channels.value.find { it.id == roomId }
+    if (channel != null) {
+      viewModel.selectChannel(channel)
+      pendingRoomId = null
     }
   }
 }
@@ -214,6 +223,12 @@ fun VanishApp(
   onRequestContactsPermission: () -> Unit
 ) {
   val channels by viewModel.channels.collectAsStateWithLifecycle()
+  val context = LocalContext.current
+  LaunchedEffect(channels) {
+    if (channels.isNotEmpty()) {
+      (context as? MainActivity)?.trySelectPendingRoom()
+    }
+  }
   val contacts by viewModel.contacts.collectAsStateWithLifecycle()
   val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
   val activeMessages by viewModel.activeMessages.collectAsStateWithLifecycle()

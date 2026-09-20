@@ -40,6 +40,10 @@ export const onMessageCreated = onDocumentCreated("messages/{messageId}", async 
       // This wakes up the device to sync (SyncMessageWorker) or displays a local notification.
       await admin.messaging().send({
         token: token,
+        notification: {
+          title: "RAIX",
+          body: "Nova mensagem recebida"
+        },
         data: {
           type: "new_message",
           messageId: event.params.messageId

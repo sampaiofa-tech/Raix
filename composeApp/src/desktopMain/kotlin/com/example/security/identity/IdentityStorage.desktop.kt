@@ -30,7 +30,9 @@ actual object IdentityStorage {
             props.setProperty("encryptedEntropy", identity.encryptedEntropy)
             props.setProperty("signingPublicKeyBase64", identity.signingPublicKeyBase64)
             props.setProperty("encryptedSigningPrivateKey", identity.encryptedSigningPrivateKey)
-            storageFile.outputStream().use { props.store(it, "Pmsg Encrypted Identity") }
+            storageFile.outputStream().use { 
+                props.store(java.io.OutputStreamWriter(it, kotlin.text.Charsets.UTF_8), "Pmsg Encrypted Identity") 
+            }
         } catch (_: Exception) {
             // Em caso de falha de I/O, permanece em cache volátil
         }
@@ -41,7 +43,9 @@ actual object IdentityStorage {
         if (!storageFile.exists()) return null
         return try {
             val props = Properties()
-            storageFile.inputStream().use { props.load(it) }
+            storageFile.inputStream().use { 
+                props.load(java.io.InputStreamReader(it, kotlin.text.Charsets.UTF_8)) 
+            }
             val pk = props.getProperty("publicKeyBase64") ?: return null
             val fp = props.getProperty("fingerprintHex") ?: return null
             val sn = props.getProperty("safetyNumber") ?: return null

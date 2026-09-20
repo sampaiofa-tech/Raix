@@ -19,7 +19,9 @@ actual object LegalConsentStorage {
         if (!storageFile.exists()) return null
         return try {
             val props = Properties()
-            storageFile.inputStream().use { props.load(it) }
+            storageFile.inputStream().use { 
+                props.load(java.io.InputStreamReader(it, kotlin.text.Charsets.UTF_8)) 
+            }
             val version = props.getProperty("version") ?: return null
             val acceptedAt = props.getProperty("acceptedAt")?.toLongOrNull() ?: return null
             val confirmedAge18 = props.getProperty("confirmedAge18")?.toBooleanStrictOrNull() ?: false
@@ -36,7 +38,9 @@ actual object LegalConsentStorage {
             props.setProperty("version", consent.version)
             props.setProperty("acceptedAt", consent.acceptedAt.toString())
             props.setProperty("confirmedAge18", consent.confirmedAge18.toString())
-            storageFile.outputStream().use { props.store(it, "Pmsg Legal Consent") }
+            storageFile.outputStream().use { 
+                props.store(java.io.OutputStreamWriter(it, kotlin.text.Charsets.UTF_8), "Pmsg Legal Consent") 
+            }
         } catch (_: Exception) {
             // Permanece em cache volátil em caso de falha de I/O
         }
