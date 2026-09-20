@@ -12,4 +12,5 @@ expect object PlatformEnvironment {
     val webApiKey: String
     fun getEnv(name: String): String?
     fun currentTimeMillis(): Long
+    fun getRestHeaders(): Map<String, String>
 }

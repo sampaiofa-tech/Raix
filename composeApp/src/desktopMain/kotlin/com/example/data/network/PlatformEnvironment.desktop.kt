@@ -17,4 +17,6 @@ actual object PlatformEnvironment {
     }
 
     actual fun currentTimeMillis(): Long = System.currentTimeMillis()
+
+    actual fun getRestHeaders(): Map<String, String> = emptyMap()
 }

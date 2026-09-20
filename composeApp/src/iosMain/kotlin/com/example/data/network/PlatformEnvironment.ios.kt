@@ -8,4 +8,5 @@ actual object PlatformEnvironment {
     actual val webApiKey: String = "NOT_IMPLEMENTED"
     actual fun getEnv(name: String): String? = null
     actual fun currentTimeMillis(): Long = (NSDate().timeIntervalSince1970 * 1000.0).toLong()
+    actual fun getRestHeaders(): Map<String, String> = emptyMap()
 }

@@ -5,6 +5,8 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
 
 expect fun createHttpClientEngine(): HttpClientEngine
 
@@ -17,6 +19,11 @@ object ApiClient {
                     isLenient = true
                     ignoreUnknownKeys = true
                 })
+            }
+            defaultRequest {
+                PlatformEnvironment.getRestHeaders().forEach { (key, value) ->
+                    header(key, value)
+                }
             }
         }
     }
