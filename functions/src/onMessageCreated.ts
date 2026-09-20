@@ -37,22 +37,14 @@ export const onMessageCreated = onDocumentCreated("messages/{messageId}", async 
     if (token) {
       // Send a high-priority push notification.
       // The payload contains only the messageId and type, never the encrypted/plaintext content.
-      // This wakes up the device to sync (SyncMessageWorker) or displays a local notification.
       await admin.messaging().send({
         token: token,
-        notification: {
-          title: "RAIX",
-          body: "Nova mensagem recebida"
-        },
         data: {
           type: "new_message",
           messageId: event.params.messageId
         },
         android: {
-          priority: "high",
-          notification: {
-            channelId: "pmsg_high_priority_messages_channel_v2"
-          }
+          priority: "high"
         }
       });
       logger.info(`onMessageCreated: Push notification sent to ${recipientUid} for message ${event.params.messageId}`);

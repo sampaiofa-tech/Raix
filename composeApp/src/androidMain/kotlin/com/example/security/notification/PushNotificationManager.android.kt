@@ -36,8 +36,15 @@ actual object PushNotificationManager {
         return NotificationHelper.hasNotificationPermission(context)
     }
 
+    private var clickedMessageId: String? = null
+
+    fun setClickedMessageId(id: String?) {
+        clickedMessageId = id
+    }
+
     actual fun getClickedNotificationMessageId(): String? {
-        // Implementação Android de deep-link pode ser tratada via Intent
-        return null
+        val id = clickedMessageId
+        clickedMessageId = null
+        return id
     }
 }

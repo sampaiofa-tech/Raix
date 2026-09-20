@@ -199,8 +199,7 @@ class MainActivity : FragmentActivity() {
   private fun handleIncomingRoomIntent(intent: Intent?) {
     val roomId = intent?.getStringExtra("SELECTED_ROOM_ID") ?: intent?.getStringExtra("messageId")
     if (!roomId.isNullOrBlank()) {
-      pendingRoomId = roomId
-      trySelectPendingRoom()
+      com.example.security.notification.PushNotificationManager.setClickedMessageId(roomId)
     }
   }
 

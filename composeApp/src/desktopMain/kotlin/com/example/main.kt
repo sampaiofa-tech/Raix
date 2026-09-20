@@ -47,6 +47,13 @@ fun main() = application {
                 addActionListener {
                     isWindowVisible = true
                 }
+                addMouseListener(object : java.awt.event.MouseAdapter() {
+                    override fun mouseClicked(e: java.awt.event.MouseEvent) {
+                        if (e.button == java.awt.event.MouseEvent.BUTTON1) {
+                            isWindowVisible = true
+                        }
+                    }
+                })
                 
                 val popup = java.awt.PopupMenu()
                 val openItem = java.awt.MenuItem("Abrir Raix")
@@ -63,6 +70,22 @@ fun main() = application {
             }
             systemTray?.add(trayIcon)
             com.example.security.notification.PushNotificationManager.sharedTrayIcon = trayIcon
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+        if (isWindows) {
+            val appData = System.getenv("APPDATA") ?: return@LaunchedEffect
+            val signalFile = java.io.File(appData, "Pmsg/toast_signal.txt")
+            var lastModified = 0L
+            while (true) {
+                if (signalFile.exists() && signalFile.lastModified() != lastModified) {
+                    lastModified = signalFile.lastModified()
+                    isWindowVisible = true
+                }
+                kotlinx.coroutines.delay(1000)
+            }
         }
     }
 

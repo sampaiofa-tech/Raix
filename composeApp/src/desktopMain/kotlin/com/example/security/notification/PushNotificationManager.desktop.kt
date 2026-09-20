@@ -65,15 +65,48 @@ actual object PushNotificationManager {
             try {
                 val safeTitle = escapePowerShell(title)
                 val safeBody = escapePowerShell(body)
+                val safeMessageId = escapePowerShell(messageId ?: "")
+                
+                val appData = System.getenv("APPDATA") ?: ""
+                if (appData.isNotEmpty()) {
+                    val pmsgDir = java.io.File(appData, "Pmsg")
+                    pmsgDir.mkdirs()
+                    val handlerFile = java.io.File(pmsgDir, "handler.ps1")
+                    if (!handlerFile.exists()) {
+                        handlerFile.writeText("""
+                            param([string]${'$'}url)
+                            ${'$'}id = ${'$'}url -replace 'raix://','' -replace '/',''
+                            Set-Content -Path "$appData\Pmsg\toast_signal.txt" -Value ${'$'}id
+                        """.trimIndent())
+                        val psReg = """
+                            ${'$'}hkcu = [Microsoft.Win32.Registry]::CurrentUser
+                            ${'$'}classes = ${'$'}hkcu.OpenSubKey('Software\Classes', ${'$'}true)
+                            ${'$'}raix = ${'$'}classes.CreateSubKey('raix')
+                            ${'$'}raix.SetValue('', 'URL:raix Protocol')
+                            ${'$'}raix.SetValue('URL Protocol', '')
+                            ${'$'}cmd = ${'$'}raix.CreateSubKey('shell\open\command')
+                            ${'$'}cmd.SetValue('', 'powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "${handlerFile.absolutePath}" "%1"')
+                        """.trimIndent().replace('\n', ';')
+                        ProcessBuilder("powershell", "-ExecutionPolicy", "Bypass", "-Command", psReg).start().waitFor()
+                    }
+                }
                 
                 val psCommand = """
                     [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null;
                     ${'$'}template = [Windows.UI.Notifications.ToastTemplateType]::ToastText02;
                     ${'$'}xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent(${'$'}template);
+                    
+                    if ('$safeMessageId' -ne '') {
+                        ${'$'}toastNode = ${'$'}xml.GetElementsByTagName('toast').Item(0);
+                        ${'$'}toastNode.SetAttribute('launch', 'raix://$safeMessageId');
+                        ${'$'}toastNode.SetAttribute('activationType', 'protocol');
+                    }
+                    
                     ${'$'}texts = ${'$'}xml.GetElementsByTagName('text');
                     ${'$'}texts.Item(0).AppendChild(${'$'}xml.CreateTextNode('$safeTitle')) | Out-Null;
                     ${'$'}texts.Item(1).AppendChild(${'$'}xml.CreateTextNode('$safeBody')) | Out-Null;
                     ${'$'}toast = [Windows.UI.Notifications.ToastNotification]::new(${'$'}xml);
+                    
                     ${'$'}notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Raix');
                     ${'$'}notifier.Show(${'$'}toast);
                 """.trimIndent().replace('\n', ' ')
