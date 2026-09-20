@@ -1,7 +1,10 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 min
 const MAX_REQUESTS_PER_WINDOW = 30; // 30 requests / min per user
@@ -17,7 +20,7 @@ const MAX_REQUESTS_PER_WINDOW = 30; // 30 requests / min per user
  * 3. Atomic per-user sliding window rate limiting prevents scraping / dictionary scans.
  * 4. Zero PII: stores and returns only technical routing identifiers, zero names or contact graphs.
  */
-export const resolveFingerprint = onCall(async (request) => {
+export const resolveFingerprint = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Marco Civil da Internet Art. 15 Connection Log
   await recordConnectionLog(request, "resolveFingerprint");
 

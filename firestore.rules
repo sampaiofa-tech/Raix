@@ -125,13 +125,17 @@ service cloud.firestore {
     }
 
     // =========================================================================
-    // COLEÇÃO: accessLogs & connectionLogs (Marco Civil Art. 15 - 180 dias TTL)
+    // COLEÇÃO: accessLogs, connectionLogs & accessLogsRaw (Marco Civil Art. 15 - 180 dias TTL)
     // =========================================================================
     match /accessLogs/{logId} {
       allow read, write: if false;
     }
 
     match /connectionLogs/{logId} {
+      allow read, write: if false;
+    }
+    
+    match /accessLogsRaw/{logId} {
       allow read, write: if false;
     }
 

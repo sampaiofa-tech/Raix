@@ -1,8 +1,11 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes window
 const MAX_REPORTS_PER_WINDOW = 5; // Maximum 5 reports per 10 minutes per user
@@ -22,7 +25,7 @@ export type AbuseType = (typeof VALID_ABUSE_TYPES)[number];
  * - Este endpoint é estritamente opcional para casos graves onde o usuário solicita intervenção humana.
  * - Sanção de moderação: revogação Ed25519 no roteamento — NUNCA bloqueio de IP.
  */
-export const reportAbuseWithContent = onCall(async (request) => {
+export const reportAbuseWithContent = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 1. Registro de conexão (Marco Civil da Internet Art. 15)
   await recordConnectionLog(request, "reportAbuseWithContent");
 

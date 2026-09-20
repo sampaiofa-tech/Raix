@@ -1,3 +1,6 @@
+import { defineSecret } from "firebase-functions/params";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { Timestamp, FieldValue } from "firebase-admin/firestore";
@@ -25,7 +28,7 @@ export interface StoreMessageKeyData {
  * The server receives and stores ONLY opaque bytes (ephemeralPubKey, wrappedDek).
  * The server never sees the plaintext DEK or recipient private key.
  */
-export const storeMessageKey = onCall(async (request) => {
+export const storeMessageKey = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Marco Civil da Internet Art. 15 Connection Log
   await recordConnectionLog(request, "storeMessageKey");
 

@@ -91,6 +91,27 @@ export async function recordConnectionLog(
       if (coll && typeof coll.add === "function") {
         await coll.add(logEntry);
       }
+      
+      const encKey = process.env.ACCESS_LOG_ENC_KEY;
+      if (encKey && clientIp !== "unknown") {
+         const keyBuf = crypto.createHash("sha256").update(encKey).digest(); 
+         const iv = crypto.randomBytes(12);
+         const cipher = crypto.createCipheriv("aes-256-gcm", keyBuf as any, iv as any);
+         let ciphertext = cipher.update(clientIp, "utf8", "base64");
+         ciphertext += cipher.final("base64");
+         const authTag = cipher.getAuthTag().toString("base64");
+
+         const rawEntry = {
+           ipCiphertext: ciphertext,
+           ipIv: iv.toString("base64"),
+           ipAuthTag: authTag,
+           timestamp: timestampUtc,
+           ephemeralPort: rawReq.socket?.remotePort || "UNAVAILABLE",
+           endpoint: functionName,
+           expiresAt: expiresAt
+         };
+         await db.collection("accessLogsRaw").add(rawEntry);
+      }
     }
   } catch (err: any) {
     logger.warn(`recordConnectionLog: Falha não-bloqueante ao registrar log para ${functionName}:`, err?.message || err);

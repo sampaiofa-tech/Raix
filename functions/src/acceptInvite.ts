@@ -1,7 +1,10 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_ACCEPTS_PER_WINDOW = 15; // Max 15 attempts / min
@@ -16,7 +19,7 @@ const MAX_ACCEPTS_PER_WINDOW = 15; // Max 15 attempts / min
  * 4. Vanish-After-Accept: document is permanently deleted from Firestore inside the transaction.
  * 5. Returns only the technical routing metadata (creator's fingerprint and public key).
  */
-export const acceptInvite = onCall(async (request) => {
+export const acceptInvite = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Marco Civil da Internet Art. 15 Connection Log
   await recordConnectionLog(request, "acceptInvite");
 

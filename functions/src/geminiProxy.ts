@@ -5,6 +5,7 @@ import * as admin from "firebase-admin";
 import { recordConnectionLog } from "./connectionLogs";
 
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const MAX_REQUESTS_PER_WINDOW = 5; // Max 5 burner notes per minute per user
@@ -73,7 +74,7 @@ export async function checkRateLimit(
  */
 export const geminiProxy = onRequest(
   {
-    secrets: [geminiApiKey],
+    secrets: [geminiApiKey, accessLogEncKey],
     cors: true,
     invoker: "public",
   },

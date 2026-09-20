@@ -1,8 +1,11 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes window
 const MAX_REPORTS_PER_WINDOW = 5; // Maximum 5 reports per 10 minutes per user
@@ -24,7 +27,7 @@ export type AbuseType = (typeof VALID_ABUSE_TYPES)[number];
  * 5. Updates server-side metrics in 'abuseMetrics/{fingerprint}' tracking distinct reporters
  *    and setting an abuse flag when multiple independent reports occur.
  */
-export const reportAbuse = onCall(async (request) => {
+export const reportAbuse = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Marco Civil da Internet Art. 15 Connection Log
   await recordConnectionLog(request, "reportAbuse");
 

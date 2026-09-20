@@ -1,8 +1,11 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 export interface RegisterPushTokenData {
   token: string;
@@ -16,7 +19,7 @@ export interface RegisterPushTokenData {
  * - Requires authentication: token is linked to request.auth.uid.
  * - Managed in isolated server-side collection devicePushTokens (inaccessible to SDK clients).
  */
-export const registerPushToken = onCall(async (request) => {
+export const registerPushToken = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Connection Log (Marco Civil da Internet Art. 15)
   await recordConnectionLog(request, "registerPushToken");
 

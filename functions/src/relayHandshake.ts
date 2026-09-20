@@ -1,9 +1,12 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { recordConnectionLog } from "./connectionLogs";
 
-export const submitHandshake = onCall(async (request) => {
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
+
+export const submitHandshake = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   await recordConnectionLog(request, "submitHandshake");
 
   if (!request.auth || !request.auth.uid) {
@@ -26,7 +29,7 @@ export const submitHandshake = onCall(async (request) => {
   return { success: true };
 });
 
-export const pollHandshake = onCall(async (request) => {
+export const pollHandshake = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   await recordConnectionLog(request, "pollHandshake");
 
   // No auth required for polling because Desktop might not be logged in yet.

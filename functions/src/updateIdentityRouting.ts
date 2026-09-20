@@ -1,9 +1,12 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import * as crypto from "crypto";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_UPDATES_PER_WINDOW = 5; // Max 5 recovery updates per 10 min
@@ -38,7 +41,7 @@ export interface UpdateIdentityRoutingData {
  *    Any signature mismatch or non-possession throws 'permission-denied'.
  * 5. Sliding window rate limiting prevents abuse.
  */
-export const updateIdentityRouting = onCall(async (request) => {
+export const updateIdentityRouting = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Marco Civil da Internet Art. 15 Connection Log
   await recordConnectionLog(request, "updateIdentityRouting");
 

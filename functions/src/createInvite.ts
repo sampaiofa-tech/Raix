@@ -1,9 +1,12 @@
+import { defineSecret } from "firebase-functions/params";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import * as crypto from "crypto";
 import { recordConnectionLog } from "./connectionLogs";
+
+const accessLogEncKey = defineSecret("ACCESS_LOG_ENC_KEY");
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_INVITES_PER_WINDOW = 10; // Max 10 invites per 10 min window
@@ -19,7 +22,7 @@ const INVITE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
  * 4. 24-hour strict TTL.
  * 5. Document stored in collection 'invites' (client read/write disabled via firestore.rules).
  */
-export const createInvite = onCall(async (request) => {
+export const createInvite = onCall({ secrets: [accessLogEncKey] }, async (request) => {
   // 0. Marco Civil da Internet Art. 15 Connection Log
   await recordConnectionLog(request, "createInvite");
 
