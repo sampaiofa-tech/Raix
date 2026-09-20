@@ -166,7 +166,7 @@ fun AddContactModelAScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Tabs: [Meu CÃ³digo (Presencial), Colar CÃ³digo (Presencial), Convite Remoto (Modelo C)]
+            // Tabs: [Meu Código (Presencial), Colar Código (Presencial), Convite Remoto (Modelo C)]
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = Color(0xFF0D1B2A),
@@ -181,7 +181,7 @@ fun AddContactModelAScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Meu CÃ³digo", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+                    text = { Text("Meu Código", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
                 )
                 Tab(
                     selected = selectedTab == 1,
@@ -224,7 +224,7 @@ fun AddContactModelAScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Compartilhe seu CÃ³digo com o Contato",
+                        text = "Compartilhe seu Código com o Contato",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -234,7 +234,7 @@ fun AddContactModelAScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "No celular escaneie o QR Code; no Desktop copie o cÃ³digo URI abaixo e envie ao contato presencialmente.",
+                        text = "No celular escaneie o QR Code; no Desktop copie o código URI abaixo e envie ao contato presencialmente.",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFB0BEC5),
                         textAlign = TextAlign.Center
@@ -290,7 +290,7 @@ fun AddContactModelAScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "Aponte a cÃ¢mera do seu celular para este QR Code para adicionar o contato presencialmente.",
+                            text = "Aponte a câmera do seu celular para este QR Code para adicionar o contato presencialmente.",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFFB0BEC5),
                             textAlign = TextAlign.Center
@@ -301,7 +301,7 @@ fun AddContactModelAScreen(
                         Button(
                             onClick = {
                                 clipboardManager.setText(AnnotatedString(myUri))
-                                copyFeedback = "CÃ³digo copiado para a Ã¡rea de transferÃªncia!"
+                                copyFeedback = "Código copiado para a área de transferência!"
                             },
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B2A3A))
@@ -315,7 +315,7 @@ fun AddContactModelAScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Copiar CÃ³digo URI",
+                                    text = "Copiar Código URI",
                                     color = Color(0xFF00FFC2),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp
@@ -331,7 +331,7 @@ fun AddContactModelAScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = "STRING-CÃ“DIGO (MODELO A):",
+                                    text = "STRING-CÓDIGO (MODELO A):",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFF00FFC2),
                                     fontWeight = FontWeight.Bold
@@ -352,7 +352,7 @@ fun AddContactModelAScreen(
                                 Button(
                                     onClick = {
                                         clipboardManager.setText(AnnotatedString(myUri))
-                                        copyFeedback = "CÃ³digo copiado para a Ã¡rea de transferÃªncia!"
+                                        copyFeedback = "Código copiado para a área de transferência!"
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(10.dp),
@@ -367,7 +367,7 @@ fun AddContactModelAScreen(
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "Copiar CÃ³digo",
+                                            text = "Copiar Código",
                                             color = Color(0xFF0A1128),
                                             fontWeight = FontWeight.Bold
                                         )
@@ -418,7 +418,7 @@ fun AddContactModelAScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Cole o cÃ³digo `pmsg://contact` fornecido pelo seu contato. A chave pÃºblica serÃ¡ validada criptograficamente contra o fingerprint.",
+                        text = "Cole o código `pmsg://contact` fornecido pelo seu contato. A chave pública será validada criptograficamente contra o fingerprint.",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFB0BEC5),
                         textAlign = TextAlign.Center
@@ -442,7 +442,7 @@ fun AddContactModelAScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Escanear QR Code com a CÃ¢mera",
+                                    text = "Escanear QR Code com a Câmera",
                                     color = Color(0xFF00FFC2),
                                     fontWeight = FontWeight.Bold
                                 )
@@ -516,7 +516,7 @@ fun AddContactModelAScreen(
                             inputUri = it
                             errorMessage = null
                         },
-                        label = { Text("Cole o CÃ³digo (pmsg://contact?...)") },
+                        label = { Text("Cole o Código (pmsg://contact?...)") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -550,14 +550,14 @@ fun AddContactModelAScreen(
                                 return@Button
                             }
                             if (inputUri.isBlank()) {
-                                errorMessage = "Por favor, cole a string-cÃ³digo do contato."
+                                errorMessage = "Por favor, cole a string-código do contato."
                                 return@Button
                             }
 
                             val parseResult = IdentityManager.parseContactUri(inputUri.trim())
                             if (parseResult.isFailure) {
                                 errorMessage = parseResult.exceptionOrNull()?.message
-                                    ?: "CÃ³digo invÃ¡lido ou corrompido."
+                                    ?: "Código inválido ou corrompido."
                                 return@Button
                             }
 
@@ -601,7 +601,7 @@ fun AddContactModelAScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Validar e Comparar CÃ³digo (60 DÃ­gitos)",
+                                text = "Validar e Comparar Código (60 Dígitos)",
                                 color = Color(0xFF0A1128),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
@@ -630,7 +630,7 @@ fun AddContactModelAScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Convite EfÃªmero Remoto (Modelo C)",
+                        text = "Convite Efêmero Remoto (Modelo C)",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -640,7 +640,7 @@ fun AddContactModelAScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Gera um link criptogrÃ¡fico Ãºnico com validade de 24 horas. O convite Ã© permanentemente incinerado no primeiro aceite (vanish-after-accept).",
+                        text = "Gera um link criptográfico único com validade de 24 horas. O convite é permanentemente incinerado no primeiro aceite (vanish-after-accept).",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFB0BEC5),
                         textAlign = TextAlign.Center
@@ -692,7 +692,7 @@ fun AddContactModelAScreen(
                                         if (result.isSuccess) {
                                             val data = result.getOrThrow()
                                             inviteLink = data.inviteLink
-                                            remoteInviteSuccess = "Convite gerado com sucesso! VÃ¡lido por 24 horas."
+                                            remoteInviteSuccess = "Convite gerado com sucesso! Válido por 24 horas."
                                         } else {
                                             remoteInviteError = result.exceptionOrNull()?.message ?: "Falha ao gerar convite."
                                         }
@@ -771,7 +771,7 @@ fun AddContactModelAScreen(
                                 ) {
                                     Column(modifier = Modifier.padding(12.dp)) {
                                         Text(
-                                            text = "LINK SEGURO (USO ÃšNICO):",
+                                            text = "LINK SEGURO (USO ÚNICO):",
                                             style = MaterialTheme.typography.labelSmall,
                                             color = Color(0xFF00FFC2),
                                             fontWeight = FontWeight.Bold
@@ -837,7 +837,7 @@ fun AddContactModelAScreen(
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = "Cole o link 'pmsg://invite?token=...' que vocÃª recebeu ou escaneie o QR code.",
+                                text = "Cole o link 'pmsg://invite?token=...' que você recebeu ou escaneie o QR code.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFFB0BEC5)
                             )
@@ -860,7 +860,7 @@ fun AddContactModelAScreen(
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
-                                            text = "Escanear QR de Convite com a CÃ¢mera",
+                                            text = "Escanear QR de Convite com a Câmera",
                                             color = Color(0xFF00FFC2),
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 12.sp
@@ -901,7 +901,7 @@ fun AddContactModelAScreen(
                                 value = inputRemoteName,
                                 onValueChange = { inputRemoteName = it },
                                 label = { Text("Nome do Contato (ex: Bob)") },
-                                placeholder = { Text("IdentificaÃ§Ã£o local (100% privada)") },
+                                placeholder = { Text("Identificação local (100% privada)") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp),
@@ -940,7 +940,7 @@ fun AddContactModelAScreen(
                                     }
                                     val token = IdentityNetworkClient.parseInviteToken(inputInviteLink)
                                     if (token == null) {
-                                        remoteInviteError = "Link ou token de convite invÃ¡lido (formato esperado: pmsg://invite?token=...)."
+                                        remoteInviteError = "Link ou token de convite inválido (formato esperado: pmsg://invite?token=...)."
                                         return@Button
                                     }
 
@@ -961,7 +961,7 @@ fun AddContactModelAScreen(
                                             Base64.decode(creatorData.creatorPubKey)
                                         } catch (e: Exception) {
                                             isAcceptingInvite = false
-                                            remoteInviteError = "Chave pÃºblica do criador corrompida."
+                                            remoteInviteError = "Chave pública do criador corrompida."
                                             return@launch
                                         }
 
@@ -1008,7 +1008,7 @@ fun AddContactModelAScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = if (isAcceptingInvite) "Validando no Servidor..." else "Aceitar Convite e Validar (60 DÃ­gitos)",
+                                        text = if (isAcceptingInvite) "Validando no Servidor..." else "Aceitar Convite e Validar (60 Dígitos)",
                                         color = Color(0xFF0A1128),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp
@@ -1079,7 +1079,7 @@ suspend fun sendAutoHandshake(contact: ContactItem, myUri: String) {
             FirestoreRestClient.createMessage(firestoreMsg, myIdToken)
         }
     } catch (e: Exception) {
-        // Falhas no auto-handshake sÃ£o silenciosas para nÃ£o interromper a UI
+        // Falhas no auto-handshake são silenciosas para não interromper a UI
         println("Auto-handshake falhou: ${e.message}")
     }
 }

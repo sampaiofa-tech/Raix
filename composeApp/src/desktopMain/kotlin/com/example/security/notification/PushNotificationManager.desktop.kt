@@ -101,6 +101,10 @@ actual object PushNotificationManager {
     }
 
     private fun escapePowerShell(str: String): String {
-        return str.replace("'", "''").replace("`", "``").replace("$", "$")
+        return str.replace("'", "''")
+            .replace("`", "``")
+            .replace("$", "`$")
+            .replace("\n", "`n")
+            .replace("\r", "")
     }
 }

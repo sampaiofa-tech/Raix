@@ -98,7 +98,7 @@ object IdentityNetworkClient {
             if (response.status.isSuccess()) {
                 val parsed = json.parseToJsonElement(responseBody).jsonObject
                 val resultObj = parsed["result"]?.jsonObject
-                    ?: return Result.failure(Exception("Resposta invÃ¡lida do servidor de convites."))
+                    ?: return Result.failure(Exception("Resposta inválida do servidor de convites."))
 
                 val token = resultObj["inviteToken"]?.jsonPrimitive?.content
                     ?: return Result.failure(Exception("Token de convite ausente."))
@@ -139,12 +139,12 @@ object IdentityNetworkClient {
             if (response.status.isSuccess()) {
                 val parsed = json.parseToJsonElement(responseBody).jsonObject
                 val resultObj = parsed["result"]?.jsonObject
-                    ?: return Result.failure(Exception("Resposta invÃ¡lida ao aceitar convite."))
+                    ?: return Result.failure(Exception("Resposta inválida ao aceitar convite."))
 
                 val fp = resultObj["creatorFingerprint"]?.jsonPrimitive?.content
                     ?: return Result.failure(Exception("Fingerprint do criador ausente."))
                 val pubKey = resultObj["creatorPubKey"]?.jsonPrimitive?.content
-                    ?: return Result.failure(Exception("Chave pÃºblica do criador ausente."))
+                    ?: return Result.failure(Exception("Chave pública do criador ausente."))
 
                 Result.success(AcceptInviteResult(fp, pubKey))
             } else {
@@ -178,12 +178,12 @@ object IdentityNetworkClient {
             if (response.status.isSuccess()) {
                 val parsed = json.parseToJsonElement(responseBody).jsonObject
                 val resultObj = parsed["result"]?.jsonObject
-                    ?: return Result.failure(Exception("Resposta invÃ¡lida ao resolver fingerprint."))
+                    ?: return Result.failure(Exception("Resposta inválida ao resolver fingerprint."))
 
                 val uid = resultObj["currentAuthUid"]?.jsonPrimitive?.content
-                    ?: return Result.failure(Exception("UID tÃ©cnico ausente."))
+                    ?: return Result.failure(Exception("UID técnico ausente."))
                 val pubKey = resultObj["pubKey"]?.jsonPrimitive?.content
-                    ?: return Result.failure(Exception("Chave pÃºblica ausente."))
+                    ?: return Result.failure(Exception("Chave pública ausente."))
                 val updatedAt = resultObj["updatedAt"]?.jsonPrimitive?.content?.toLongOrNull()
                     ?: PlatformEnvironment.currentTimeMillis()
 
