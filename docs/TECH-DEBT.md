@@ -234,4 +234,7 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 - **Rotação do Segredo GEMINI_API_KEY:** A rotação para a versão 3 (devido ao vazamento do valor em logs) não pôde ser executada em virtude do congelamento do baseline (ausência de deploy liberado). Deve ser executada logo que o deploy for desbloqueado para não gerar indisponibilidade.
 - **Separação da Browser key (Web × Desktop):** Atualmente, os clientes Desktop e Web compartilham a "Browser key". É necessário separar e criar chaves dedicadas: uma para Web (com restrições de HTTP Referrer) e outra para Desktop (isolada).
 - **SHA-1 da Play App Signing:** Pendente adicionar o SHA-1 gerado pelo Google Play Console (Play App Signing) nas credenciais da chave Android e no Firebase.
+- **Correção de Build Dummy:** O build da v1.6.3 foi inicialmente gerado com chaves dummy, exigindo a reconstrução neste ciclo.
+- **Mecanismo de Injeção de Chaves:** O mecanismo via `.env` exige o arquivo no build, impactando o CI (ex: `ios-build.yml` e health-checks precisam das chaves na esteira). Avaliar solução definitiva para injeção via pipeline sem `.env` fixo.
+- **Ordem de Provisionamento de Segredos:** Estabelecer a regra de que o deploy deve sempre criar o segredo no Secret Manager *antes* de publicar as funções que o referenciam, evitando cold start failures (outages).
 
