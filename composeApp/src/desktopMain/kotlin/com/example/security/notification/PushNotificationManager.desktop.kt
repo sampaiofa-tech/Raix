@@ -72,12 +72,20 @@ actual object PushNotificationManager {
                     val pmsgDir = java.io.File(appData, "Pmsg")
                     pmsgDir.mkdirs()
                     val handlerFile = java.io.File(pmsgDir, "handler.ps1")
-                    if (!handlerFile.exists()) {
+                    val vbsFile = java.io.File(pmsgDir, "handler.vbs")
+                    
+                    if (!handlerFile.exists() || !vbsFile.exists()) {
                         handlerFile.writeText("""
                             param([string]${'$'}url)
                             ${'$'}id = ${'$'}url -replace 'raix://','' -replace '/',''
                             Set-Content -Path "$appData\Pmsg\toast_signal.txt" -Value ${'$'}id
                         """.trimIndent())
+                        
+                        vbsFile.writeText(
+                            "Set objShell = CreateObject(\"WScript.Shell\")\n" +
+                            "cmd = \"powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File \\\"\"\" & \"${handlerFile.absolutePath}\" & \"\\\"\" \\\"\"\" & WScript.Arguments(0) & \"\\\"\"\"\"\n" +
+                            "objShell.Run cmd, 0, False\n"
+                        )
                         val psReg = """
                             ${'$'}hkcu = [Microsoft.Win32.Registry]::CurrentUser
                             ${'$'}classes = ${'$'}hkcu.OpenSubKey('Software\Classes', ${'$'}true)
@@ -85,9 +93,9 @@ actual object PushNotificationManager {
                             ${'$'}raix.SetValue('', 'URL:raix Protocol')
                             ${'$'}raix.SetValue('URL Protocol', '')
                             ${'$'}cmd = ${'$'}raix.CreateSubKey('shell\open\command')
-                            ${'$'}cmd.SetValue('', 'powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "${handlerFile.absolutePath}" "%1"')
+                            ${'$'}cmd.SetValue('', 'wscript.exe "${vbsFile.absolutePath}" "%1"')
                         """.trimIndent().replace('\n', ';')
-                        ProcessBuilder("powershell", "-ExecutionPolicy", "Bypass", "-Command", psReg).start().waitFor()
+                        ProcessBuilder("powershell", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-Command", psReg).start().waitFor()
                     }
                 }
                 
@@ -111,12 +119,17 @@ actual object PushNotificationManager {
                     ${'$'}notifier.Show(${'$'}toast);
                 """.trimIndent().replace('\n', ' ')
                 
-                val process = ProcessBuilder("powershell", "-ExecutionPolicy", "Bypass", "-Command", psCommand).start()
+                val process = ProcessBuilder("powershell", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-Command", psCommand).start()
                 process.waitFor()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            // Retorna early no Windows para não duplicar com o TrayIcon, que não funciona direito.
+            
+            // Fallback for tray: ensure user gets notified even if Toast is suppressed
+            try {
+                sharedTrayIcon?.displayMessage(title, body, TrayIcon.MessageType.INFO)
+            } catch (_: Throwable) {
+            }
             return
         }
 
@@ -154,7 +167,7 @@ actual object PushNotificationManager {
     private fun escapePowerShell(str: String): String {
         return str.replace("'", "''")
             .replace("`", "``")
-            .replace("$", "`$")
+            .replace("\$", "`\$")
             .replace("\n", "`n")
             .replace("\r", "")
     }

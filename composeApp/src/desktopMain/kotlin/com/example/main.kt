@@ -73,6 +73,8 @@ fun main() = application {
         }
     }
 
+    var appWindow: java.awt.Window? by remember { mutableStateOf(null) }
+
     LaunchedEffect(Unit) {
         val isWindows = System.getProperty("os.name").lowercase().contains("windows")
         if (isWindows) {
@@ -84,6 +86,14 @@ fun main() = application {
                     lastModified = signalFile.lastModified()
                     isWindowVisible = true
                     windowState.isMinimized = false
+                    
+                    kotlinx.coroutines.delay(100)
+                    appWindow?.let { win ->
+                        java.awt.EventQueue.invokeLater {
+                            win.toFront()
+                            win.requestFocus()
+                        }
+                    }
                 }
                 kotlinx.coroutines.delay(1000)
             }
@@ -98,12 +108,7 @@ fun main() = application {
         alwaysOnTop = true,
         visible = isWindowVisible
     ) {
-        LaunchedEffect(isWindowVisible, windowState.isMinimized) {
-            if (isWindowVisible && !windowState.isMinimized) {
-                window.toFront()
-                window.requestFocus()
-            }
-        }
+        appWindow = this.window
         App()
     }
 }
