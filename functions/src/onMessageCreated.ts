@@ -49,7 +49,10 @@ export const onMessageCreated = onDocumentCreated("messages/{messageId}", async 
           messageId: event.params.messageId
         },
         android: {
-          priority: "high"
+          priority: "high",
+          notification: {
+            channelId: "pmsg_high_priority_messages_channel_v2"
+          }
         }
       });
       logger.info(`onMessageCreated: Push notification sent to ${recipientUid} for message ${event.params.messageId}`);

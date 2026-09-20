@@ -17,7 +17,7 @@ import com.example.R
 
 object NotificationHelper {
 
-    const val CHANNEL_NEW_CONVERSATIONS_ID = "pmsg_new_conversations_channel"
+    const val CHANNEL_NEW_CONVERSATIONS_ID = "pmsg_high_priority_messages_channel_v2"
 
     private const val NOTIFICATION_ID_BASE = 2000
     private var notificationCounter = 0
@@ -32,12 +32,13 @@ object NotificationHelper {
             // Channel specifically for incoming conversations matching Android system standards
             val conversationsChannel = NotificationChannel(
                 CHANNEL_NEW_CONVERSATIONS_ID,
-                "Mensagens e Conversas",
+                "Mensagens e Conversas (Alta Prioridade)",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Notificações de novas conversas e mensagens recebidas no Pmsg"
                 enableLights(true)
                 enableVibration(true)
+                vibrationPattern = longArrayOf(0, 250, 250, 250)
                 setShowBadge(true)
                 lockscreenVisibility = NotificationCompat.VISIBILITY_PRIVATE
             }

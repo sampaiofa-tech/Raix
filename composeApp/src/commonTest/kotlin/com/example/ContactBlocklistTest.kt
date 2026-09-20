@@ -37,6 +37,7 @@ class ContactBlocklistTest {
 
             override suspend fun setVerified(fingerprint: String, verified: Boolean) {}
             override suspend fun updateAuthUid(fingerprint: String, newUid: String) {}
+            override suspend fun renameContact(fingerprint: String, newName: String) {}
             override suspend fun deleteContact(fingerprint: String) {
                 val current = contactsFlow.value.toMutableMap()
                 current.remove(fingerprint)
