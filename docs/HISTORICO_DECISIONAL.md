@@ -49,6 +49,7 @@
 ### Incidente de Vazamento e Consolidação de Chaves
 
 - **Decisão:** Encerrar o incidente de segurança executando a consolidação das chaves: chave Android restrita a app + 5 APIs; Browser key a 3 APIs; segredo v1 no Secret Manager destruído; chave "Default" excluída; "Gemini API Key 2" definida como canônica; senha do keystore local trocada.
+- **Incidente de Indisponibilidade (Outage):** Durante a consolidação, um deploy referenciou o segredo `ACCESS_LOG_ENC_KEY` antes de ser provisionado, causando falha de cold start nas funções principais e indisponibilidade temporária. Recuperado com a criação do segredo e redeploy.
 - **Marco:** Incidente encerrado em setembro de 2026.
 
 ---
