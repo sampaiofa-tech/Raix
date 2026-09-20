@@ -86,6 +86,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -1178,7 +1185,18 @@ fun ChatBottomInputBar(
                         value = text,
                         onValueChange = onTextChanged,
                         placeholder = { Text("Mensagem efêmera cifrada...", fontSize = 14.sp) },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .onPreviewKeyEvent { event ->
+                                if (event.type == KeyEventType.KeyUp && event.key == Key.Enter) {
+                                    if (event.isShiftPressed) {
+                                        false // Permite quebra de linha
+                                    } else {
+                                        if (text.isNotBlank()) onSend()
+                                        true // Consome o evento
+                                    }
+                                } else false
+                            },
                         shape = RoundedCornerShape(24.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Color.White,

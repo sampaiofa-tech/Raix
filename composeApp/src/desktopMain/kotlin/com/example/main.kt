@@ -17,7 +17,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.example.security.notification.PushNotificationManager
 
 fun main() = application {
-    com.example.util.VersionMigrationManagerDesktop.checkAndWipeOnUpdate("1.6.2")
+    com.example.util.VersionMigrationManagerDesktop.checkAndWipeOnUpdate(com.example.DesktopBuildConfig.APP_VERSION)
     val isDev = System.getProperty("raix.dev") == "true" || System.getenv("RAIX_DEV") == "true"
     val windowTitle = if (isDev) "Raix [desktop-dev]" else "Raix"
     

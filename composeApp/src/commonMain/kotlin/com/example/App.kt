@@ -32,6 +32,10 @@ import com.example.ui.screens.DataPrivacyScreen
 import com.example.ui.screens.IdentityScreen
 import com.example.ui.screens.RecoverySeedScreen
 import com.example.ui.screens.SafetyNumberScreen
+import kotlinx.coroutines.delay
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import androidx.compose.runtime.LaunchedEffect
 
 sealed interface AppDestination {
     data object AppLock : AppDestination
@@ -77,8 +81,90 @@ fun App() {
         )
     }
 
+    val notifiedMessages = remember { mutableSetOf<String>() }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    LaunchedEffect(Unit) {
+        while (true) {
+            try {
+                val authManager = com.example.security.DeviceAuthManager
+                val myToken = authManager.getIdToken()
+                val myUid = authManager.getUserId()
+                
+                if (myToken != null) {
+                    val pendingResult = com.example.data.network.FirestoreRestClient.fetchPendingMessages(myUid, myToken)
+                    if (pendingResult.isSuccess) {
+                        val pending = pendingResult.getOrThrow()
+                        for (msg in pending) {
+                            val keyResult = com.example.data.network.KeyStoreClient.getMessageKey(msg.id, myToken)
+                            if (keyResult.success && keyResult.ephemeralPubKey != null && keyResult.wrappedDek != null) {
+                                val myPrivKey = com.example.security.identity.IdentityManager.getIdentity()?.privateKey
+                                if (myPrivKey != null) {
+                                    val env = com.example.security.identity.SealedBoxEnvelope(
+                                        ephemeralPubKeyHex = keyResult.ephemeralPubKey,
+                                        wrappedDekBase64 = keyResult.wrappedDek
+                                    )
+                                    val dek = com.example.security.identity.SealedBox.unseal(env, myPrivKey)
+                                    val cipherBytes = Base64.decode(msg.ciphertext)
+                                    val ivBytes = Base64.decode(msg.iv)
+                                    val decryptedBytes = com.example.security.identity.AesGcm.decrypt(cipherBytes, dek, ivBytes)
+                                    val decryptedText = decryptedBytes.decodeToString()
+                                    
+                                    if (decryptedText.startsWith("[AUTO-HANDSHAKE] ")) {
+                                        val uri = decryptedText.substringAfter("[AUTO-HANDSHAKE] ").trim()
+                                        val parseRes = com.example.security.identity.IdentityManager.parseContactUri(uri)
+                                        if (parseRes.isSuccess) {
+                                            val contactData = parseRes.getOrThrow()
+                                            val existing = contactRepository.getContact(contactData.fingerprintHex)
+                                            if (existing == null) {
+                                                val myIdentity = com.example.security.identity.IdentityManager.getIdentity()
+                                                val pairSafetyNumber = com.example.security.identity.IdentityCryptoManager.computePairSafetyNumber(
+                                                    myPubKey = myIdentity!!.publicKey,
+                                                    peerPubKey = contactData.publicKeyBytes
+                                                )
+                                                val newContact = ContactItem(
+                                                    fingerprint = contactData.fingerprintHex,
+                                                    pubKey = contactData.publicKeyBase64,
+                                                    currentAuthUid = contactData.authUid,
+                                                    displayName = "Contato_${contactData.fingerprintHex.take(6)}",
+                                                    securityNumber = pairSafetyNumber,
+                                                    verified = false,
+                                                    addedAt = com.example.data.network.PlatformEnvironment.currentTimeMillis()
+                                                )
+                                                contactRepository.saveContact(newContact)
+                                            }
+                                            // Exclui a mensagem (Vanish-after-read)
+                                            com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
+                                        }
+                                    } else {
+                                        // É uma mensagem normal recebida em 2º plano no desktop
+                                        if (notifiedMessages.add(msg.id)) {
+                                            com.example.security.notification.PushNotificationManager.showLocalNotification(
+                                                title = "RAIX",
+                                                body = "Nova mensagem recebida",
+                                                messageId = msg.id
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Fail silently to not disrupt the UI
+            }
+            delay(10000L) // Verifica a cada 10s
+        }
+    }
+
     MaterialTheme(colorScheme = RaixDarkColors, typography = com.example.ui.theme.Typography) {
         Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
+            
+            com.example.ui.components.BackHandler(enabled = currentDestination != AppDestination.Contacts && currentDestination != AppDestination.AppLock && currentDestination != AppDestination.AgeGate && currentDestination != AppDestination.RecoverySeed) {
+                currentDestination = AppDestination.Contacts
+            }
+
             AnimatedContent(
                 targetState = currentDestination,
                 transitionSpec = {
