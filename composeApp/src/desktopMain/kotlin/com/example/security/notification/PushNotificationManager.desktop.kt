@@ -74,7 +74,7 @@ actual object PushNotificationManager {
                     val handlerFile = java.io.File(pmsgDir, "handler.ps1")
                     val vbsFile = java.io.File(pmsgDir, "handler.vbs")
                     
-                    if (!handlerFile.exists() || !vbsFile.exists()) {
+                    if (true) {
                         handlerFile.writeText("""
                             param([string]${'$'}url)
                             ${'$'}id = ${'$'}url -replace 'raix://','' -replace '/',''
@@ -100,7 +100,7 @@ actual object PushNotificationManager {
 
                     // AUMID Registry
                     val aumidPs1 = java.io.File(pmsgDir, "setup_aumid.ps1")
-                    if (!aumidPs1.exists()) {
+                    if (true) {
                         val currentExe = ProcessHandle.current().info().command().orElse(System.getProperty("java.home") + "\\bin\\javaw.exe").replace("\\", "\\\\")
                         aumidPs1.writeText("""
                             ${'$'}Code = @'
