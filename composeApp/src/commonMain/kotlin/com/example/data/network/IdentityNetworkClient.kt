@@ -98,7 +98,7 @@ object IdentityNetworkClient {
             if (response.status.isSuccess()) {
                 val parsed = json.parseToJsonElement(responseBody).jsonObject
                 val resultObj = parsed["result"]?.jsonObject
-                    ?: return Result.failure(Exception("Resposta inválida do servidor de convites."))
+                    ?: return Result.failure(Exception("Resposta invÃ¡lida do servidor de convites."))
 
                 val token = resultObj["inviteToken"]?.jsonPrimitive?.content
                     ?: return Result.failure(Exception("Token de convite ausente."))
@@ -139,12 +139,12 @@ object IdentityNetworkClient {
             if (response.status.isSuccess()) {
                 val parsed = json.parseToJsonElement(responseBody).jsonObject
                 val resultObj = parsed["result"]?.jsonObject
-                    ?: return Result.failure(Exception("Resposta inválida ao aceitar convite."))
+                    ?: return Result.failure(Exception("Resposta invÃ¡lida ao aceitar convite."))
 
                 val fp = resultObj["creatorFingerprint"]?.jsonPrimitive?.content
                     ?: return Result.failure(Exception("Fingerprint do criador ausente."))
                 val pubKey = resultObj["creatorPubKey"]?.jsonPrimitive?.content
-                    ?: return Result.failure(Exception("Chave pública do criador ausente."))
+                    ?: return Result.failure(Exception("Chave pÃºblica do criador ausente."))
 
                 Result.success(AcceptInviteResult(fp, pubKey))
             } else {
@@ -178,12 +178,12 @@ object IdentityNetworkClient {
             if (response.status.isSuccess()) {
                 val parsed = json.parseToJsonElement(responseBody).jsonObject
                 val resultObj = parsed["result"]?.jsonObject
-                    ?: return Result.failure(Exception("Resposta inválida ao resolver fingerprint."))
+                    ?: return Result.failure(Exception("Resposta invÃ¡lida ao resolver fingerprint."))
 
                 val uid = resultObj["currentAuthUid"]?.jsonPrimitive?.content
-                    ?: return Result.failure(Exception("UID técnico ausente."))
+                    ?: return Result.failure(Exception("UID tÃ©cnico ausente."))
                 val pubKey = resultObj["pubKey"]?.jsonPrimitive?.content
-                    ?: return Result.failure(Exception("Chave pública ausente."))
+                    ?: return Result.failure(Exception("Chave pÃºblica ausente."))
                 val updatedAt = resultObj["updatedAt"]?.jsonPrimitive?.content?.toLongOrNull()
                     ?: PlatformEnvironment.currentTimeMillis()
 
@@ -364,7 +364,7 @@ object IdentityNetworkClient {
                 val resultObj = parsed["result"]?.jsonObject
                 
                 if (resultObj == null) {
-                    return Result.failure(Exception("Resposta inv�lida do servidor."))
+                    return Result.failure(Exception("Resposta inválida do servidor."))
                 }
                 
                 val status = resultObj["status"]?.jsonPrimitive?.content ?: "pending"
@@ -389,6 +389,35 @@ object IdentityNetworkClient {
         }
     }
 
+    suspend fun registerPushToken(
+        token: String,
+        platform: String,
+        idToken: String
+    ): Result<Unit> {
+        return try {
+            val payload = buildJsonObject {
+                put("data", buildJsonObject {
+                    put("token", token)
+                    put("platform", platform)
+                })
+            }
+
+            val response = ApiClient.client.post(AppEndpoints.registerPushTokenUrl) {
+                contentType(ContentType.Application.Json)
+                header("Authorization", "Bearer $idToken")
+                setBody(payload.toString())
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception(extractErrorMessage(response.bodyAsText(), response.status.value)))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     private fun extractErrorMessage(responseBody: String, statusCode: Int): String {
         return try {
             val parsed = json.parseToJsonElement(responseBody).jsonObject
@@ -399,3 +428,4 @@ object IdentityNetworkClient {
         }
     }
 }
+

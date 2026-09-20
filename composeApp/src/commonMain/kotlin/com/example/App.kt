@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.flow.first
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,6 +86,7 @@ fun App() {
 
     @OptIn(ExperimentalEncodingApi::class)
     LaunchedEffect(Unit) {
+        var pushTokenRegistered = false
         while (true) {
             try {
                 val authManager = com.example.security.DeviceAuthManager
@@ -92,6 +94,18 @@ fun App() {
                 val myUid = authManager.getUserId()
                 
                 if (myToken != null) {
+                    if (!pushTokenRegistered) {
+                        try {
+                            val token = com.example.security.notification.PushNotificationManager.getPushToken()
+                            if (token != null) {
+                                // Envia "android" por padrão, o backend aceita e apenas loga.
+                                com.example.data.network.IdentityNetworkClient.registerPushToken(token, "android", myToken)
+                                pushTokenRegistered = true
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                     val pendingResult = com.example.data.network.FirestoreRestClient.fetchPendingMessages(myUid, myToken)
                     if (pendingResult.isSuccess) {
                         val pending = pendingResult.getOrThrow()
@@ -138,12 +152,45 @@ fun App() {
                                         }
                                     } else {
                                         // É uma mensagem normal recebida em 2º plano no desktop
-                                        if (notifiedMessages.add(msg.id)) {
-                                            com.example.security.notification.PushNotificationManager.showLocalNotification(
-                                                title = "RAIX",
-                                                body = "Nova mensagem recebida",
-                                                messageId = msg.id
-                                            )
+                                        val allContacts = contactRepository.getContacts().first()
+                                        val existingContact = allContacts.find { it.currentAuthUid == msg.senderId || it.fingerprint == msg.senderId }
+                                        val contactFingerprint = existingContact?.fingerprint ?: msg.senderId
+                                        
+                                        val openChatFingerprint = (currentDestination as? AppDestination.Chat)?.contact?.fingerprint
+                                        
+                                        if (contactFingerprint != openChatFingerprint) {
+                                            // A conversa NÃO está aberta. Salva no cache local e notifica.
+                                            if (existingContact != null && contactRepository.isContactBlocked(contactFingerprint)) {
+                                                contactRepository.recordBlockedPurge(contactFingerprint)
+                                                com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
+                                            } else {
+                                                val now = com.example.data.network.PlatformEnvironment.currentTimeMillis()
+                                                val remainingTtl = (msg.expiresAt - now).coerceAtLeast(10_000L)
+                                                val ephemeralMsg = com.example.ui.screens.EphemeralUiMessage(
+                                                    id = msg.id,
+                                                    senderId = contactFingerprint,
+                                                    senderName = existingContact?.displayName ?: "Desconhecido",
+                                                    isMe = false,
+                                                    text = decryptedText,
+                                                    timestamp = now,
+                                                    ttlMillis = remainingTtl,
+                                                    expiresAt = msg.expiresAt
+                                                )
+                                                
+                                                val cacheList = com.example.ui.screens.InMemoryMessageCache.getMessages(contactFingerprint)
+                                                if (cacheList.none { it.id == msg.id }) {
+                                                    cacheList.add(ephemeralMsg)
+                                                    com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
+                                                    
+                                                    if (notifiedMessages.add(msg.id)) {
+                                                        com.example.security.notification.PushNotificationManager.showLocalNotification(
+                                                            title = "RAIX - ${existingContact?.displayName ?: "Mensagem"}",
+                                                            body = "Nova mensagem recebida",
+                                                            messageId = msg.id
+                                                        )
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -158,7 +205,7 @@ fun App() {
         }
     }
 
-    MaterialTheme(colorScheme = RaixDarkColors, typography = com.example.ui.theme.Typography) {
+    MaterialTheme(colorScheme = RaixDarkColors, typography = com.example.ui.theme.getRaixTypography()) {
         Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
             
             com.example.ui.components.BackHandler(enabled = currentDestination != AppDestination.Contacts && currentDestination != AppDestination.AppLock && currentDestination != AppDestination.AgeGate && currentDestination != AppDestination.RecoverySeed) {

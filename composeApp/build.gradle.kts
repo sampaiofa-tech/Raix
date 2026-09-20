@@ -139,7 +139,7 @@ kotlin {
                         exampleFile.inputStream().use { stream -> properties.load(stream) }
                     }
                     val webApiKey = properties.getProperty("FIREBASE_DESKTOP_WEB_API_KEY") ?: ""
-                    val appVersion = "1.6.8"
+                    val appVersion = "1.6.9"
                     
                     outputFile.parentFile.mkdirs()
                     outputFile.writeText("""
@@ -203,8 +203,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 14
-        versionName = "1.6.8"
+        versionCode = 15
+        versionName = "1.6.9"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -294,10 +294,11 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
 compose.desktop {
     application {
         mainClass = "com.example.MainKt"
+        jvmArgs += listOf("-Dfile.encoding=UTF-8")
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.6.8"
+            packageVersion = "1.6.9"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"

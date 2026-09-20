@@ -26,6 +26,7 @@ object AppEndpoints {
     const val PROD_UPDATE_IDENTITY_ROUTING_URL: String = "https://$REGION-$DEFAULT_PROJECT_ID.cloudfunctions.net/updateIdentityRouting"
     const val PROD_SUBMIT_HANDSHAKE_URL: String = "https://$REGION-$DEFAULT_PROJECT_ID.cloudfunctions.net/submitHandshake"
     const val PROD_POLL_HANDSHAKE_URL: String = "https://$REGION-$DEFAULT_PROJECT_ID.cloudfunctions.net/pollHandshake"
+    const val PROD_REGISTER_PUSH_TOKEN_URL: String = "https://$REGION-$DEFAULT_PROJECT_ID.cloudfunctions.net/registerPushToken"
     const val PROD_REPORT_ABUSE_URL: String = "https://$REGION-$DEFAULT_PROJECT_ID.cloudfunctions.net/reportAbuse"
     const val PROD_REPORT_ABUSE_WITH_CONTENT_URL: String = "https://$REGION-$DEFAULT_PROJECT_ID.cloudfunctions.net/reportAbuseWithContent"
     const val PROD_IDENTITY_TOOLKIT_URL: String = "https://identitytoolkit.googleapis.com/v1"
@@ -187,5 +188,16 @@ object AppEndpoints {
             }
         } else {
             PROD_POLL_HANDSHAKE_URL
+        }
+
+    val registerPushTokenUrl: String
+        get() = if (isDebug) {
+            PlatformEnvironment.getEnv("PMSG_REGISTER_PUSH_TOKEN_URL") ?: if (isEmulator) {
+                "http://127.0.0.1:5001/$projectId/$REGION/registerPushToken"
+            } else {
+                PROD_REGISTER_PUSH_TOKEN_URL
+            }
+        } else {
+            PROD_REGISTER_PUSH_TOKEN_URL
         }
 }
