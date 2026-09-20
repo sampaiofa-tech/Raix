@@ -25,23 +25,46 @@ fun main() = application {
     var isWindowVisible by remember { mutableStateOf(true) }
     val appIcon = painterResource("icon.png")
     
-    val trayState = rememberTrayState()
+    var trayIcon: java.awt.TrayIcon? = null
+    var systemTray: java.awt.SystemTray? = null
     
-    // Register the trayState so PushNotificationManager can use it
-    LaunchedEffect(trayState) {
-        PushNotificationManager.composeTrayState = trayState
-    }
-
-    Tray(
-        icon = appIcon,
-        tooltip = "Raix",
-        state = trayState,
-        onAction = { isWindowVisible = true },
-        menu = {
-            Item("Abrir Raix", onClick = { isWindowVisible = true })
-            Item("Sair", onClick = ::exitApplication)
+    LaunchedEffect(Unit) {
+        if (java.awt.SystemTray.isSupported()) {
+            systemTray = java.awt.SystemTray.getSystemTray()
+            val resource = object {}.javaClass.getResource("/icon.png")
+            val image = if (resource != null) {
+                java.awt.Toolkit.getDefaultToolkit().createImage(resource)
+            } else {
+                val fallback = java.awt.image.BufferedImage(16, 16, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+                val g = fallback.createGraphics()
+                g.color = java.awt.Color.BLUE
+                g.fillRect(0, 0, 16, 16)
+                g.dispose()
+                fallback
+            }
+            trayIcon = java.awt.TrayIcon(image, "Raix").apply {
+                isImageAutoSize = true
+                addActionListener {
+                    isWindowVisible = true
+                }
+                
+                val popup = java.awt.PopupMenu()
+                val openItem = java.awt.MenuItem("Abrir Raix")
+                openItem.addActionListener {
+                    isWindowVisible = true
+                }
+                val exitItem = java.awt.MenuItem("Sair")
+                exitItem.addActionListener {
+                    exitApplication()
+                }
+                popup.add(openItem)
+                popup.add(exitItem)
+                popupMenu = popup
+            }
+            systemTray?.add(trayIcon)
+            com.example.security.notification.PushNotificationManager.sharedTrayIcon = trayIcon
         }
-    )
+    }
 
     Window(
         onCloseRequest = { isWindowVisible = false },

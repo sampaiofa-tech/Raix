@@ -11,8 +11,7 @@ import kotlinx.coroutines.launch
 
 actual object PushNotificationManager {
 
-    var composeTrayState: TrayState? = null
-    private var trayIcon: TrayIcon? = null
+    var sharedTrayIcon: TrayIcon? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
     actual fun getPushToken(): String? {
@@ -20,26 +19,8 @@ actual object PushNotificationManager {
     }
 
     actual fun showLocalNotification(title: String, body: String, messageId: String?) {
-        // (1) Compose native Tray notification
-        var composeSuccess = false
-        try {
-            composeTrayState?.let {
-                it.sendNotification(
-                    Notification(
-                        title = title,
-                        message = body,
-                        type = Notification.Type.Info
-                    )
-                )
-                composeSuccess = true
-            }
-        } catch (_: Throwable) {}
-
-        // (2) Fallback AWT TrayIcon
-        if (!composeSuccess) {
-            scope.launch {
-                showSystemTrayNotification(title, body)
-            }
+        scope.launch {
+            showSystemTrayNotification(title, body)
         }
     }
 
@@ -52,7 +33,7 @@ actual object PushNotificationManager {
             if (!SystemTray.isSupported()) return
             val tray = SystemTray.getSystemTray()
 
-            if (trayIcon == null) {
+            val iconToUse = sharedTrayIcon ?: run {
                 val resource = PushNotificationManager::class.java.getResource("/icon.png")
                 val image = if (resource != null) {
                     Toolkit.getDefaultToolkit().createImage(resource)
@@ -64,13 +45,13 @@ actual object PushNotificationManager {
                     g.dispose()
                     fallback
                 }
-                trayIcon = TrayIcon(image, "Raix").apply {
+                TrayIcon(image, "Raix").apply {
                     isImageAutoSize = true
                     tray.add(this)
                 }
             }
 
-            trayIcon?.displayMessage(title, body, TrayIcon.MessageType.INFO)
+            iconToUse.displayMessage(title, body, TrayIcon.MessageType.INFO)
         } catch (_: Throwable) {
         }
     }
