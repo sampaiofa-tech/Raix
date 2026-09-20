@@ -1,6 +1,22 @@
 import fs from 'fs';
 import https from 'https';
 import crypto from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+try {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const envPath = path.resolve(__dirname, '../.env');
+  const envConfig = fs.readFileSync(envPath, 'utf8');
+  envConfig.split('\n').forEach(line => {
+    const match = line.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      process.env[match[1].trim()] = match[2].trim().replace(/^"|"$/g, '').replace(/\r$/, '');
+    }
+  });
+} catch (e) {
+  console.warn('Warning: Could not read .env file', e.message);
+}
 
 const PROJECT_ID = 'gen-lang-client-0858445711';
 const REGION = 'us-central1';

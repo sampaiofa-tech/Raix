@@ -97,14 +97,6 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 5. **Governança** (somente entra se houver ciclo autorizado ou estiver no roadmap).
 
 ### 3. Roteamento e Execução
-- **Críticos:** Direcionados imediatamente ao Analista + Executor (via Analista), com urgência.
-- **UX:** Inseridos no ciclo autorizado e priorizados.
-- **Essência:** Adicionados ao roadmap pós-rodada.
-- **Não-alinhados:** Registrados apenas como consideração (arquivados).
-- **Segurança/Arquitetura:** Acionamento obrigatório do Guru (via Analista) antes de qualquer ação.
-
-> **Regra de Ouro:** Nenhum feedback se torna escopo não aprovado. Tudo deve passar pela triagem e pelo roteamento adequado antes de qualquer modificação no produto. Nada de escopo novo sem aprovação (baseline congelado).
-
 # Dívida Técnica e Triagem de Avisos de Build (TECH-DEBT)
 
 Este documento registra a triagem formal, justificativas arquiteturais, impactos e gatilhos de resolução para os 8 avisos de build identificados durante o ciclo de auditoria e pré-deploy do projeto Pmsg.
@@ -123,7 +115,7 @@ Este documento registra a triagem formal, justificativas arquiteturais, impactos
 ## Tabela Consolidada de Triagem dos 8 Avisos
 
 | # | Item | Origem | Impacto Atual | Gatilho de Resolução | Versão-Alvo |
-|---|------|--------|---------------|----------------------|-------------|
+| --- | --- | --- | --- | --- | --- |
 | **1** | `android.builtInKotlin=false` depreciado | `gradle.properties` (AGP) | **Nenhum**. Flag necessária para coexistência estável entre AGP 9 e KMP; removê-la agora quebraria o build. | Remover flag após migração estrutural para o AGP 10. | AGP 10.0.0 |
 | **2** | `android.newDsl=false` depreciado | `gradle.properties` (AGP) | **Nenhum**. Mantém retrocompatibilidade com a sintaxe DSL declarativa atual do projeto. | Adotar a nova DSL declarativa no ciclo de migração do AGP 10. | AGP 10.0.0 |
 | **3** | `Unused Kotlin Source Sets (iosMain)` | Plugin KMP (`composeApp/build.gradle.kts`) | **Nenhum**. Comportamento esperado em host Windows. O target nativo iOS compila exclusivamente no CI macOS via GitHub Actions (`.github/workflows/ios-build.yml`). | Nenhuma ação local. Mantido como esperado no fluxo multiplatforma. | Kotlin 2.2.x+ / CMP |
@@ -138,6 +130,7 @@ Este documento registra a triagem formal, justificativas arquiteturais, impactos
 | **12** | `Proteção Anti-Vazamento Multitarefa no iOS (Blur / Privacy Overlay)` | `iosMain` (UIKit / SceneDelegate) | **Baixo (iOS em prévia/backlog)**. No Android, o `FLAG_SECURE` impede capturas de tela e snapshots no alternador de apps nativamente. No iOS, o snapshot do alternador de apps exige aplicação de `UIBlurEffect` ou overlay opaco em `sceneWillResignActive` / `applicationWillResignActive`. | Implementar overlay de privacidade nativo no ciclo de homologação oficial do iOS. | v1.5 |
 | **13** | `Custódia hardware-backed das chaves derivadas (Keystore/Keychain) — P-H1` | `KeyVault` (Android/iOS/Desktop) | **Alto (P-H1 — Hardening contra IA e Exfiltração)**. A derivação da semente de 12 palavras para chaves clássicas e pós-quânticas ocorre atualmente em memória protegida com DPAPI/Keystore. Elevada para **P-H1** com justificativa formal de defesa contra exfiltração de chaves e ataques de engenharia social por IA que visem a extração de chaves em software. | Encapsular semente mnemônica e chaves sob hardware dedicado (StrongBox/TEE/Secure Enclave/TPM) e vincular à UX anti-phishing estrita. | Prioridade P-H1 (Ciclo Pós-Rodada) |
 | **14** | `Proxy Cloudflare & WAF na Borda (Hardening Pós-Reunião)` | Cloudflare DNS / GitHub Pages | **Nenhum (Estratégico)**. Operando em DNS-only para validação estável do certificado TLS no GitHub Pages. WAF e Super Bot Fight Mode configurados na conta. | Habilitar proxy Cloudflare + Origin Certificate + Full (Strict) SSL pós-reunião. | Pós-Reunião |
+| **15** | `Incluir AdversarialCorrelationTest na suíte adversarial do CI (reforço de solidez — recomendado pelo Guru, não bloqueante)` | GitHub Actions / CI | **Nenhum (Não bloqueante)**. | Adicionar script de teste ao workflow do CI. | Próximo ciclo |
 
 ---
 
@@ -186,7 +179,7 @@ Conforme auditoria executada em `functions/`:
 **Data de Aprovação:** 22/05/2024
 **Status:** Processo Congelado (Baseline)
 
-Este fluxo define a triagem e priorização obrigatória de feedbacks de usuários, garantindo que nenhum feedback vire escopo não aprovado sem passar pela análise estruturada. 
+Este fluxo define a triagem e priorização obrigatória de feedbacks de usuários, garantindo que nenhum feedback vire escopo não aprovado sem passar pela análise estruturada.
 
 ### 1. Classificação (Triagem Obrigatória)
 Todo feedback recebido deve ser classificado em uma das seguintes categorias antes de qualquer ação:
@@ -216,7 +209,7 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 ## Histórico de Resolução de Feedback (Ciclo Maio/2024)
 
 | Item | Status | Descrição da Resolução |
-|---|---|---|
+| --- | --- | --- |
 | **Phase 1** | **Concluído** | **2024-05-22 — Limpeza do Build Desktop:** Remoção dos contatos mock hardcoded (`defaultSeed`) em `DesktopContactRepository`. Banco inicializa vazio e reativo corretamente. |
 | **Phase 2** | **Concluído** | **2024-05-22 — Address Book Zero-Knowledge:** Isolamento do repositório de contatos via nova derivação de chave Argon2 a partir do mnemônico (BIP-39). Cifra AES-GCM-256 aplicada no JSON (`AddressBookCrypto`). Lógica de TTL (48h) inserida nas streams de UI e carregamento, preservando isolamento da base. |
 | **Phase 3** | **Concluído** | **2024-05-22 — App-Lock Local na Abertura:** Implementação do `AppLockGate` como barreira inicial de navegação (`App.kt`), utilizando Biometria/Device Credentials no Android/iOS (com liberação de Master Key). |
@@ -228,6 +221,7 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 ## Conformidade Legal e Regulatória (Adicionado em 18/09/2026)
 
 - **Correção de conformidade:** retenção do IP real (cifrado) em coleção isolada `accessLogsRaw`, TTL 180 dias, chave no Secret Manager, para atendimento ao Art. 15 do MCI. **Prioridade alta.** Ciclo: próximo build, após contenção de segurança.
+- **Art. 15 — IP cifrado (accessLogsRaw):** código presente, recurso INATIVO em produção (segredo não atrelado). Ativar no próximo ciclo com defineSecret correto + teste de gravação cifrada. Atenção: um próximo deploy pode ativar o recurso — validar antes.
 
 ## Pendências de Segurança e Infraestrutura (Incidente de Chaves)
 
