@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import kotlinx.serialization.Serializable
 import com.example.data.network.PlatformEnvironment
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -109,18 +110,31 @@ object InMemoryMessageCache {
     val contactMessages = mutableMapOf<String, MutableList<EphemeralUiMessage>>()
     
     fun getMessages(fingerprint: String): MutableList<EphemeralUiMessage> {
-        return contactMessages.getOrPut(fingerprint) { mutableListOf() }
+        return contactMessages.getOrPut(fingerprint) {
+            val now = PlatformEnvironment.currentTimeMillis()
+            val loaded = com.example.security.MessageStorage.loadMessages(fingerprint)
+            val validMessages = loaded.filter { it.expiresAt > now }
+            if (validMessages.size != loaded.size) {
+                com.example.security.MessageStorage.saveMessages(fingerprint, validMessages)
+            }
+            validMessages.toMutableList()
+        }
     }
     
     fun saveMessages(fingerprint: String, messages: List<EphemeralUiMessage>) {
-        contactMessages[fingerprint] = messages.toMutableList()
+        val now = PlatformEnvironment.currentTimeMillis()
+        val validMessages = messages.filter { it.expiresAt > now }
+        contactMessages[fingerprint] = validMessages.toMutableList()
+        com.example.security.MessageStorage.saveMessages(fingerprint, validMessages)
     }
     
     fun clearMessages(fingerprint: String) {
         contactMessages.remove(fingerprint)
+        com.example.security.MessageStorage.clearMessages(fingerprint)
     }
 }
 
+@Serializable
 data class EphemeralUiMessage(
     val id: String,
     val senderId: String,

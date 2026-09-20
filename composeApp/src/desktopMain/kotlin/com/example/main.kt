@@ -48,13 +48,9 @@ fun main() = application {
         title = windowTitle,
         state = windowState,
         icon = appIcon,
-        alwaysOnTop = true
+        alwaysOnTop = true,
+        visible = isWindowVisible
     ) {
-        LaunchedEffect(isWindowVisible) {
-            java.awt.EventQueue.invokeLater {
-                window.isVisible = isWindowVisible
-            }
-        }
         App()
     }
 }

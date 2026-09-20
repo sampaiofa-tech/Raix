@@ -180,6 +180,7 @@ fun App() {
                                                 val cacheList = com.example.ui.screens.InMemoryMessageCache.getMessages(contactFingerprint)
                                                 if (cacheList.none { it.id == msg.id }) {
                                                     cacheList.add(ephemeralMsg)
+                                                    com.example.ui.screens.InMemoryMessageCache.saveMessages(contactFingerprint, cacheList)
                                                     com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
                                                     
                                                     if (notifiedMessages.add(msg.id)) {

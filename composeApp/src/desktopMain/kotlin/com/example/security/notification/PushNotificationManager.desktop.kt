@@ -21,25 +21,23 @@ actual object PushNotificationManager {
 
     actual fun showLocalNotification(title: String, body: String, messageId: String?) {
         // (1) Compose native Tray notification
+        var composeSuccess = false
         try {
-            composeTrayState?.sendNotification(
-                Notification(
-                    title = title,
-                    message = body,
-                    type = Notification.Type.Info
+            composeTrayState?.let {
+                it.sendNotification(
+                    Notification(
+                        title = title,
+                        message = body,
+                        type = Notification.Type.Info
+                    )
                 )
-            )
+                composeSuccess = true
+            }
         } catch (_: Throwable) {}
 
-        // (2) WinRT PowerShell Toast (as requested: ambos)
-        scope.launch {
-            val os = System.getProperty("os.name")?.lowercase() ?: ""
-            if (os.contains("win")) {
-                val shown = showWindowsWinRtToast(title, body)
-                if (!shown) {
-                    showSystemTrayNotification(title, body)
-                }
-            } else {
+        // (2) Fallback AWT TrayIcon
+        if (!composeSuccess) {
+            scope.launch {
                 showSystemTrayNotification(title, body)
             }
         }
@@ -47,29 +45,6 @@ actual object PushNotificationManager {
 
     actual fun hasPermission(): Boolean {
         return true
-    }
-
-    private fun showWindowsWinRtToast(title: String, body: String): Boolean {
-        return try {
-            val escapedTitle = escapePowerShell(title)
-            val escapedBody = escapePowerShell(body)
-            val script = "" +
-                "[void][Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime]; " +
-                "\$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02); " +
-                "\$textNodes = \$template.GetElementsByTagName('text'); " +
-                "[void]\$textNodes.Item(0).AppendChild(\$template.CreateTextNode('$escapedTitle')); " +
-                "[void]\$textNodes.Item(1).AppendChild(\$template.CreateTextNode('$escapedBody')); " +
-                "\$toast = [Windows.UI.Notifications.ToastNotification]::new(\$template); " +
-                "[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\WindowsPowerShell\\v1.0\\powershell.exe').Show(\$toast)"
-
-            val process = ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
-                .redirectErrorStream(true)
-                .start()
-            val exited = process.waitFor()
-            exited == 0
-        } catch (_: Throwable) {
-            false
-        }
     }
 
     private fun showSystemTrayNotification(title: String, body: String) {
