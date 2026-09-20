@@ -31,6 +31,32 @@ actual object PushNotificationManager {
 
     private fun showSystemTrayNotification(title: String, body: String) {
         println("[PushNotificationManager] showSystemTrayNotification invocado. title=$title")
+        
+        val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+        if (isWindows) {
+            try {
+                val safeTitle = escapePowerShell(title)
+                val safeBody = escapePowerShell(body)
+                val psCommand = """
+                    [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null;
+                    ${'$'}template = [Windows.UI.Notifications.ToastTemplateType]::ToastText02;
+                    ${'$'}xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent(${'$'}template);
+                    ${'$'}texts = ${'$'}xml.GetElementsByTagName('text');
+                    ${'$'}texts.Item(0).AppendChild(${'$'}xml.CreateTextNode('$safeTitle')) | Out-Null;
+                    ${'$'}texts.Item(1).AppendChild(${'$'}xml.CreateTextNode('$safeBody')) | Out-Null;
+                    ${'$'}toast = [Windows.UI.Notifications.ToastNotification]::new(${'$'}xml);
+                    ${'$'}notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Raix');
+                    ${'$'}notifier.Show(${'$'}toast);
+                """.trimIndent().replace('\n', ' ')
+                
+                val process = ProcessBuilder("powershell", "-ExecutionPolicy", "Bypass", "-Command", psCommand).start()
+                process.waitFor()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        // Fallback: AWT TrayIcon
         try {
             if (!SystemTray.isSupported()) {
                 println("[PushNotificationManager] SystemTray não é suportado!")
