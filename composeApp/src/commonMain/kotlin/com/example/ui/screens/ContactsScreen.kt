@@ -63,6 +63,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.MoreVert
 import com.example.data.model.ContactItem
 import com.example.data.repository.ContactRepository
 import kotlinx.coroutines.launch
@@ -115,25 +116,59 @@ fun ContactsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onOpenBlockedContacts) {
+                    var expanded by remember { mutableStateOf(false) }
+                    IconButton(onClick = { expanded = true }) {
                         Icon(
-                            imageVector = Icons.Default.Block,
-                            contentDescription = "Contatos Bloqueados",
-                            tint = Color(0xFFFF8080)
+                            imageVector = androidx.compose.material.icons.Icons.Default.MoreVert,
+                            contentDescription = "Menu Principal",
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    IconButton(onClick = onOpenDataPrivacy) {
-                        Icon(
-                            imageVector = Icons.Default.Shield,
-                            contentDescription = "Sobre seus dados (LGPD)",
-                            tint = MaterialTheme.colorScheme.primary
+                    androidx.compose.material3.DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text("Minha Identidade") },
+                            onClick = {
+                                expanded = false
+                                onOpenIdentity()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Fingerprint,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         )
-                    }
-                    IconButton(onClick = onOpenIdentity) {
-                        Icon(
-                            imageVector = Icons.Default.Fingerprint,
-                            contentDescription = "Minha Identidade",
-                            tint = MaterialTheme.colorScheme.primary
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text("Contatos Bloqueados") },
+                            onClick = {
+                                expanded = false
+                                onOpenBlockedContacts()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Block,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFF8080)
+                                )
+                            }
+                        )
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text("Privacidade (LGPD)") },
+                            onClick = {
+                                expanded = false
+                                onOpenDataPrivacy()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Shield,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         )
                     }
                 },

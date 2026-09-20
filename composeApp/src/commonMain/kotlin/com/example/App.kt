@@ -11,11 +11,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.data.model.ContactItem
 import com.example.data.repository.ContactRepositoryProvider
 import com.example.security.consent.LegalConsentManager
+import com.example.security.identity.IdentityManager
 import com.example.ui.screens.AddContactModelAScreen
 import com.example.ui.screens.AgeGateScreen
 import com.example.ui.screens.AppLockGate
@@ -34,17 +30,16 @@ import com.example.ui.screens.ContactChatScreen
 import com.example.ui.screens.ContactsScreen
 import com.example.ui.screens.DataPrivacyScreen
 import com.example.ui.screens.IdentityScreen
-import com.example.ui.screens.SafetyNumberScreen
 import com.example.ui.screens.RecoverySeedScreen
-import com.example.security.identity.IdentityManager
+import com.example.ui.screens.SafetyNumberScreen
 
 sealed interface AppDestination {
     data object AppLock : AppDestination
     data object AgeGate : AppDestination
     data object RecoverySeed : AppDestination
     data object Contacts : AppDestination
-    data object BlockedContacts : AppDestination
     data class Chat(val contact: ContactItem) : AppDestination
+    data object BlockedContacts : AppDestination
     data object Identity : AppDestination
     data object DataPrivacy : AppDestination
     data object AddModelA : AppDestination
@@ -53,17 +48,20 @@ sealed interface AppDestination {
 }
 
 private val RaixDarkColors = darkColorScheme(
-    primary = Color(0xFFD4AF37),      // Gold
-    onPrimary = Color(0xFF0A1128),
-    secondary = Color(0xFF043927),    // Emerald Green
-    onSecondary = Color(0xFFF1F5F9),
+    primary = Color(0xFF00E676),
+    onPrimary = Color.Black,
+    background = Color(0xFF0B1325),
+    onBackground = Color(0xFFF5F7FA),
+    surface = Color(0xFF1E2432),
+    onSurface = Color(0xFFF5F7FA),
+    surfaceVariant = Color(0xFF1E2432),
+    onSurfaceVariant = Color(0xFF8A93A6),
+    secondary = Color(0xFF00E676),
+    onSecondary = Color.Black,
+    error = Color(0xFFCF6679),
+    onError = Color.Black,
     tertiary = Color(0xFFD4AF37),
-    surface = Color(0xFF0A1128),      // Navy Blue
-    onSurface = Color(0xFFF1F5F9),
-    background = Color(0xFF0A1128),   // Navy Blue
-    onBackground = Color(0xFFF1F5F9),
-    surfaceVariant = Color(0xFF064D35),
-    outline = Color(0x80D4AF37)       // Semi-transparent Gold
+    onTertiary = Color.Black
 )
 
 @Composable
@@ -79,25 +77,7 @@ fun App() {
         )
     }
 
-    val RaixTypography = Typography(
-        displayLarge = TextStyle(
-            fontWeight = FontWeight.Bold,
-            fontSize = 32.sp,
-            letterSpacing = 0.25.sp
-        ),
-        titleLarge = TextStyle(
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 22.sp,
-            letterSpacing = 0.sp
-        ),
-        bodyLarge = TextStyle(
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
-            letterSpacing = 0.5.sp
-        )
-    )
-
-    MaterialTheme(colorScheme = RaixDarkColors, typography = RaixTypography) {
+    MaterialTheme(colorScheme = RaixDarkColors, typography = com.example.ui.theme.Typography) {
         Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
             AnimatedContent(
                 targetState = currentDestination,
@@ -240,4 +220,3 @@ fun App() {
         }
     }
 }
-
