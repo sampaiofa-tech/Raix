@@ -25,4 +25,10 @@ expect object PushNotificationManager {
      * Checks if notification permission is currently granted.
      */
     fun hasPermission(): Boolean
+
+    /**
+     * Checks if a notification was clicked and returns its messageId (or contactFingerprint),
+     * consuming the event. Returns null if no notification was clicked.
+     */
+    fun getClickedNotificationMessageId(): String?
 }

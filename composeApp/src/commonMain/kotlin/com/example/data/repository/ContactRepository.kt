@@ -10,6 +10,7 @@ interface ContactRepository {
     suspend fun saveContact(contact: ContactItem)
     suspend fun setVerified(fingerprint: String, verified: Boolean)
     suspend fun updateAuthUid(fingerprint: String, newUid: String)
+    suspend fun renameContact(fingerprint: String, newName: String)
     suspend fun deleteContact(fingerprint: String)
     suspend fun panicWipe(): Int
 

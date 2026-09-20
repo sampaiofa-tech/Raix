@@ -80,13 +80,12 @@ fun ContactsScreen(
     onOpenIdentity: () -> Unit,
     onOpenDataPrivacy: () -> Unit = {},
     onOpenBlockedContacts: () -> Unit = {},
+    onOpenAgenda: () -> Unit,
     onAddContactModelA: () -> Unit,
     onCompareSafetyNumber: (ContactItem) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val contacts by contactRepository.getContacts().collectAsState(initial = emptyList())
-    var contactToDelete by remember { mutableStateOf<ContactItem?>(null) }
-    var contactToBlock by remember { mutableStateOf<ContactItem?>(null) }
     var showPanicDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -137,6 +136,20 @@ fun ContactsScreen(
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Fingerprint,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        )
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text("Agenda de Contatos") },
+                            onClick = {
+                                expanded = false
+                                onOpenAgenda()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
@@ -223,9 +236,7 @@ fun ContactsScreen(
                         ContactRowItem(
                             contact = contact,
                             onClick = { onContactSelected(contact) },
-                            onVerifyClick = { onCompareSafetyNumber(contact) },
-                            onBlockClick = { contactToBlock = contact },
-                            onDeleteClick = { contactToDelete = contact }
+                            onVerifyClick = { onCompareSafetyNumber(contact) }
                         )
                     }
 
@@ -235,62 +246,6 @@ fun ContactsScreen(
                 }
             }
         }
-    }
-
-    // Block Contact Dialog
-    contactToBlock?.let { contact ->
-        AlertDialog(
-            onDismissRequest = { contactToBlock = null },
-            title = { Text("Bloquear Contato?") },
-            text = {
-                Text("O contato \"${contact.displayName}\" será bloqueado localmente no dispositivo.\n\nNovas mensagens recebidas deste contato serão descartadas imediatamente sem serem exibidas.\n\nO servidor não tem acesso à sua lista de bloqueados.")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            contactRepository.blockContact(contact.fingerprint)
-                            contactToBlock = null
-                        }
-                    }
-                ) {
-                    Text("Bloquear", color = Color(0xFFFF5252), fontWeight = FontWeight.Bold)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { contactToBlock = null }) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
-
-    // Delete Single Contact Dialog
-    contactToDelete?.let { contact ->
-        AlertDialog(
-            onDismissRequest = { contactToDelete = null },
-            title = { Text("Excluir Contato?") },
-            text = {
-                Text("O contato \"${contact.displayName}\" será incinerado localmente. Todas as chaves e mensagens associadas serão destruídas.")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            contactRepository.deleteContact(contact.fingerprint)
-                            contactToDelete = null
-                        }
-                    }
-                ) {
-                    Text("Excluir", color = Color(0xFFFF5252))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { contactToDelete = null }) {
-                    Text("Cancelar")
-                }
-            }
-        )
     }
 
     // Panic Wipe Dialog
@@ -368,9 +323,7 @@ fun QuickActionBar(
 fun ContactRowItem(
     contact: ContactItem,
     onClick: () -> Unit,
-    onVerifyClick: () -> Unit,
-    onBlockClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onVerifyClick: () -> Unit
 ) {
     ElevatedCard(
         onClick = onClick,
@@ -480,26 +433,6 @@ fun ContactRowItem(
                     style = MaterialTheme.typography.labelSmall,
                     color = Color(0xFF78909C),
                     fontFamily = FontFamily.Monospace
-                )
-            }
-
-            // Block Action
-            IconButton(onClick = onBlockClick) {
-                Icon(
-                    imageVector = Icons.Default.Block,
-                    contentDescription = "Bloquear",
-                    tint = Color(0xFFFF5252),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            // Delete Action
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Excluir",
-                    tint = Color(0xFF546E7A),
-                    modifier = Modifier.size(20.dp)
                 )
             }
         }

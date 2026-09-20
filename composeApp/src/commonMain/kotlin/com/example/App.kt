@@ -43,6 +43,7 @@ sealed interface AppDestination {
     data object AgeGate : AppDestination
     data object RecoverySeed : AppDestination
     data object Contacts : AppDestination
+    data object Agenda : AppDestination
     data class Chat(val contact: ContactItem) : AppDestination
     data object BlockedContacts : AppDestination
     data object Identity : AppDestination
@@ -106,14 +107,15 @@ fun App() {
                             e.printStackTrace()
                         }
                     }
-                    val pendingResult = com.example.data.network.FirestoreRestClient.fetchPendingMessages(myUid, myToken)
-                    if (pendingResult.isSuccess) {
-                        val pending = pendingResult.getOrThrow()
-                        for (msg in pending) {
-                            val keyResult = com.example.data.network.KeyStoreClient.getMessageKey(msg.id, myToken)
-                            if (keyResult.success && keyResult.ephemeralPubKey != null && keyResult.wrappedDek != null) {
-                                val myPrivKey = com.example.security.identity.IdentityManager.getIdentity()?.privateKey
-                                if (myPrivKey != null) {
+                    if (currentDestination != AppDestination.AppLock && currentDestination != AppDestination.AgeGate && currentDestination != AppDestination.RecoverySeed) {
+                        val pendingResult = com.example.data.network.FirestoreRestClient.fetchPendingMessages(myUid, myToken)
+                        if (pendingResult.isSuccess) {
+                            val pending = pendingResult.getOrThrow()
+                            for (msg in pending) {
+                                val keyResult = com.example.data.network.KeyStoreClient.getMessageKey(msg.id, myToken)
+                                if (keyResult.success && keyResult.ephemeralPubKey != null && keyResult.wrappedDek != null) {
+                                    val myPrivKey = com.example.security.identity.IdentityManager.getIdentity()?.privateKey
+                                    if (myPrivKey != null) {
                                     val env = com.example.security.identity.SealedBoxEnvelope(
                                         ephemeralPubKeyHex = keyResult.ephemeralPubKey,
                                         wrappedDekBase64 = keyResult.wrappedDek
@@ -187,7 +189,7 @@ fun App() {
                                                         com.example.security.notification.PushNotificationManager.showLocalNotification(
                                                             title = "RAIX - ${existingContact?.displayName ?: "Mensagem"}",
                                                             body = "Nova mensagem recebida",
-                                                            messageId = msg.id
+                                                            messageId = contactFingerprint
                                                         )
                                                     }
                                                 }
@@ -199,10 +201,21 @@ fun App() {
                         }
                     }
                 }
+            }
+                
+                val clickedFingerprint = com.example.security.notification.PushNotificationManager.getClickedNotificationMessageId()
+                if (clickedFingerprint != null) {
+                    val allContacts = contactRepository.getContacts().first()
+                    val contactToOpen = allContacts.find { it.fingerprint == clickedFingerprint }
+                    if (contactToOpen != null) {
+                        currentDestination = AppDestination.Chat(contactToOpen)
+                    }
+                }
+                
             } catch (e: Exception) {
                 // Fail silently to not disrupt the UI
             }
-            delay(10000L) // Verifica a cada 10s
+            delay(3000L) // Verifica a cada 3s (global listener)
         }
     }
 
@@ -210,7 +223,11 @@ fun App() {
         Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
             
             com.example.ui.components.BackHandler(enabled = currentDestination != AppDestination.Contacts && currentDestination != AppDestination.AppLock && currentDestination != AppDestination.AgeGate && currentDestination != AppDestination.RecoverySeed) {
-                currentDestination = AppDestination.Contacts
+                if (currentDestination == AppDestination.Agenda) {
+                    currentDestination = AppDestination.Contacts
+                } else {
+                    currentDestination = AppDestination.Contacts
+                }
             }
 
             AnimatedContent(
@@ -262,8 +279,23 @@ fun App() {
                             onOpenBlockedContacts = {
                                 currentDestination = AppDestination.BlockedContacts
                             },
+                            onOpenAgenda = {
+                                currentDestination = AppDestination.Agenda
+                            },
                             onAddContactModelA = {
                                 currentDestination = AppDestination.AddModelA
+                            },
+                            onCompareSafetyNumber = { contact ->
+                                currentDestination = AppDestination.SafetyNumber(contact)
+                            }
+                        )
+                    }
+
+                    is AppDestination.Agenda -> {
+                        com.example.ui.screens.AgendaScreen(
+                            contactRepository = contactRepository,
+                            onBack = {
+                                currentDestination = AppDestination.Contacts
                             },
                             onCompareSafetyNumber = { contact ->
                                 currentDestination = AppDestination.SafetyNumber(contact)

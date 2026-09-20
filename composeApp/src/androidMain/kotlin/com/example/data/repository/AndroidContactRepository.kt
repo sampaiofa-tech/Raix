@@ -89,6 +89,11 @@ class AndroidContactRepository(
         contactDao.deleteContact(fingerprint)
     }
 
+    override suspend fun renameContact(fingerprint: String, newName: String) = withContext(Dispatchers.IO) {
+        val contact = getContact(fingerprint) ?: return@withContext
+        saveContact(contact.copy(displayName = newName))
+    }
+
     override suspend fun panicWipe(): Int = withContext(Dispatchers.IO) {
         val count = contactDao.panicWipeAllContacts()
         blockedContactDao?.panicWipeAllBlockedContacts()

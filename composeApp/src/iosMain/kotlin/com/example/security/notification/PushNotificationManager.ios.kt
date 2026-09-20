@@ -21,7 +21,12 @@ actual object PushNotificationManager {
     }
 
     actual fun hasPermission(): Boolean {
-        return false
+        // Implementar no lado Swift, para agora retornamos true ou simulamos
+        return true
+    }
+
+    actual fun getClickedNotificationMessageId(): String? {
+        return null
     }
 
     fun setApnsDeviceToken(tokenHex: String) {

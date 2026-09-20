@@ -35,4 +35,9 @@ actual object PushNotificationManager {
         val context = AndroidContextHolder.appContext ?: return false
         return NotificationHelper.hasNotificationPermission(context)
     }
+
+    actual fun getClickedNotificationMessageId(): String? {
+        // Implementação Android de deep-link pode ser tratada via Intent
+        return null
+    }
 }

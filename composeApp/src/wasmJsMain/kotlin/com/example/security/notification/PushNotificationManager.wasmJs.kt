@@ -16,6 +16,11 @@ actual object PushNotificationManager {
     }
 
     actual fun hasPermission(): Boolean {
-        return false
+        // Requereria checar permissão via interop JS
+        return true
+    }
+
+    actual fun getClickedNotificationMessageId(): String? {
+        return null
     }
 }
