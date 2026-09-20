@@ -3,6 +3,7 @@ import https from 'https';
 import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 try {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -82,9 +83,7 @@ async function callCallable(functionName, data, idToken = null) {
 
 // 3. Helper to get Google Cloud admin access token
 function getAdminAccessToken() {
-  const configPath = `${process.env.USERPROFILE}/.config/configstore/firebase-tools.json`;
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  return config.tokens.access_token;
+  return execSync('gcloud auth print-access-token').toString().trim();
 }
 
 // 4. Firestore REST check (Admin)

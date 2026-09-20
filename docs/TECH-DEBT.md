@@ -141,3 +141,4 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 - **Correção de Build Dummy:** O build da v1.6.3 foi inicialmente gerado com chaves dummy, exigindo a reconstrução neste ciclo.
 - **Mecanismo de Injeção de Chaves:** O mecanismo via `.env` exige o arquivo no build, impactando o CI (ex: `ios-build.yml` e health-checks precisam das chaves na esteira). Avaliar solução definitiva para injeção via pipeline sem `.env` fixo.
 - **Ordem de Provisionamento de Segredos:** Estabelecer a regra de que o deploy deve sempre criar o segredo no Secret Manager *antes* de publicar as funções que o referenciam, evitando cold start failures (outages).
+- **Restrição de Aplicativo da Chave Android:** A restrição de pacote/SHA-1 foi removida da chave Android para contornar bloqueios nas chamadas REST manuais ao Identity Toolkit. Pendente injetar os cabeçalhos `X-Android-Package` e `X-Android-Cert` no cliente HTTP para reativar essa proteção.

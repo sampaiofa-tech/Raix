@@ -121,6 +121,36 @@ kotlin {
 
         sourceSets.named("desktopMain") {
             dependsOn(nonWebMain)
+            val generateDesktopBuildConfig by tasks.registering {
+                val envFile = rootProject.file(".env")
+                val exampleFile = rootProject.file(".env.example")
+                val desktopOutputDir = layout.buildDirectory.dir("generated/source/buildconfig/desktop").get().asFile
+                val outputFile = File(desktopOutputDir, "com/example/DesktopBuildConfig.kt")
+                
+                inputs.file(envFile)
+                inputs.file(exampleFile).optional()
+                outputs.dir(desktopOutputDir)
+                
+                doLast {
+                    val properties = Properties()
+                    if (envFile.exists()) {
+                        envFile.inputStream().use { stream -> properties.load(stream) }
+                    } else if (exampleFile.exists()) {
+                        exampleFile.inputStream().use { stream -> properties.load(stream) }
+                    }
+                    val webApiKey = properties.getProperty("FIREBASE_DESKTOP_WEB_API_KEY") ?: ""
+                    
+                    outputFile.parentFile.mkdirs()
+                    outputFile.writeText("""
+                        package com.example
+                        
+                        object DesktopBuildConfig {
+                            const val FIREBASE_DESKTOP_WEB_API_KEY = "$webApiKey"
+                        }
+                    """.trimIndent())
+                }
+            }
+            kotlin.srcDir(generateDesktopBuildConfig.map { it.outputs.files.singleFile })
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.ktor.client.okhttp)
@@ -171,8 +201,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.6.3"
+        versionCode = 10
+        versionName = "1.6.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -264,7 +294,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.6.3"
+            packageVersion = "1.6.4"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"
