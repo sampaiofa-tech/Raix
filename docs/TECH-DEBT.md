@@ -146,3 +146,13 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 - **Lock de Arquivos no Build do Gradle (RESOLVIDO na v1.7.8):** Build travado pelo Gradle-extension da IDE (AccessDeniedException em pastas temporárias) — excluir pastas build do file-watching (resolvido em `.vscode/settings.json`).
 
 - **Windows AUMID Shortcut (2026-09-20):** The setup_aumid.ps1 script creates a Start Menu shortcut using PowerShell so that toast notifications correctly bind to the AUMID "Raix". The target of the shortcut is set dynamically by inspecting the current Java process. This fallback to javaw.exe works in most cases, but for MSI installations, it might be better to hardcode or securely discover the Raix.exe binary path.
+
+## Pendencias v1.8.0 (Adicionado em 2026-09-21)
+
+| # | Item | Impacto Atual | Descricao | Versao-Alvo |
+| --- | --- | --- | --- | --- |
+| **16** | Botao de Audio (Vetado no ciclo v1.8.0) | **Nenhum**. Funcionalidade nao implementada neste ciclo por decisao de design. | Especificacao futura: gravacao press-and-hold, preview antes de envio, TTL herdado da conversa, autodestruicao por design. Paleta: acento primario #00E676 em estado ativo, #1E2432 inativo. Tipografia: Inter 14sp/500 para label; JetBrains Mono 12sp para duracao. | v1.9+ |
+| **17** | Deep-link da Notificacao | **Baixo**. Notificacao nao navega diretamente para a conversa do remetente. | Implementar deep-link que, ao tocar na notificacao, abre diretamente a conversa com o contato correspondente (usando fingerprint ou roomId). Atualmente abre apenas a tela principal. | v1.9+ |
+| **18** | Cache Incremental na Atualizacao | **Baixo**. Dados volateis nao sao preservados entre atualizacoes de versao. | Avaliar estrategia de cache para preservar estado de UI (filtros, scroll position) e dados temporarios entre atualizacoes do app. | v1.9+ |
+| **19** | Reorganizacao Estrutural de Telas (Descopado v1.8.0) | **Nenhum**. Escopo visual-funcional concluido; reestruturacao de layout (agrupamento de secoes, colapso de cards, navegacao por abas internas) condicionada a wireframes aprovados pelo Assessor. | Redesenhar hierarquia visual de SettingsScreen (2022 linhas) e DataPrivacyScreen com agrupamento por categoria, cards colapsaveis e navegacao interna. Requer wireframes do Assessor antes da implementacao. | v1.9.0 |
+| **20** | BOM UTF-8 em Bip39Portuguese.kt | **Nenhum**. Arquivo baseline congelado com BOM (EF BB BF). Nao causa defeito funcional. | Regravar Bip39Portuguese.kt como UTF-8 sem BOM em ciclo dedicado de higiene de codificacao. | v1.9+ |

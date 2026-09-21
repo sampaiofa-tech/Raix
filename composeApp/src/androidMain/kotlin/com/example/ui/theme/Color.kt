@@ -3,77 +3,107 @@ package com.example.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // =========================================================================
-// Pmsg Official Brand Specifications: Stealth Obsidian & Brushed Titanium
+// Raix v1.8.0 Design System — Paleta Oficial
+// WCAG AA: 4.5:1 texto normal, 3:1 texto grande
 // =========================================================================
-val PmsgMatteDark = Color(0xFF111215)       // Fundo: Grafite Obsidiana Profundo (#111215)
-val PmsgPlatinum = Color(0xFFE4E4E7)        // Elemento Principal: Platina Titânio (#E4E4E7)
-val PmsgEvasionGray = Color(0xFF52525B)     // Detalhe Neutro (#52525B)
-val PmsgBorder = Color(0xFF26282E)          // Borda Refinada (#26282E)
-val PmsgCardBg = Color(0xFF181A1F)          // Superfície Elevada (#181A1F)
 
-// =========================================================================
-// Harmonious Executive Semantic Tokens (Fase 5)
-// =========================================================================
-val ObsidianBlack = Color(0xFF0A1128) // Raix Navy Blue Background
-val ObsidianSurface = Color(0xFF0B1430)
-val ObsidianCard = Color(0xFF043927) // Raix Emerald Green
-val ObsidianCardElevated = Color(0xFF064D35)
-val ObsidianBorder = Color(0x33D4AF37) // Subtle Gold Border
-val ObsidianBorderSubtle = Color(0x18D4AF37)
+// Core Backgrounds
+val RaixBackground = Color(0xFF0B1325)         // Fundo principal
+val RaixSurface = Color(0xFF1E2432)            // Superficies / Cards / Headers
+val RaixSurfaceElevated = Color(0xFF252A3A)    // Superficie elevada (dialogs, menus)
 
-val TitaniumPrimary = Color(0xFFD4AF37) // Raix Gold Accent
-val TitaniumSecondary = Color(0xFFE2C873)
-val TitaniumMuted = Color(0xFF8A92A6)
+// Text
+val RaixTextPrimary = Color(0xFFF5F7FA)        // Texto principal
+val RaixTextSecondary = Color(0xFF8A93A6)       // Texto secundario / metadados
 
-val SecurityEmerald = Color(0xFF10B981)
-val SecurityEmeraldContainer = Color(0xFF064E3B)
-val EmberFlame = Color(0xFFF59E0B)
-val EmberFlameContainer = Color(0xFF451A03)
-val IncinerateCrimson = Color(0xFFEF4444)
-val IncinerateCrimsonBg = Color(0xFF2C1316)
+// Action / Status
+val RaixActionPrimary = Color(0xFF00E676)       // Acao primaria / status ativo / sucesso
+val RaixAccentPremium = Color(0xFFD4AF37)       // Acento premium (Escritorio/Private, selo verificacao, seguranca)
+val RaixError = Color(0xFFE5484D)               // Erro (nunca laranja/amarelo)
+val RaixErrorContainer = Color(0xFF2C1316)      // Container de erro
+
+// Borders
+val RaixBorder = Color(0xFF2A2F3E)              // Borda sutil
+val RaixBorderAccent = Color(0x33D4AF37)        // Borda com acento dourado (15% opacity)
 
 // Chat Bubbles
-val BubbleUser = Color(0xFF043927) // Emerald Green for user
-val BubbleUserBorder = Color(0x33D4AF37) // Subtle Gold
-val BubbleContact = Color(0xFF0D183B) // Slightly lighter Navy Blue
-val BubbleContactBorder = Color(0xFF14224D)
+val RaixBubbleUser = Color(0xFF1A3A2A)          // Esverdeado sutil para usuario
+val RaixBubbleUserBorder = Color(0xFF1E4A32)    // Borda do bubble usuario
+val RaixBubbleContact = Color(0xFF1E2432)       // Superficie para contato
+val RaixBubbleContactBorder = Color(0xFF2A2F3E) // Borda do bubble contato
+
+// Avatar
+val RaixAvatarBg = Color(0xFF1A1F2E)            // Fundo do avatar
 
 // =========================================================================
-// Immersive UI Palette (Maintained for total backward compatibility)
+// Backward-Compatibility Aliases (Immersive/Obsidian/Stealth series)
+// Gradual migration: screens should prefer RaixXxx tokens.
 // =========================================================================
-val ImmersiveSurface = ObsidianBlack
-val ImmersiveHeader = ObsidianSurface
-val ImmersiveCard = ObsidianCard
-val ImmersiveCardVariant = ObsidianCardElevated
-val ImmersivePrimary = TitaniumPrimary
-val ImmersivePrimaryContainer = Color(0xFF2D3039)
-val ImmersiveOnPrimary = ObsidianBlack
+val ObsidianBlack = RaixBackground
+val ObsidianSurface = RaixSurface
+val ObsidianCard = RaixSurface
+val ObsidianCardElevated = RaixSurfaceElevated
+val ObsidianBorder = RaixBorderAccent
+val ObsidianBorderSubtle = Color(0x18D4AF37)
+
+val TitaniumPrimary = RaixAccentPremium
+val TitaniumSecondary = Color(0xFFE2C873)
+val TitaniumMuted = RaixTextSecondary
+
+val SecurityEmerald = RaixActionPrimary
+val SecurityEmeraldContainer = Color(0xFF0D2818)
+val EmberFlame = RaixError                      // v1.8.0: remapped from orange to error red
+val EmberFlameContainer = RaixErrorContainer
+val IncinerateCrimson = RaixError
+val IncinerateCrimsonBg = RaixErrorContainer
+
+// Chat Bubbles (compat)
+val BubbleUser = RaixBubbleUser
+val BubbleUserBorder = RaixBubbleUserBorder
+val BubbleContact = RaixBubbleContact
+val BubbleContactBorder = RaixBubbleContactBorder
+
+// Immersive UI Palette (compat aliases)
+val ImmersiveSurface = RaixBackground
+val ImmersiveHeader = RaixSurface
+val ImmersiveCard = RaixSurface
+val ImmersiveCardVariant = RaixSurfaceElevated
+val ImmersivePrimary = RaixActionPrimary
+val ImmersivePrimaryContainer = RaixSurfaceElevated
+val ImmersiveOnPrimary = RaixBackground
 val ImmersiveSecondary = TitaniumSecondary
-val ImmersiveOutline = ObsidianBorder
-val ImmersiveOnSurface = Color(0xFFF4F4F5)
-val ImmersiveMuted = TitaniumMuted
+val ImmersiveOutline = RaixBorder
+val ImmersiveOnSurface = RaixTextPrimary
+val ImmersiveMuted = RaixTextSecondary
 val ImmersiveMutedLight = TitaniumSecondary
-val ImmersiveExpiring = IncinerateCrimson
-val ImmersiveOnlineGreen = SecurityEmerald
-val ImmersiveAvatarDeep = Color(0xFF20232A)
+val ImmersiveExpiring = RaixError
+val ImmersiveOnlineGreen = RaixActionPrimary
+val ImmersiveAvatarDeep = RaixAvatarBg
 
-// Mappings for theme interoperability
+// Legacy mappings
 val StealthBlack = ImmersiveSurface
 val StealthDarkSurface = ImmersiveHeader
 val StealthCardSurface = ImmersiveCard
 val StealthCardSurfaceLight = ImmersiveCardVariant
 
-// Accents
-val ElectricCyan = ImmersivePrimary
-val ElectricCyanDim = ImmersiveSecondary
-val NeonEmerald = ImmersiveOnlineGreen
-val EmberOrange = EmberFlame
-val IncinerateRed = ImmersiveExpiring
-val GhostPurple = ImmersivePrimary
+// Accents (compat)
+val ElectricCyan = RaixActionPrimary
+val ElectricCyanDim = TitaniumSecondary
+val NeonEmerald = RaixActionPrimary
+val EmberOrange = RaixError
+val IncinerateRed = RaixError
+val GhostPurple = RaixActionPrimary
 
-// Text & Neutral Colors
-val TextPrimaryDark = ImmersiveOnSurface
-val TextSecondaryDark = ImmersiveMutedLight
-val TextMutedDark = ImmersiveMuted
-val BorderSubtleDark = ImmersiveOutline
-val GlowOverlay = Color(0x1AE4E4E7)
+// Text & Neutral Colors (compat)
+val TextPrimaryDark = RaixTextPrimary
+val TextSecondaryDark = TitaniumSecondary
+val TextMutedDark = RaixTextSecondary
+val BorderSubtleDark = RaixBorder
+val GlowOverlay = Color(0x1AF5F7FA)
+
+// Pmsg Brand (compat)
+val PmsgMatteDark = RaixBackground
+val PmsgPlatinum = RaixTextPrimary
+val PmsgEvasionGray = RaixTextSecondary
+val PmsgBorder = RaixBorder
+val PmsgCardBg = RaixSurface

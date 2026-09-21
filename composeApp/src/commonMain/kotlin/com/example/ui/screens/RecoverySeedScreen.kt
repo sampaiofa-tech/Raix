@@ -63,7 +63,7 @@ fun RecoverySeedScreen(
                 Text(
                     text = "Frase de Recuperação",
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -118,7 +118,7 @@ fun RecoverySeedScreen(
                     Text(
                         text = "Eu anotei as palavras",
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }

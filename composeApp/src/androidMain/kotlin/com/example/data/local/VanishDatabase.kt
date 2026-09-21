@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [EphemeralMessage::class, BurnerChannel::class, Contact::class, BlockedContactEntity::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class VanishDatabase : RoomDatabase() {
@@ -40,6 +40,7 @@ abstract class VanishDatabase : RoomDatabase() {
                     "vanish_zero_trace_db"
                 )
                 .addCallback(VanishDatabaseCallback(scope))
+                .addMigrations(MIGRATION_6_7)
                 .fallbackToDestructiveMigration()
                 .build()
                 INSTANCE = instance
@@ -57,6 +58,14 @@ abstract class VanishDatabase : RoomDatabase() {
             try {
                 INSTANCE?.openHelper?.writableDatabase?.execSQL("VACUUM")
             } catch (_: Throwable) {}
+        }
+
+        private val MIGRATION_6_7 = object : androidx.room.migration.Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE contacts ADD COLUMN nicknameEncrypted TEXT DEFAULT NULL")
+                db.execSQL("ALTER TABLE contacts ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE contacts ADD COLUMN categoryEncrypted TEXT DEFAULT NULL")
+            }
         }
 
         private class VanishDatabaseCallback(

@@ -217,7 +217,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Configurações",
                                     fontSize = 17.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -313,7 +313,7 @@ fun SettingsScreen(
                         Text(
                             text = "Proteção em Cascata de 512-bit (Dual-Layer)",
                             fontSize = 14.5.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = ImmersiveOnSurface
                         )
                         Text(
@@ -330,7 +330,7 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Hardware & OS Security Posture Diagnostic Card
             Card(
@@ -356,7 +356,7 @@ fun SettingsScreen(
                             Text(
                                 text = "Auditoria de Integridade do Dispositivo",
                                 fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = ImmersiveOnSurface
                             )
                         }
@@ -373,7 +373,7 @@ fun SettingsScreen(
                             Text(
                                 text = if (securityPosture.isDeviceSecure) "SEGURO" else "VULNERÁVEL",
                                 fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = if (securityPosture.isDeviceSecure) com.example.ui.theme.SecurityEmerald else com.example.ui.theme.IncinerateCrimson
                             )
                         }
@@ -444,7 +444,7 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // SECTION 1: BLOQUEIO & ACESSO
             SectionTitle(title = "SEGURANÇA & AUTO-BLOQUEIO")
@@ -486,7 +486,7 @@ fun SettingsScreen(
                             Text(
                                 text = "Auto-Bloqueio Automático",
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = ImmersiveOnSurface
                             )
                             Text(
@@ -510,11 +510,11 @@ fun SettingsScreen(
                 }
 
                 if (autoLockEnabled) {
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "TEMPO DE INATIVIDADE PARA BLOQUEIO:",
                         fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         color = ImmersivePrimary,
                         letterSpacing = 0.5.sp
                     )
@@ -543,7 +543,7 @@ fun SettingsScreen(
                                 Text(
                                     text = if (mins == 5) "5m (Padrão)" else "${mins}m",
                                     fontSize = 10.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
                                     color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
                                     maxLines = 1
                                 )
@@ -597,7 +597,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Biometria (Digital / Facial)",
                                     fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -690,7 +690,7 @@ fun SettingsScreen(
                             Text(
                                 text = "PIN de Segurança",
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = ImmersiveOnSurface
                             )
                             Text(
@@ -725,7 +725,7 @@ fun SettingsScreen(
                             text = if (isEditingPin) "Cancelar" else "Alterar",
                             color = ImmersivePrimary,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -776,7 +776,7 @@ fun SettingsScreen(
                                     "Salvar",
                                     color = ImmersiveOnPrimary,
                                     fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
@@ -836,7 +836,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "PIN de Coerção (Duress PIN)",
                                     fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 if (hasDuressPin) {
@@ -851,7 +851,7 @@ fun SettingsScreen(
                                             text = "ARMADO",
                                             color = com.example.ui.theme.IncinerateCrimson,
                                             fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Medium
                                         )
                                     }
                                 }
@@ -882,7 +882,7 @@ fun SettingsScreen(
                             text = if (isEditingDuressPin) "Cancelar" else if (hasDuressPin) "Alterar" else "Configurar",
                             color = com.example.ui.theme.TitaniumPrimary,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -938,7 +938,7 @@ fun SettingsScreen(
                                     "Salvar",
                                     color = Color.White,
                                     fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
@@ -1002,7 +1002,7 @@ fun SettingsScreen(
                         Text(
                             text = "Auto-Limpeza da Área de Transferência",
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = ImmersiveOnSurface
                         )
                         Text(
@@ -1045,7 +1045,7 @@ fun SettingsScreen(
                             Text(
                                 text = label,
                                 fontSize = 10.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
                                 color = if (isSelected) com.example.ui.theme.ObsidianBlack else ImmersiveOnSurface,
                                 maxLines = 1
                             )
@@ -1097,7 +1097,7 @@ fun SettingsScreen(
                             Text(
                                 text = "Cortina no Alternador de Aplicativos",
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = ImmersiveOnSurface
                             )
                             Text(
@@ -1124,7 +1124,7 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // SECTION 2: PRIVACIDADE & SISTEMA
             SectionTitle(title = "PRIVACIDADE & NOTIFICAÇÕES")
@@ -1165,7 +1165,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Confirmação de Leitura",
                                     fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Text(
@@ -1188,11 +1188,11 @@ fun SettingsScreen(
                     }
 
                     if (readReceiptsEnabled) {
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "DESAPARECER APÓS LEITURA (EFEITO VISUAL):",
                             fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = ImmersivePrimary,
                             letterSpacing = 0.5.sp
                         )
@@ -1229,7 +1229,7 @@ fun SettingsScreen(
                                     Text(
                                         text = if (secs == 0) "Off" else "${secs}s",
                                         fontSize = 10.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
                                         color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
                                         maxLines = 1
                                     )
@@ -1297,7 +1297,7 @@ fun SettingsScreen(
                             Text(
                                 text = "Anti-Captura (FLAG_SECURE)",
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = ImmersiveOnSurface
                             )
                             Text(
@@ -1358,7 +1358,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Detector de Screenshots",
                                     fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Text(
@@ -1414,7 +1414,7 @@ fun SettingsScreen(
                                     Text(
                                         text = "Bloqueio de Conteúdo Sensível",
                                         fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         color = ImmersiveOnSurface
                                     )
                                     Text(
@@ -1448,7 +1448,7 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Warning, contentDescription = null, tint = EmberOrange, modifier = Modifier.size(15.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Simular Detecção de Print (Teste)", color = EmberOrange, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text("Simular Detecção de Print (Teste)", color = EmberOrange, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -1492,7 +1492,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Shake to Clear (Chacoalhar)",
                                     fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Text(
@@ -1515,11 +1515,11 @@ fun SettingsScreen(
                     }
 
                     if (shakeToClearEnabled) {
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "SENSIBILIDADE DO MOVIMENTO:",
                             fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = ImmersivePrimary,
                             letterSpacing = 0.5.sp
                         )
@@ -1554,7 +1554,7 @@ fun SettingsScreen(
                                     Text(
                                         text = label,
                                         fontSize = 10.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
                                         color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
                                         maxLines = 1
                                     )
@@ -1562,7 +1562,7 @@ fun SettingsScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         // Confirmation Toggle
                         Row(
@@ -1607,7 +1607,7 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(15.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Simular Chacoalhar (Teste de Limpeza)", color = ImmersivePrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text("Simular Chacoalhar (Teste de Limpeza)", color = ImmersivePrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -1651,7 +1651,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Permissão de Notificações",
                                     fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Text(
@@ -1670,7 +1670,7 @@ fun SettingsScreen(
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                                 modifier = Modifier.height(32.dp).testTag("enable_notifications_button")
                             ) {
-                                Text("Ativar", color = ImmersiveOnPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("Ativar", color = ImmersiveOnPrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                             }
                         } else {
                             OutlinedButton(
@@ -1680,14 +1680,14 @@ fun SettingsScreen(
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                                 modifier = Modifier.height(32.dp).testTag("test_notification_button")
                             ) {
-                                Text("Testar", color = ImmersivePrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("Testar", color = ImmersivePrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     HorizontalDivider(color = ImmersiveOutline, thickness = 0.6.dp)
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Toggle: Notificar quando uma nova conversa for iniciada (Desativado por padrão)
                     Row(
@@ -1727,7 +1727,7 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // SECTION 3: INFORMAÇÕES DE PROTOCOLO
             SectionTitle(title = "ARQUITETURA & EXPIRAÇÃO")
@@ -1773,7 +1773,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "Limpeza Room (WorkManager)",
                                     fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     color = ImmersiveOnSurface
                                 )
                                 Text(
@@ -1806,7 +1806,7 @@ fun SettingsScreen(
                             text = "Executar Varredura de Limpeza Agora",
                             color = ElectricCyan,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -1844,7 +1844,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Bloquear Aplicativo Agora",
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = ImmersivePrimary,
                     fontSize = 13.sp
                 )
@@ -1924,7 +1924,7 @@ fun SettingsScreen(
             title = {
                 Text(
                     text = "Protocolo de Emergência (Wipe)",
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     fontSize = 18.sp
                 )
             },
@@ -1945,7 +1945,7 @@ fun SettingsScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = EmberOrange)
                 ) {
-                    Text("VAPORIZAR TUDO AGORA", fontWeight = FontWeight.Bold, color = Color(0xFF601410))
+                    Text("VAPORIZAR TUDO AGORA", fontWeight = FontWeight.Medium, color = Color(0xFF601410))
                 }
             },
             dismissButton = {
@@ -1962,7 +1962,7 @@ private fun SectionTitle(title: String) {
     Text(
         text = title,
         fontSize = 11.sp,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         color = ImmersivePrimary,
         letterSpacing = 1.sp,
         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
@@ -2009,7 +2009,6 @@ private fun InfoProtocolCard(
                     fontWeight = FontWeight.Bold,
                     color = ImmersiveOnSurface
                 )
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = description,
                     fontSize = 11.sp,

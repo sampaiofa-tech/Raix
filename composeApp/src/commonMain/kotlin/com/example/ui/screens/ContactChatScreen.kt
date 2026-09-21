@@ -408,8 +408,8 @@ fun ContactChatScreen(
                         ) {
                             Text(
                                 text = contact.displayName.take(1).uppercase(),
-                                color = if (contact.verified) Color(0xFF00FFC2) else Color.White,
-                                fontWeight = FontWeight.Bold,
+                                color = if (contact.verified) MaterialTheme.colorScheme.primary else Color.White,
+                                fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp
                             )
                         }
@@ -420,7 +420,7 @@ fun ContactChatScreen(
                             Text(
                                 text = contact.displayName,
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = Color.White
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -428,27 +428,27 @@ fun ContactChatScreen(
                                     Icon(
                                         imageVector = Icons.Default.CheckCircle,
                                         contentDescription = null,
-                                        tint = Color(0xFF00E676),
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(12.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = "Verificado (60 dígitos OK)",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFF00E676)
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 } else {
                                     Icon(
                                         imageVector = Icons.Default.Warning,
                                         contentDescription = null,
-                                        tint = Color(0xFFFFB300),
+                                        tint = MaterialTheme.colorScheme.tertiary,
                                         modifier = Modifier.size(12.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = "Não verificado (Toque para validar)",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFFFFB300)
+                                        color = MaterialTheme.colorScheme.tertiary
                                     )
                                 }
                             }
@@ -553,13 +553,13 @@ fun ContactChatScreen(
                             Column {
                                 Text(
                                     text = "Contato Bloqueado (Client-Side)",
-                                    color = Color(0xFFFF8080),
-                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontWeight = FontWeight.Medium,
                                     fontSize = 12.sp
                                 )
                                 Text(
                                     text = "Mensagens recebidas são descartadas e não serão exibidas.",
-                                    color = Color(0xFFFFCDD2),
+                                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
                                     fontSize = 11.sp
                                 )
                             }
@@ -572,7 +572,7 @@ fun ContactChatScreen(
                                 }
                             }
                         ) {
-                            Text("Desbloquear", color = Color(0xFF00FFC2), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Desbloquear", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -601,7 +601,7 @@ fun ContactChatScreen(
                             Text(
                                 text = "Aviso: Identidade Não Verificada",
                                 color = Color(0xFFFFD54F),
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 fontSize = 12.sp
                             )
                             Text(
@@ -675,8 +675,8 @@ fun ContactChatScreen(
                 ) {
                     Text(
                         if (isBlocked) "Desbloquear" else "Bloquear",
-                        color = if (isBlocked) Color(0xFF00FFC2) else Color(0xFFFF5252),
-                        fontWeight = FontWeight.Bold
+                        color = if (isBlocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             },
@@ -724,7 +724,7 @@ fun ContactChatScreen(
                         }
                     }
                 ) {
-                    Text("Enviar Mesmo Assim", color = Color(0xFFFFB300), fontWeight = FontWeight.Bold)
+                    Text("Enviar Mesmo Assim", color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Medium)
                 }
             },
             dismissButton = {
@@ -761,7 +761,7 @@ fun ContactChatScreen(
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Denunciar Abuso", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Denunciar Abuso", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 }
             },
             text = {
@@ -774,11 +774,10 @@ fun ContactChatScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFB0BEC5)
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Motivo da Denúncia:",
                         style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         color = Color.White
                     )
                     val abuseOptions = listOf(
@@ -808,7 +807,6 @@ fun ContactChatScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -833,7 +831,6 @@ fun ContactChatScreen(
                     }
 
                     // C6: Fluxo opcional e voluntário de envio de conteúdo para moderação
-                    Spacer(modifier = Modifier.height(6.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -949,8 +946,8 @@ fun ContactChatScreen(
                     } else {
                         Text(
                             "Enviar Denúncia",
-                            color = if (canSubmit) Color(0xFFFF5252) else Color.Gray,
-                            fontWeight = FontWeight.Bold
+                            color = if (canSubmit) MaterialTheme.colorScheme.error else Color.Gray,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -1040,7 +1037,7 @@ fun EphemeralMessageBubble(
                             text = if (message.isMe) "Você" else message.senderName,
                             style = MaterialTheme.typography.labelSmall,
                             color = accentColor,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                         if (!message.isMe && onBlockSender != null) {
                             Spacer(modifier = Modifier.width(6.dp))
@@ -1077,7 +1074,7 @@ fun EphemeralMessageBubble(
                             text = "💥 $formattedRemaining",
                             fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = if (remainingSec < 15) Color(0xFFFF5252) else Color(0xFFFFD54F)
                         )
                     }
@@ -1158,7 +1155,7 @@ fun ChatBottomInputBar(
                         text = "TTL:",
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF80CBC4),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
 
                     val ttlOptions = listOf(

@@ -48,8 +48,8 @@ class RaixFirebaseMessagingService : FirebaseMessagingService() {
             // Trigger high-priority notification with standard privacy-preserving copy
             NotificationHelper.showPushNotification(
                 context = this,
-                title = "RAIX",
-                body = "Nova mensagem recebida",
+                title = "Raix",
+                body = "Nova mensagem criptografada",
                 roomId = senderId
             )
         }

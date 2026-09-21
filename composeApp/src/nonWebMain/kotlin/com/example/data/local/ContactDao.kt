@@ -28,6 +28,15 @@ interface ContactDao {
     @Query("DELETE FROM contacts WHERE fingerprint = :fingerprint")
     suspend fun deleteContact(fingerprint: String)
 
+    @Query("UPDATE contacts SET isFavorite = :isFavorite WHERE fingerprint = :fingerprint")
+    suspend fun updateFavorite(fingerprint: String, isFavorite: Boolean)
+
+    @Query("UPDATE contacts SET nicknameEncrypted = :nicknameEncrypted WHERE fingerprint = :fingerprint")
+    suspend fun updateNickname(fingerprint: String, nicknameEncrypted: String?)
+
+    @Query("UPDATE contacts SET categoryEncrypted = :categoryEncrypted WHERE fingerprint = :fingerprint")
+    suspend fun updateCategory(fingerprint: String, categoryEncrypted: String?)
+
     @Query("DELETE FROM contacts")
     suspend fun panicWipeAllContacts(): Int
 }

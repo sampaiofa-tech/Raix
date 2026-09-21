@@ -148,8 +148,8 @@ object NotificationHelper {
      */
     fun showPushNotification(
         context: Context,
-        title: String = "RAIX",
-        body: String = "Nova mensagem recebida",
+        title: String = "Raix",
+        body: String = "Nova mensagem criptografada",
         roomId: String = ""
     ) {
         if (!hasNotificationPermission(context)) return

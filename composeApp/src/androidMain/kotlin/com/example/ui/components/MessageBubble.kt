@@ -303,7 +303,7 @@ fun MessageBubble(
                             Text(
                                 text = "NOTA SECRETA",
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = EmberOrange,
                                 letterSpacing = 0.5.sp
                             )
@@ -357,7 +357,7 @@ fun MessageBubble(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = if (isLockdownActive) "Foto Bloqueada (Print Detectado)" else "Foto confidencial",
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         color = if (isLockdownActive) ImmersiveExpiring else EmberOrange,
                                         fontSize = 13.sp
                                     )
@@ -411,7 +411,7 @@ fun MessageBubble(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = if (isLockdownActive) "Mensagem Bloqueada (Print Detectado)" else "Mensagem confidencial",
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         color = if (isLockdownActive) ImmersiveExpiring else EmberOrange,
                                         fontSize = 13.sp
                                     )
@@ -528,7 +528,7 @@ fun MessageBubble(
                                     Text(
                                         text = message.fileName ?: "Vídeo Criptografado",
                                         fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         color = Color.White,
                                         maxLines = 1
                                     )
@@ -593,7 +593,7 @@ fun MessageBubble(
                                     Text(
                                         text = message.fileName ?: "Arquivo Seguro",
                                         fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         color = ImmersiveOnSurface,
                                         maxLines = 1
                                     )
@@ -889,7 +889,7 @@ fun MessageBubble(
                     Spacer(modifier = Modifier.height(14.dp))
                     Text(
                         text = "Conteúdo Sensível Bloqueado",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 16.sp,
                         color = ImmersiveOnSurface
                     )
@@ -935,7 +935,7 @@ fun MessageBubble(
                                 contentColor = Color.Black
                             )
                         ) {
-                            Text("Abrir Mesmo", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Abrir Mesmo", fontSize = 12.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }

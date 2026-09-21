@@ -143,7 +143,7 @@ fun main() = application {
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            "Nova mensagem",
+                            "Nova mensagem criptografada",
                             color = Color(0xFFF5F7FA),
                             fontSize = 14.sp
                         )

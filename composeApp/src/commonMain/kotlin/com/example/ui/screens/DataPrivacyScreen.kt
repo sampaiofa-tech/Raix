@@ -96,7 +96,7 @@ fun DataPrivacyScreen(
                         Icon(
                             imageVector = Icons.Default.Shield,
                             contentDescription = null,
-                            tint = Color(0xFF00FFC2),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -104,7 +104,7 @@ fun DataPrivacyScreen(
                             Text(
                                 text = "Sobre seus dados",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = Color.White
                             )
                             Text(
@@ -155,13 +155,13 @@ fun DataPrivacyScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFF00FFC2).copy(alpha = 0.15f)),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
                                 contentDescription = null,
-                                tint = Color(0xFF00FFC2),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -169,7 +169,7 @@ fun DataPrivacyScreen(
                         Column {
                             Text(
                                 text = "Arquitetura Zero-Knowledge",
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = Color.White,
                                 fontSize = 16.sp
                             )
@@ -218,7 +218,7 @@ fun DataPrivacyScreen(
                         Column {
                             Text(
                                 text = "Notificações em Background",
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = Color.White,
                                 fontSize = 16.sp
                             )
@@ -257,7 +257,7 @@ fun DataPrivacyScreen(
                             Icon(
                                 imageVector = Icons.Default.Fingerprint,
                                 contentDescription = null,
-                                tint = Color(0xFF00FFC2),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -297,7 +297,7 @@ fun DataPrivacyScreen(
                             text = userFingerprint,
                             fontFamily = FontFamily.Monospace,
                             fontSize = 11.sp,
-                            color = Color(0xFF00FFC2),
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(10.dp)
                         )
                     }
@@ -314,7 +314,7 @@ fun DataPrivacyScreen(
             Text(
                 text = "INVENTÁRIO SIMPLIFICADO DE DADOS",
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 color = Color(0xFF80CBC4),
                 letterSpacing = 1.sp
             )
@@ -338,7 +338,7 @@ fun DataPrivacyScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "O que o Servidor VÊ (Dados Técnicos Mínimos)",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = Color(0xFF93C5FD),
                             fontSize = 14.sp
                         )
@@ -390,7 +390,7 @@ fun DataPrivacyScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "O que o Servidor NUNCA VÊ (Exclusivo Local)",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = Color(0xFFF472B6),
                             fontSize = 14.sp
                         )
@@ -433,14 +433,14 @@ fun DataPrivacyScreen(
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
                         contentDescription = null,
-                        tint = Color(0xFF00FFC2),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
                             text = "Câmera: Processamento 100% Local",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = Color.White,
                             fontSize = 14.sp
                         )
@@ -468,13 +468,13 @@ fun DataPrivacyScreen(
                         Icon(
                             imageVector = Icons.Default.Public,
                             contentDescription = null,
-                            tint = Color(0xFF00FFC2),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Infraestrutura & Transferência Internacional",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = Color.White,
                             fontSize = 13.sp
                         )
@@ -504,13 +504,13 @@ fun DataPrivacyScreen(
                         Icon(
                             imageVector = Icons.Default.Email,
                             contentDescription = null,
-                            tint = Color(0xFF00FFC2),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Canal do Encarregado (DPO) & Direitos LGPD",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             color = Color.White,
                             fontSize = 13.sp
                         )
@@ -534,7 +534,7 @@ fun DataPrivacyScreen(
                         ) {
                             Text(
                                 text = LegalConstants.DPO_EMAIL,
-                                color = Color(0xFF00FFC2),
+                                color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp
                             )
@@ -576,7 +576,7 @@ fun DataPrivacyScreen(
                     Text(
                         text = "DOCUMENTOS LEGAIS COMPLETOS",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         color = Color(0xFF80CBC4),
                         letterSpacing = 1.sp
                     )

@@ -69,7 +69,7 @@ fun SafetyNumberScreen(
                     Text(
                         text = "Número de Segurança",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                 },
                 navigationIcon = {
@@ -108,17 +108,17 @@ fun SafetyNumberScreen(
                 Icon(
                     imageVector = Icons.Default.Shield,
                     contentDescription = null,
-                    tint = if (contact.verified) Color(0xFF00FFC2) else Color(0xFFFFD54F),
+                    tint = if (contact.verified) MaterialTheme.colorScheme.primary else Color(0xFFFFD54F),
                     modifier = Modifier.size(36.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = "Verificação de Chaves com ${contact.displayName}",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 color = Color.White,
                 textAlign = TextAlign.Center
             )
@@ -133,7 +133,7 @@ fun SafetyNumberScreen(
                 lineHeight = 18.sp
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 60 Digits Display Card (12 blocks of 5 digits)
             Card(
@@ -148,12 +148,12 @@ fun SafetyNumberScreen(
                     Text(
                         text = "CÓDIGO DE 60 DÍGITOS (PADRÃO SIGNAL)",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF00FFC2),
-                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
                         letterSpacing = 1.sp
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Split into blocks of 5 digits, 3 blocks per line (4 lines total)
                     val blocks = contact.securityNumber.split(" ")
@@ -175,7 +175,7 @@ fun SafetyNumberScreen(
                                         text = block,
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         color = Color.White,
                                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                                     )
@@ -186,7 +186,7 @@ fun SafetyNumberScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Current status
             Row(
@@ -197,34 +197,34 @@ fun SafetyNumberScreen(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF00E676),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Status: Identidade Verificada Presencialmente",
-                        color = Color(0xFF00E676),
-                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 13.sp
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
-                        tint = Color(0xFFFFB300),
+                        tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Status: Aguardando Comparação Visual",
-                        color = Color(0xFFFFB300),
-                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 13.sp
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Action Buttons
             Button(
@@ -236,7 +236,7 @@ fun SafetyNumberScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00FFC2))
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Row(
                     modifier = Modifier.padding(vertical = 4.dp),
@@ -251,7 +251,7 @@ fun SafetyNumberScreen(
                     Text(
                         text = "Marcar como Verificado",
                         color = Color(0xFF0A1128),
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 15.sp
                     )
                 }

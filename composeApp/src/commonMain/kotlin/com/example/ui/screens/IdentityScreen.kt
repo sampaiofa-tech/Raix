@@ -122,9 +122,9 @@ fun IdentityScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Security, contentDescription = null, tint = Color(0xFF00FFC2))
+                        Icon(Icons.Default.Security, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("Minha Identidade", fontWeight = FontWeight.Bold)
+                        Text("Minha Identidade", fontWeight = FontWeight.Medium)
                     }
                 },
                 navigationIcon = {
@@ -137,7 +137,7 @@ fun IdentityScreen(
                         Icon(
                             imageVector = Icons.Default.Shield,
                             contentDescription = "Sobre seus dados (LGPD)",
-                            tint = Color(0xFF00FFC2)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -159,20 +159,20 @@ fun IdentityScreen(
             // Header Security Badge
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1E1B)),
-                modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFF00FFC2).copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                modifier = Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF00FFC2))
+                    Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
                             "Identidade Criptográfica X25519",
                             style = MaterialTheme.typography.titleSmall,
-                            color = Color(0xFF00FFC2),
-                            fontWeight = FontWeight.Bold
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Medium
                         )
                         Text(
                             "Protegida em repouso por Hardware KeyVault • Padrão Signal • Zero Rastro",
@@ -198,7 +198,7 @@ fun IdentityScreen(
                             Text(
                                 "Número de Segurança (Fingerprint)",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Medium
                             )
                             IconButton(
                                 onClick = {
@@ -210,7 +210,7 @@ fun IdentityScreen(
                                     }
                                 }
                             ) {
-                                Icon(Icons.Default.ContentCopy, contentDescription = "Copiar", tint = Color(0xFF00FFC2))
+                                Icon(Icons.Default.ContentCopy, contentDescription = "Copiar", tint = MaterialTheme.colorScheme.primary)
                             }
                         }
 
@@ -243,9 +243,9 @@ fun IdentityScreen(
                                     Text(
                                         text = block,
                                         fontFamily = FontFamily.Monospace,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         fontSize = 15.sp,
-                                        color = Color(0xFF00FFC2)
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }
@@ -260,12 +260,12 @@ fun IdentityScreen(
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.QrCode, contentDescription = null, tint = Color(0xFF00FFC2))
+                            Icon(Icons.Default.QrCode, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 "Troca Presencial (Modelo A)",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Medium
                             )
                         }
 
@@ -309,12 +309,12 @@ fun IdentityScreen(
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Key, contentDescription = null, tint = Color(0xFFFFB300))
+                            Icon(Icons.Default.Key, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 "Mnemônico de Recuperação (BIP-39)",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Medium
                             )
                         }
 
@@ -333,9 +333,9 @@ fun IdentityScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E3A24)),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(Icons.Default.Visibility, contentDescription = null, tint = Color(0xFFFFB300))
+                                Icon(Icons.Default.Visibility, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Ver Mnemônico de 12 Palavras", color = Color(0xFFFFB300))
+                                Text("Ver Mnemônico de 12 Palavras", color = MaterialTheme.colorScheme.tertiary)
                             }
                         } else {
                             val words = mnemonicWords ?: emptyList()
@@ -357,7 +357,7 @@ fun IdentityScreen(
                                     ) {
                                         Text(
                                             text = "${index + 1}. $word",
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.Medium,
                                             fontFamily = FontFamily.Monospace,
                                             fontSize = 14.sp,
                                             color = Color(0xFFFFE082)
@@ -412,9 +412,9 @@ fun IdentityScreen(
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B2A3A))
                         ) {
-                            Icon(Icons.Default.Key, contentDescription = null, tint = Color(0xFF00FFC2), modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Key, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Restaurar Outro Aparelho (Recovery)", color = Color(0xFF00FFC2), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Restaurar Outro Aparelho (Recovery)", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -428,11 +428,11 @@ fun IdentityScreen(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFFFB300), modifier = Modifier.padding(bottom = 12.dp))
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.padding(bottom = 12.dp))
                         Text(
                             "Nenhuma Identidade Configurada",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -468,7 +468,7 @@ fun IdentityScreen(
                     Icon(
                         imageVector = Icons.Default.Shield,
                         contentDescription = null,
-                        tint = Color(0xFF00FFC2),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(26.dp)
                     )
                     Spacer(modifier = Modifier.width(14.dp))
@@ -477,7 +477,7 @@ fun IdentityScreen(
                             text = "Sobre seus dados",
                             style = MaterialTheme.typography.titleSmall,
                             color = Color.White,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = "Inventário em linguagem simples, conformidade LGPD e canal do Encarregado",
@@ -488,7 +488,7 @@ fun IdentityScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,
-                        tint = Color(0xFF00FFC2),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -500,7 +500,7 @@ fun IdentityScreen(
     if (showMnemonicWarningDialog) {
         AlertDialog(
             onDismissRequest = { showMnemonicWarningDialog = false },
-            icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFFFB300)) },
+            icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary) },
             title = { Text("⚠️ Aviso de Alto Risco — Backup") },
             text = {
                 Text("ATENÇÃO CRÍTICA DE SEGURANÇA:\n\n" +
@@ -595,7 +595,7 @@ fun IdentityScreen(
                                 Column {
                                     Text(
                                         "AVISO MANDATÓRIO DE PERDA IRREVERSÍVEL",
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Medium,
                                         fontSize = 12.sp,
                                         color = Color(0xFFFF9800)
                                     )
@@ -622,7 +622,7 @@ fun IdentityScreen(
                                 checked = acknowledgedIrreversibleLoss,
                                 onCheckedChange = { acknowledgedIrreversibleLoss = it },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = Color(0xFF00FFC2),
+                                    checkedColor = MaterialTheme.colorScheme.primary,
                                     checkmarkColor = Color.Black
                                 )
                             )
@@ -653,9 +653,9 @@ fun IdentityScreen(
                             Text(
                                 text = correctWord,
                                 fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 fontSize = 24.sp,
-                                color = Color(0xFF00FFC2)
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -722,8 +722,8 @@ fun IdentityScreen(
                                     Text(
                                         text = "${index + 1}. $word",
                                         fontFamily = FontFamily.Monospace,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF00FFC2)
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }
@@ -763,7 +763,7 @@ fun IdentityScreen(
                         restoreError = null
                         showRestoreDialog = true
                     }) {
-                        Text("Já possuo 12 palavras (Restaurar)", color = Color(0xFF00FFC2), fontSize = 12.sp)
+                        Text("Já possuo 12 palavras (Restaurar)", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                     }
                 } else {
                     TextButton(onClick = {
@@ -783,9 +783,9 @@ fun IdentityScreen(
             onDismissRequest = { if (!isRestoring) showRestoreDialog = false },
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Key, contentDescription = null, tint = Color(0xFF00FFC2))
+                    Icon(Icons.Default.Key, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Restaurar Identidade (Recovery)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Restaurar Identidade (Recovery)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 }
             },
             text = {
@@ -821,7 +821,7 @@ fun IdentityScreen(
                         modifier = Modifier.fillMaxWidth().height(110.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF00FFC2),
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = Color(0xFF2A3B4D)
                         )
                     )
@@ -830,9 +830,9 @@ fun IdentityScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = restoreError ?: "",
-                            color = Color(0xFFFF5252),
+                            color = MaterialTheme.colorScheme.error,
                             fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -891,12 +891,12 @@ fun IdentityScreen(
                         }
                     },
                     enabled = !isRestoring,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00FFC2))
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = if (isRestoring) "Restaurando..." else "Restaurar e Vincular Roteamento",
                         color = Color(0xFF0A1128),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                 }
             },

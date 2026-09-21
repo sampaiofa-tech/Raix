@@ -155,6 +155,22 @@ class DesktopContactRepository : ContactRepository {
         saveContact(contact.copy(displayName = newName))
     }
 
+    override suspend fun setFavorite(fingerprint: String, isFavorite: Boolean) = withContext(Dispatchers.IO) {
+        val current = contactsFlow.value.toMutableMap()
+        val c = current[fingerprint] ?: return@withContext
+        current[fingerprint] = c.copy(isFavorite = isFavorite)
+        contactsFlow.value = current
+        saveToDisk()
+    }
+
+    override suspend fun setCategory(fingerprint: String, category: String?) = withContext(Dispatchers.IO) {
+        val current = contactsFlow.value.toMutableMap()
+        val c = current[fingerprint] ?: return@withContext
+        current[fingerprint] = c.copy(category = category)
+        contactsFlow.value = current
+        saveToDisk()
+    }
+
     override suspend fun panicWipe(): Int = withContext(Dispatchers.IO) {
         val count = contactsFlow.value.size
         contactsFlow.value = emptyMap()

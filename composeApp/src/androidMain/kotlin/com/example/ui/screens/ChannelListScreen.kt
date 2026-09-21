@@ -191,7 +191,7 @@ fun ChannelListScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (selectedTab == 0) "Novo Chat" else "Novo Contato",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 13.sp
                     )
                 }
@@ -299,7 +299,7 @@ fun ChannelListScreen(
                             Text(
                                 text = "INCINERAR",
                                 fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = com.example.ui.theme.IncinerateCrimson,
                                 letterSpacing = 0.5.sp
                             )
@@ -472,7 +472,7 @@ fun ChannelListScreen(
                                 tint = ImmersiveMuted,
                                 modifier = Modifier.size(50.dp)
                             )
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Nenhuma conversa ativa no momento",
                                 fontSize = 15.sp,
@@ -485,7 +485,7 @@ fun ChannelListScreen(
                                 fontSize = 12.sp,
                                 color = ImmersiveMuted
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = { selectedTab = 1 },
                                 colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
@@ -493,7 +493,7 @@ fun ChannelListScreen(
                             ) {
                                 Icon(Icons.Default.Contacts, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Ver Contatos com Pmsg", color = ImmersiveOnPrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                Text("Ver Contatos com Pmsg", color = ImmersiveOnPrimary, fontWeight = FontWeight.Medium, fontSize = 12.sp)
                             }
                         }
                     }
@@ -563,7 +563,7 @@ fun ChannelListScreen(
                         ) {
                             Icon(Icons.Default.Forum, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Simular Chegada", color = ImmersivePrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text("Simular Chegada", color = ImmersivePrimary, fontSize = 10.sp, fontWeight = FontWeight.Medium)
                         }
                     }
 
@@ -580,7 +580,7 @@ fun ChannelListScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "Permissão de Contatos Necessária",
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Medium,
                                     fontSize = 14.sp,
                                     color = ImmersiveOnSurface
                                 )
@@ -596,7 +596,7 @@ fun ChannelListScreen(
                                     colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("Autorizar Contatos", color = ImmersiveOnPrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Text("Autorizar Contatos", color = ImmersiveOnPrimary, fontWeight = FontWeight.Medium, fontSize = 12.sp)
                                 }
                             }
                         }
@@ -653,7 +653,7 @@ fun ChannelListScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Novo Chat",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         color = ImmersiveOnSurface,
                         fontSize = 18.sp
                     )
@@ -666,7 +666,7 @@ fun ChannelListScreen(
                         fontSize = 12.sp,
                         color = ImmersiveMutedLight
                     )
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = contactName,
                         onValueChange = { contactName = it },
@@ -685,11 +685,11 @@ fun ChannelListScreen(
                             .testTag("channel_name_input")
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "TEMPO ATÉ A EXCLUSÃO:",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         color = ImmersivePrimary,
                         letterSpacing = 0.5.sp
                     )
@@ -720,7 +720,7 @@ fun ChannelListScreen(
                                     Text(
                                         text = label,
                                         fontSize = 11.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
                                         color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
                                         maxLines = 1
                                     )
@@ -751,7 +751,7 @@ fun ChannelListScreen(
                                     Text(
                                         text = label,
                                         fontSize = 11.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
                                         color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
                                         maxLines = 1
                                     )
@@ -773,7 +773,7 @@ fun ChannelListScreen(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.testTag("confirm_create_channel_button")
                 ) {
-                    Text("Iniciar Chat", color = ImmersiveOnPrimary, fontWeight = FontWeight.Bold)
+                    Text("Iniciar Chat", color = ImmersiveOnPrimary, fontWeight = FontWeight.Medium)
                 }
             },
             dismissButton = {
@@ -795,7 +795,7 @@ fun ChannelListScreen(
             title = {
                 Text(
                     text = "🚨 INCINERAÇÃO TOTAL EM PÂNICO",
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = ImmersiveExpiring,
                     fontSize = 16.sp
                 )
@@ -818,7 +818,7 @@ fun ChannelListScreen(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.testTag("confirm_panic_wipe_button")
                 ) {
-                    Text("VAPORIZAR TUDO AGORA", fontWeight = FontWeight.Bold, color = Color(0xFF601410))
+                    Text("VAPORIZAR TUDO AGORA", fontWeight = FontWeight.Medium, color = Color(0xFF601410))
                 }
             },
             dismissButton = {
@@ -872,7 +872,7 @@ fun ContactListItem(
                     Text(
                         text = contact.name.take(1).uppercase(),
                         color = Color(contact.avatarColorHex),
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 16.sp
                     )
                 }
@@ -900,13 +900,12 @@ fun ContactListItem(
                                     text = "Pmsg Ativo",
                                     color = com.example.ui.theme.SecurityEmerald,
                                     fontSize = 9.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
                         text = contact.phoneNumber,
@@ -947,7 +946,7 @@ fun ContactListItem(
                         text = "Conversar",
                         color = com.example.ui.theme.ObsidianBlack,
                         fontSize = 11.5.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                 }
             } else {
@@ -1026,7 +1025,7 @@ fun ChannelListItem(
                         Text(
                             text = channel.name.take(1).uppercase(),
                             color = if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson else com.example.ui.theme.TitaniumPrimary,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Medium,
                             fontSize = 17.sp
                         )
                     }
@@ -1085,7 +1084,6 @@ fun ChannelListItem(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(3.dp))
 
                     Text(
                         text = channel.lastMessagePreview,
@@ -1094,7 +1092,6 @@ fun ChannelListItem(
                         maxLines = 1
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
 
                     // Live Expiration Chip
                     Box(

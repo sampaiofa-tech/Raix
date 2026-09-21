@@ -73,6 +73,20 @@ private object InMemoryContactRepository : ContactRepository {
         contactsFlow.value = current
     }
 
+    override suspend fun setFavorite(fingerprint: String, isFavorite: Boolean) {
+        val current = contactsFlow.value.toMutableMap()
+        val c = current[fingerprint] ?: return
+        current[fingerprint] = c.copy(isFavorite = isFavorite)
+        contactsFlow.value = current
+    }
+
+    override suspend fun setCategory(fingerprint: String, category: String?) {
+        val current = contactsFlow.value.toMutableMap()
+        val c = current[fingerprint] ?: return
+        current[fingerprint] = c.copy(category = category)
+        contactsFlow.value = current
+    }
+
     override suspend fun panicWipe(): Int {
         val count = contactsFlow.value.size
         contactsFlow.value = emptyMap()

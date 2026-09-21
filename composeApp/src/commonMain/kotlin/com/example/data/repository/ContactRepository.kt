@@ -14,6 +14,10 @@ interface ContactRepository {
     suspend fun deleteContact(fingerprint: String)
     suspend fun panicWipe(): Int
 
+    // v1.8.0: Local metadata (operates on encrypted local data only)
+    suspend fun setFavorite(fingerprint: String, isFavorite: Boolean)
+    suspend fun setCategory(fingerprint: String, category: String?)
+
     // Client-side blocklist (zero-knowledge server-side)
     fun getBlockedContacts(): Flow<List<BlockedContact>>
     suspend fun blockContact(fingerprint: String)

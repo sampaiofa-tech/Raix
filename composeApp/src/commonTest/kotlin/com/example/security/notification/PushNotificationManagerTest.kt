@@ -16,7 +16,7 @@ class PushNotificationManagerTest {
         // showLocalNotification should execute gracefully without uncaught exceptions
         PushNotificationManager.showLocalNotification(
             title = "Raix",
-            body = "Nova mensagem efêmera recebida.",
+            body = "Nova mensagem criptografada",
             messageId = "test_msg_contract_01"
         )
 

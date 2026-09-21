@@ -187,8 +187,8 @@ fun App() {
                                                     
                                                     if (notifiedMessages.add(msg.id)) {
                                                         com.example.security.notification.PushNotificationManager.showLocalNotification(
-                                                            title = "RAIX - ${existingContact?.displayName ?: "Mensagem"}",
-                                                            body = "Nova mensagem recebida",
+                                                            title = "Raix",
+                                                            body = "Nova mensagem criptografada",
                                                             messageId = contactFingerprint
                                                         )
                                                     }
