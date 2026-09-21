@@ -203,8 +203,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 33
-        versionName = "1.7.17"
+        versionCode = 34
+        versionName = "1.7.18"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -291,6 +291,28 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
     }
 }
 
+// Rename APK/AAB outputs to Raix-{version} after build
+tasks.register("renameReleaseArtifacts") {
+    description = "Copies release APK and AAB with versioned names"
+    group = "build"
+    dependsOn("assembleRelease", "bundleRelease")
+    doLast {
+        val ver = android.defaultConfig.versionName
+        val apkDir = layout.buildDirectory.dir("outputs/apk/release").get().asFile
+        val aabDir = layout.buildDirectory.dir("outputs/bundle/release").get().asFile
+        val outDir = rootProject.file("release-artifacts")
+        outDir.mkdirs()
+        apkDir.listFiles()?.filter { it.extension == "apk" }?.forEach {
+            it.copyTo(File(outDir, "Raix-${ver}.apk"), overwrite = true)
+            println("[RELEASE] APK: ${File(outDir, "Raix-${ver}.apk").absolutePath}")
+        }
+        aabDir.listFiles()?.filter { it.extension == "aab" }?.forEach {
+            it.copyTo(File(outDir, "Raix-${ver}.aab"), overwrite = true)
+            println("[RELEASE] AAB: ${File(outDir, "Raix-${ver}.aab").absolutePath}")
+        }
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "com.example.MainKt"
@@ -298,7 +320,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.7.17"
+            packageVersion = "1.7.18"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"

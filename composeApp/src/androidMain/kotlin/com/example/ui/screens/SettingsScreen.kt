@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -1877,6 +1878,33 @@ fun SettingsScreen(
             }
 
             Spacer(modifier = Modifier.height(30.dp))
+
+            // App version display
+            val packageInfo = remember {
+                try {
+                    context.packageManager.getPackageInfo(context.packageName, 0)
+                } catch (_: Exception) { null }
+            }
+            val versionText = remember(packageInfo) {
+                val name = packageInfo?.versionName ?: "?"
+                val code = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    packageInfo?.longVersionCode?.toString() ?: "?"
+                } else {
+                    @Suppress("DEPRECATION")
+                    packageInfo?.versionCode?.toString() ?: "?"
+                }
+                "Raix v$name (build $code)"
+            }
+            Text(
+                text = versionText,
+                modifier = Modifier.fillMaxWidth().testTag("app_version_label"),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                fontSize = 11.sp,
+                color = ImmersiveMutedLight.copy(alpha = 0.6f),
+                fontWeight = FontWeight.Normal
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 

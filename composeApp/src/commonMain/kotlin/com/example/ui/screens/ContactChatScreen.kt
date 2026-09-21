@@ -282,11 +282,8 @@ fun ContactChatScreen(
                                         // Vanish-after-read: delete doc immediately from Firestore (triggers onDeleteMessage shredder)
                                         FirestoreRestClient.deleteMessage(msg.id, myToken)
 
-                                        com.example.security.notification.PushNotificationManager.showLocalNotification(
-                                            title = "RAIX",
-                                            body = "Nova mensagem recebida",
-                                            messageId = activeContact.fingerprint
-                                        )
+                                        // NOT notifying here: user is already viewing this chat in foreground.
+                                        // Background notifications are handled by App.kt's global listener.
 
                                         val now = PlatformEnvironment.currentTimeMillis()
                                         val remainingTtl = (msg.expiresAt - now).coerceAtLeast(10_000L)
