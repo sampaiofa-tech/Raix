@@ -12,6 +12,7 @@ object VersionMigrationManagerDesktop {
     
     fun checkAndWipeOnUpdate(currentVersion: String) {
         val appData = System.getenv("APPDATA") ?: System.getProperty("user.home")
+        val localAppData = System.getenv("LOCALAPPDATA") ?: ""
         val dir = File(appData, "Pmsg")
         if (!dir.exists()) dir.mkdirs()
         
@@ -33,41 +34,66 @@ object VersionMigrationManagerDesktop {
 
         if (shouldWipe) {
             println("[WIPE] Atualização detectada (last=$lastVersion -> curr=$currentVersion). Executando Wipe Master (Desktop)...")
+            
+            // Camada 1: Java delete — remove tudo que não está travado pelo próprio processo
             try {
-                // Execute Wipe using PowerShell to bypass file locks and remove WebView2 session data
+                dir.listFiles()?.forEach { file ->
+                    if (file.name != "version_info.json") {
+                        val deleted = file.deleteRecursively()
+                        println("[WIPE] Java delete: ${file.name} -> ${if (deleted) "OK" else "FALHA (lock?)"}")
+                    }
+                }
+                if (localAppData.isNotEmpty()) {
+                    val raixLocal = File(localAppData, "Raix")
+                    if (raixLocal.exists()) {
+                        val deleted = raixLocal.deleteRecursively()
+                        println("[WIPE] Java delete: %LOCALAPPDATA%\\Raix -> ${if (deleted) "OK" else "FALHA (lock?)"}")
+                    }
+                }
+            } catch (e: Exception) {
+                println("[WIPE] Java delete parcial: ${e.message}")
+            }
+            
+            // Camada 2: PowerShell — força remoção de ficheiros travados (WebView, etc.)
+            try {
                 val psCommand = """
-                    Remove-Item -Recurse -Force "${'$'}env:APPDATA\Pmsg" -ErrorAction SilentlyContinue;
+                    Get-ChildItem -Path "${'$'}env:APPDATA\Pmsg" -Recurse -Force -ErrorAction SilentlyContinue | Where-Object { ${'$'}_.Name -ne 'version_info.json' } | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue;
                     Remove-Item -Recurse -Force "${'$'}env:LOCALAPPDATA\Raix" -ErrorAction SilentlyContinue;
-                    Remove-Item -Force "${'$'}env:APPDATA\Microsoft\Windows\Start Menu\Programs\Raix.lnk" -ErrorAction SilentlyContinue
+                    Remove-Item -Force "${'$'}env:APPDATA\Microsoft\Windows\Start Menu\Programs\Raix.lnk" -ErrorAction SilentlyContinue;
+                    Remove-Item -Recurse -Force "HKCU:\Software\Classes\raix" -ErrorAction SilentlyContinue
                 """.trimIndent()
 
-                println("[WIPE] PowerShell Command: $psCommand")
-
-                val process = ProcessBuilder("powershell", "-Command", psCommand)
+                val process = ProcessBuilder("powershell", "-WindowStyle", "Hidden", "-Command", psCommand)
                     .redirectErrorStream(true)
                     .start()
 
-                // Wait for process to complete
                 process.waitFor()
-                println("[WIPE] PowerShell Wipe executado com sucesso.")
+                println("[WIPE] PowerShell cleanup executado.")
             } catch (e: Exception) {
-                println("[WIPE] Falha ao executar o Wipe Master via PowerShell: ${e.message}")
-                e.printStackTrace()
+                println("[WIPE] Falha no PowerShell cleanup: ${e.message}")
+            }
+            
+            // Verificar resultado
+            val remaining = dir.listFiles()?.filter { it.name != "version_info.json" }?.map { it.name } ?: emptyList()
+            if (remaining.isEmpty()) {
+                println("[WIPE] Wipe completo — pasta limpa.")
+            } else {
+                println("[WIPE] Ficheiros restantes (possivelmente travados): $remaining")
             }
         } else {
             println("[WIPE] Nenhum wipe necessário. last=$lastVersion, curr=$currentVersion")
         }
         
         try {
-            // Re-create the dir since it was wiped
+            // Re-create the dir since it may have been wiped
             if (!dir.exists()) dir.mkdirs()
             val newInfo = json.encodeToString(VersionInfo.serializer(), VersionInfo(currentVersion))
             versionFile.writeText(newInfo)
+            println("[WIPE] version_info.json gravado: $currentVersion")
         } catch (_: Exception) {}
     }
     
     private fun isNewerVersion(current: String, last: String): Boolean {
-        // Simple semver check
         val currParts = current.split(".").map { it.toIntOrNull() ?: 0 }
         val lastParts = last.split(".").map { it.toIntOrNull() ?: 0 }
         
@@ -79,14 +105,5 @@ object VersionMigrationManagerDesktop {
             if (c < l) return false
         }
         return false
-    }
-    
-    private fun wipeDirectory(dir: File, exclude: String) {
-        if (!dir.exists() || !dir.isDirectory) return
-        dir.listFiles()?.forEach { file ->
-            if (file.name != exclude) {
-                file.deleteRecursively()
-            }
-        }
     }
 }

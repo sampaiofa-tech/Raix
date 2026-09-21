@@ -1,11 +1,11 @@
 package com.example.security.notification
 
 /**
- * Multiplatform Push and Local Notification Manager (v1.6).
+ * Multiplatform Push and Local Notification Manager (v1.7).
  *
  * Supported Targets:
  * - Android: Firebase Cloud Messaging (FCM) + Android NotificationManager.
- * - Desktop (JVM/Windows): Native Windows Toast via PowerShell/WinRT with SystemTray fallback.
+ * - Desktop (JVM/Windows): Compose mini-window (alwaysOnTop, auto-dismiss).
  * - iOS: APNs stub (ready for Apple Developer account activation).
  * - Web (Wasm): Session-based notification interface.
  */
