@@ -25,9 +25,27 @@ object VersionMigrationManagerDesktop {
             } catch (_: Exception) {}
         }
         
-        if (lastVersion != null && isNewerVersion(currentVersion, lastVersion)) {
-            println("Atualização detectada de $lastVersion para $currentVersion. Executando Wipe Master (Desktop)...")
+        val shouldWipe = if (lastVersion != null) {
+            isNewerVersion(currentVersion, lastVersion)
+        } else {
+            // Se lastVersion é nulo mas existem outros arquivos no Pmsg, é uma atualização de versão antiga
+            dir.listFiles()?.any { it.name != "version_info.json" } == true
+        }
+
+        if (shouldWipe) {
+            println("[WIPE] Atualização detectada (last=$lastVersion -> curr=$currentVersion). Executando Wipe Master (Desktop)...")
             wipeDirectory(dir, exclude = versionFile.name)
+            
+            val localAppData = System.getenv("LOCALAPPDATA")
+            if (localAppData != null) {
+                val raixDir = File(localAppData, "Raix")
+                if (raixDir.exists()) {
+                    println("[WIPE] Apagando LOCALAPPDATA Raix: ${raixDir.absolutePath}")
+                    wipeDirectory(raixDir, exclude = "")
+                }
+            }
+        } else {
+            println("[WIPE] Nenhum wipe necessário. last=$lastVersion, curr=$currentVersion")
         }
         
         try {

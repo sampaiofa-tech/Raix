@@ -24,80 +24,72 @@ fun main() = application {
     val windowState = rememberWindowState(size = DpSize(450.dp, 800.dp))
     var isWindowVisible by remember { mutableStateOf(true) }
     val appIcon = painterResource("icon.png")
-    
-    var trayIcon: java.awt.TrayIcon? = null
-    var systemTray: java.awt.SystemTray? = null
-    
-    LaunchedEffect(Unit) {
-        if (java.awt.SystemTray.isSupported()) {
-            systemTray = java.awt.SystemTray.getSystemTray()
-            val resource = object {}.javaClass.getResource("/icon.png")
-            val image = if (resource != null) {
-                java.awt.Toolkit.getDefaultToolkit().createImage(resource)
-            } else {
-                val fallback = java.awt.image.BufferedImage(16, 16, java.awt.image.BufferedImage.TYPE_INT_ARGB)
-                val g = fallback.createGraphics()
-                g.color = java.awt.Color.BLUE
-                g.fillRect(0, 0, 16, 16)
-                g.dispose()
-                fallback
-            }
-            trayIcon = java.awt.TrayIcon(image, "Raix").apply {
-                isImageAutoSize = true
-                addActionListener {
-                    isWindowVisible = true
-                }
-                addMouseListener(object : java.awt.event.MouseAdapter() {
-                    override fun mouseClicked(e: java.awt.event.MouseEvent) {
-                        if (e.button == java.awt.event.MouseEvent.BUTTON1) {
-                            isWindowVisible = true
-                        }
-                    }
-                })
-                
-                val popup = java.awt.PopupMenu()
-                val openItem = java.awt.MenuItem("Abrir Raix")
-                openItem.addActionListener {
-                    isWindowVisible = true
-                }
-                val exitItem = java.awt.MenuItem("Sair")
-                exitItem.addActionListener {
-                    exitApplication()
-                }
-                popup.add(openItem)
-                popup.add(exitItem)
-                popupMenu = popup
-            }
-            systemTray?.add(trayIcon)
-            com.example.security.notification.PushNotificationManager.sharedTrayIcon = trayIcon
-        }
-    }
-
     var appWindow: java.awt.Window? by remember { mutableStateOf(null) }
+    
+    val trayState = rememberTrayState()
+    
+    Tray(
+        state = trayState,
+        icon = appIcon,
+        tooltip = "Raix",
+        onAction = {
+            isWindowVisible = true
+            windowState.isMinimized = false
+        },
+        menu = {
+            Item("Abrir Raix", onClick = {
+                isWindowVisible = true
+                windowState.isMinimized = false
+            })
+            Item("Sair", onClick = ::exitApplication)
+        }
+    )
+
+    LaunchedEffect(trayState) {
+        com.example.security.notification.PushNotificationManager.sharedTrayState = trayState
+    }
 
     LaunchedEffect(Unit) {
         val isWindows = System.getProperty("os.name").lowercase().contains("windows")
         if (isWindows) {
-            val appData = System.getenv("APPDATA") ?: return@LaunchedEffect
-            val signalFile = java.io.File(appData, "Pmsg/toast_signal.txt")
-            var lastModified = 0L
-            while (true) {
-                if (signalFile.exists() && signalFile.lastModified() != lastModified) {
-                    lastModified = signalFile.lastModified()
-                    isWindowVisible = true
-                    windowState.isMinimized = false
-                    
-                    kotlinx.coroutines.delay(100)
-                    appWindow?.let { win ->
-                        java.awt.EventQueue.invokeLater {
-                            win.toFront()
-                            win.requestFocus()
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                val appData = System.getenv("APPDATA") ?: return@withContext
+                val signalFile = java.io.File(appData, "Pmsg/toast_signal.txt")
+                var lastModified = 0L
+                while (true) {
+                    if (signalFile.exists() && signalFile.lastModified() != lastModified) {
+                        lastModified = signalFile.lastModified()
+                        
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                            isWindowVisible = true
+                            windowState.isMinimized = false
                         }
                     }
+                    kotlinx.coroutines.delay(1000)
                 }
-                kotlinx.coroutines.delay(1000)
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(8000)
+        println("[DIAGNOSTICO] TESTE: Minimizando a janela...")
+        windowState.isMinimized = true
+        
+        kotlinx.coroutines.delay(8000)
+        println("[DIAGNOSTICO] TESTE: Fechando a janela (enviando para a bandeja)...")
+        isWindowVisible = false
+        
+        kotlinx.coroutines.delay(4000)
+        println("[DIAGNOSTICO] TESTE: Enviando notificacao de teste...")
+        com.example.security.notification.PushNotificationManager.showLocalNotification(
+            "Teste de Bandeja",
+            "Esta é uma mensagem de teste na bandeja",
+            "teste-id-123"
+        )
+        
+        kotlinx.coroutines.delay(6000)
+        println("[DIAGNOSTICO] TESTE: Teste finalizado.")
     }
 
     Window(
@@ -109,6 +101,15 @@ fun main() = application {
         visible = isWindowVisible
     ) {
         appWindow = this.window
+        
+        LaunchedEffect(isWindowVisible, windowState.isMinimized) {
+            if (isWindowVisible && !windowState.isMinimized) {
+                appWindow?.toFront()
+                appWindow?.requestFocus()
+            }
+            println("[DIAGNOSTICO] Estado da Janela: visible=$isWindowVisible, minimized=${windowState.isMinimized}")
+        }
+        
         App()
     }
 }

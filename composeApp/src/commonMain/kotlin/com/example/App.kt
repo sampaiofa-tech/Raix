@@ -212,7 +212,9 @@ fun App() {
                 }
             } catch (e: Exception) {
                 // Fail silently to not disrupt the UI
+                println("[DIAGNOSTICO] Exceção no listener: ${e.message}")
             }
+            println("[DIAGNOSTICO] app vivo na bandeja + heartbeat do listener")
             delay(3000L) // Verifica a cada 3s (global listener)
         }
     }

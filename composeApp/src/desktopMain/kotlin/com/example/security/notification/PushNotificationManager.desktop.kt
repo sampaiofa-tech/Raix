@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 actual object PushNotificationManager {
 
-    var sharedTrayIcon: TrayIcon? = null
+    var sharedTrayState: TrayState? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
     actual fun getPushToken(): String? {
@@ -19,7 +19,7 @@ actual object PushNotificationManager {
     }
 
     actual fun showLocalNotification(title: String, body: String, messageId: String?) {
-        println("[PushNotificationManager] showLocalNotification chamado. title: $title, body: $body")
+        println("[DIAGNOSTICO] [PushNotificationManager] showLocalNotification chamado. title: $title, body: $body, Thread: ${Thread.currentThread().name}")
         scope.launch {
             showSystemTrayNotification(title, body, messageId)
         }
@@ -52,11 +52,11 @@ actual object PushNotificationManager {
     }
 
     private fun showSystemTrayNotification(title: String, body: String, messageId: String?) {
-        println("[PushNotificationManager] showSystemTrayNotification invocado. title=$title")
+        println("[DIAGNOSTICO] [PushNotificationManager] showSystemTrayNotification invocado. title=$title, Thread: ${Thread.currentThread().name}")
         
         // Dedup: só exibe se o messageId for nulo ou ainda não foi exibido.
         if (messageId != null && !shownNotifications.add(messageId)) {
-            println("[PushNotificationManager] Notificação ignorada (já exibida): $messageId")
+            println("[DIAGNOSTICO] [PushNotificationManager] Notificação ignorada (já exibida): $messageId")
             return
         }
         
@@ -206,40 +206,23 @@ actual object PushNotificationManager {
                 
                 val process = ProcessBuilder("powershell", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-Command", psCommand).start()
                 process.waitFor()
+                println("[DIAGNOSTICO] [PushNotificationManager] PowerShell Toast finalizado.")
             } catch (e: Exception) {
+                println("[DIAGNOSTICO] [PushNotificationManager] Exceção no PowerShell: ${e.message}")
                 e.printStackTrace()
             }
             return
         }
 
-        // Fallback: AWT TrayIcon (Para Linux/Mac se houver)
+        // Fallback: Compose TrayState
         try {
-            if (!SystemTray.isSupported()) {
-                println("[PushNotificationManager] SystemTray não é suportado!")
-                return
-            }
-            val tray = SystemTray.getSystemTray()
-
-            val iconToUse = sharedTrayIcon ?: run {
-                val resource = PushNotificationManager::class.java.getResource("/icon.png")
-                val image = if (resource != null) {
-                    Toolkit.getDefaultToolkit().createImage(resource)
-                } else {
-                    val fallback = java.awt.image.BufferedImage(16, 16, java.awt.image.BufferedImage.TYPE_INT_ARGB)
-                    val g = fallback.createGraphics()
-                    g.color = java.awt.Color.BLUE
-                    g.fillRect(0, 0, 16, 16)
-                    g.dispose()
-                    fallback
-                }
-                TrayIcon(image, "Raix").apply {
-                    isImageAutoSize = true
-                    tray.add(this)
-                }
-            }
-
-            iconToUse.displayMessage(title, body, TrayIcon.MessageType.INFO)
-        } catch (_: Throwable) {
+            sharedTrayState?.sendNotification(
+                Notification(title, body, Notification.Type.Info)
+            )
+            println("[DIAGNOSTICO] [PushNotificationManager] Compose Tray Notification exibida com sucesso.")
+        } catch (e: Throwable) {
+            println("[DIAGNOSTICO] [PushNotificationManager] Falha no Compose Tray Notification: ${e.message}")
+            e.printStackTrace()
         }
     }
 
