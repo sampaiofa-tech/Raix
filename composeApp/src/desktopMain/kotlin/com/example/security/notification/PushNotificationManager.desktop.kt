@@ -28,22 +28,16 @@ actual object PushNotificationManager {
 
     private val shownNotifications = mutableSetOf<String>()
 
-    actual fun getClickedNotificationMessageId(): String? {
-        val isWindows = System.getProperty("os.name").lowercase().contains("windows")
-        if (!isWindows) return null
+    /** Written by main.kt poller when toast_signal.txt is detected. Consumed once by getClickedNotificationMessageId(). */
+    @Volatile
+    var pendingClickedMessageId: String? = null
 
-        try {
-            val appData = System.getenv("APPDATA") ?: return null
-            val signalFile = java.io.File(appData, "Pmsg/toast_signal.txt")
-            if (signalFile.exists()) {
-                val messageId = signalFile.readText().trim()
-                signalFile.delete()
-                if (messageId.isNotEmpty()) {
-                    return messageId
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+    actual fun getClickedNotificationMessageId(): String? {
+        val id = pendingClickedMessageId
+        if (id != null) {
+            pendingClickedMessageId = null
+            println("[DIAGNOSTICO] [PushNotificationManager] getClickedNotificationMessageId consumido: $id")
+            return id
         }
         return null
     }

@@ -1,8 +1,3 @@
-﻿
-Algorithm Hash                                                             Path                                                                          
---------- ----                                                             ----                                                                          
-SHA256    E9499C1AD2A4E5015DBC2929A20C9FC04CDF4F18D4208B6DAC356849FAC0E831 C:\Dev\Pmsg\composeApp\build\outputs\apk\release\composeApp-release.apk       
-SHA256    95F9B490F3B832A800733C0CDBA58576EEA1083D2FC3E00FD88AC60FAD4E2193 C:\Dev\Pmsg\composeApp\build\outputs\bundle\release\composeApp-release.aab    
-SHA256    9114AAFE2F798ED51B26DF489B5F62358BE5E289FC7D59E84CE45C1C5F23714F C:\Dev\Pmsg\composeApp\build\compose\binaries\main-release\msi\Raix-1.7.15.msi
-
-
+﻿E3791F422F6BA822B522A58757CE67F30EA630DFE762A07F4ED2D3EC5C43A1A6  Raix-1.7.16.msi
+7B2CBFE99B8BEEC1C1E9BA18E174D5D5F0847089E13F415B21F2EA54DAE62D6F  composeApp-release.apk
+7511ACA67BC0832FEA0006782D7B9C730BF1EFAB5E626F4ACB4D96C21D7B40D1  composeApp-release.aab

@@ -19,7 +19,7 @@ fun main() = application {
     val windowTitle = if (isDev) "Raix [desktop-dev]" else "Raix"
     
     val windowState = rememberWindowState(size = DpSize(450.dp, 800.dp))
-    var isWindowVisible by remember { mutableStateOf(true) }
+
     val appIcon = painterResource("icon.png")
     var appWindow: java.awt.Window? by remember { mutableStateOf(null) }
 
@@ -33,9 +33,14 @@ fun main() = application {
                 while (true) {
                     if (signalFile.exists() && signalFile.lastModified() != lastModified) {
                         lastModified = signalFile.lastModified()
-                        
+                        val messageId = signalFile.readText().trim()
+                        signalFile.delete()
+                        lastModified = 0L
+                        if (messageId.isNotEmpty()) {
+                            PushNotificationManager.pendingClickedMessageId = messageId
+                            println("[DIAGNOSTICO] main.kt: toast_signal.txt lido -> messageId=$messageId")
+                        }
                         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                            isWindowVisible = true
                             windowState.isMinimized = false
                         }
                     }
@@ -49,18 +54,16 @@ fun main() = application {
         onCloseRequest = { windowState.isMinimized = true },
         title = windowTitle,
         state = windowState,
-        icon = appIcon,
-        alwaysOnTop = true,
-        visible = isWindowVisible
+        icon = appIcon
     ) {
         appWindow = this.window
         
-        LaunchedEffect(isWindowVisible, windowState.isMinimized) {
-            if (isWindowVisible && !windowState.isMinimized) {
+        LaunchedEffect(windowState.isMinimized) {
+            if (!windowState.isMinimized) {
                 appWindow?.toFront()
                 appWindow?.requestFocus()
             }
-            println("[DIAGNOSTICO] Estado da Janela: visible=$isWindowVisible, minimized=${windowState.isMinimized}")
+            println("[DIAGNOSTICO] Estado da Janela: minimized=${windowState.isMinimized}")
         }
         
         App()
