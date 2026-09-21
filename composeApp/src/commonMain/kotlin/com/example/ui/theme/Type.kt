@@ -6,9 +6,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import pmsg.composeapp.generated.resources.Res
-import pmsg.composeapp.generated.resources.inter_regular
-import pmsg.composeapp.generated.resources.inter_medium
+import raix.composeapp.generated.resources.Res
+import raix.composeapp.generated.resources.inter_regular
+import raix.composeapp.generated.resources.inter_medium
 import androidx.compose.runtime.Composable
 
 @Composable

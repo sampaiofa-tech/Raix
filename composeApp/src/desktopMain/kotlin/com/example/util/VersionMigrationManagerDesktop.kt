@@ -28,27 +28,39 @@ object VersionMigrationManagerDesktop {
         val shouldWipe = if (lastVersion != null) {
             isNewerVersion(currentVersion, lastVersion)
         } else {
-            // Se lastVersion é nulo mas existem outros arquivos no Pmsg, é uma atualização de versão antiga
             dir.listFiles()?.any { it.name != "version_info.json" } == true
         }
 
         if (shouldWipe) {
             println("[WIPE] Atualização detectada (last=$lastVersion -> curr=$currentVersion). Executando Wipe Master (Desktop)...")
-            wipeDirectory(dir, exclude = versionFile.name)
-            
-            val localAppData = System.getenv("LOCALAPPDATA")
-            if (localAppData != null) {
-                val raixDir = File(localAppData, "Raix")
-                if (raixDir.exists()) {
-                    println("[WIPE] Apagando LOCALAPPDATA Raix: ${raixDir.absolutePath}")
-                    wipeDirectory(raixDir, exclude = "")
-                }
+            try {
+                // Execute Wipe using PowerShell to bypass file locks and remove WebView2 session data
+                val psCommand = """
+                    Remove-Item -Recurse -Force "${'$'}env:APPDATA\Pmsg" -ErrorAction SilentlyContinue;
+                    Remove-Item -Recurse -Force "${'$'}env:LOCALAPPDATA\Raix" -ErrorAction SilentlyContinue;
+                    Remove-Item -Force "${'$'}env:APPDATA\Microsoft\Windows\Start Menu\Programs\Raix.lnk" -ErrorAction SilentlyContinue
+                """.trimIndent()
+
+                println("[WIPE] PowerShell Command: $psCommand")
+
+                val process = ProcessBuilder("powershell", "-Command", psCommand)
+                    .redirectErrorStream(true)
+                    .start()
+
+                // Wait for process to complete
+                process.waitFor()
+                println("[WIPE] PowerShell Wipe executado com sucesso.")
+            } catch (e: Exception) {
+                println("[WIPE] Falha ao executar o Wipe Master via PowerShell: ${e.message}")
+                e.printStackTrace()
             }
         } else {
             println("[WIPE] Nenhum wipe necessário. last=$lastVersion, curr=$currentVersion")
         }
         
         try {
+            // Re-create the dir since it was wiped
+            if (!dir.exists()) dir.mkdirs()
             val newInfo = json.encodeToString(VersionInfo.serializer(), VersionInfo(currentVersion))
             versionFile.writeText(newInfo)
         } catch (_: Exception) {}

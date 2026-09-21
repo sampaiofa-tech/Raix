@@ -1,7 +1,5 @@
 package com.example.security.notification
 
-import androidx.compose.ui.window.TrayState
-import androidx.compose.ui.window.Notification
 import java.awt.SystemTray
 import java.awt.Toolkit
 import java.awt.TrayIcon
@@ -11,7 +9,6 @@ import kotlinx.coroutines.launch
 
 actual object PushNotificationManager {
 
-    var sharedTrayState: TrayState? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
     actual fun getPushToken(): String? {
@@ -211,18 +208,6 @@ actual object PushNotificationManager {
                 println("[DIAGNOSTICO] [PushNotificationManager] Exceção no PowerShell: ${e.message}")
                 e.printStackTrace()
             }
-            return
-        }
-
-        // Fallback: Compose TrayState
-        try {
-            sharedTrayState?.sendNotification(
-                Notification(title, body, Notification.Type.Info)
-            )
-            println("[DIAGNOSTICO] [PushNotificationManager] Compose Tray Notification exibida com sucesso.")
-        } catch (e: Throwable) {
-            println("[DIAGNOSTICO] [PushNotificationManager] Falha no Compose Tray Notification: ${e.message}")
-            e.printStackTrace()
         }
     }
 

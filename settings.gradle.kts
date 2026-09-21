@@ -23,6 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Pmsg"
+rootProject.name = "Raix"
 
 include(":composeApp")
