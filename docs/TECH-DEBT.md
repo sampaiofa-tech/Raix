@@ -156,3 +156,13 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 | **18** | Cache Incremental na Atualizacao | **Baixo**. Dados volateis nao sao preservados entre atualizacoes de versao. | Avaliar estrategia de cache para preservar estado de UI (filtros, scroll position) e dados temporarios entre atualizacoes do app. | v1.9+ |
 | **19** | Reorganizacao Estrutural de Telas (Descopado v1.8.0) | **Nenhum**. Escopo visual-funcional concluido; reestruturacao de layout (agrupamento de secoes, colapso de cards, navegacao por abas internas) condicionada a wireframes aprovados pelo Assessor. | Redesenhar hierarquia visual de SettingsScreen (2022 linhas) e DataPrivacyScreen com agrupamento por categoria, cards colapsaveis e navegacao interna. Requer wireframes do Assessor antes da implementacao. | v1.9.0 |
 | **20** | BOM UTF-8 em Bip39Portuguese.kt | **Nenhum**. Arquivo baseline congelado com BOM (EF BB BF). Nao causa defeito funcional. | Regravar Bip39Portuguese.kt como UTF-8 sem BOM em ciclo dedicado de higiene de codificacao. | v1.9+ |
+
+## Pendencias v1.9.3 (Adicionado em 2026-09-21)
+
+| # | Item | Impacto Atual | Descricao | Versao-Alvo |
+| --- | --- | --- | --- | --- |
+| **21** | Relatorio Visual do Assessor (Wireframes) | **Nenhum**. | Redesenho hierarquico de SettingsScreen, DataPrivacyScreen e IdentityScreen com agrupamento por categoria, cards colapsaveis e navegacao interna. Requer wireframes aprovados pelo Assessor antes da implementacao. | v2.0 |
+| **22** | Permissao de Notificacao (timeout de 3s) | **Baixo**. | O gate NOTIFICATION_PERMISSION usa timeout de 3s para caso de negacao. Se o usuario negar rapidamente, a app segue sem notificacoes. Avaliar tela dedicada com explicacao e botao de "Abrir Configuracoes". | v1.9.4+ |
+| **23** | Deprecation warnings do build | **Nenhum**. | 21 warnings de depreciacao (Icons.Filled.ArrowBack -> AutoMirrored, TabRow -> PrimaryTabRow, LocalClipboardManager -> LocalClipboard, etc.). Nenhum afeta funcionalidade. | v2.0 |
+| **24** | Paridade iOS | **Alto (bloqueado)**. | iOS em homologacao. Privacy overlay (blur no alternador de apps) pendente. Target iosMain compila apenas no CI macOS. | v2.0 |
+| **25** | ChannelListScreen vs ContactsScreen na Home Android | **Baixo**. | A Home Android usa ChannelListScreen (wrapper sobre contatos E2E). Avaliar unificacao com ContactsScreen (commonMain) para eliminar duplicacao. | v2.0 |

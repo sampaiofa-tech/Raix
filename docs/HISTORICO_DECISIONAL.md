@@ -131,3 +131,28 @@
 ### Nota Técnica de Adequação (MCI / LGPD)
 
 - **Decisão (18/09/2026):** Parecer do Guru aprovado, com decisão do Assessor (Opção 1, redação corrigida, consenso fechado). Gerada versão v3.2 contemplando pseudonimização provisória no estágio atual e mapeamento formal para retenção de IP cifrado (Art. 15 MCI) no próximo ciclo.
+
+---
+
+## 8. SAGA DE CORRECOES v1.7--v1.9.3 (13 correcoes, Set/2026)
+
+### Contexto
+
+Apos a homologacao da v1.6, o app foi submetido a testes fisicos intensivos pelo Principal (dispositivo real). Foram identificadas 13 correcoes em cascata, executadas entre v1.7 e v1.9.3.
+
+### Correcoes aplicadas (ordem cronologica)
+
+1. **Corr 1-3 (v1.7):** Visual (tokens RAIX: paleta #0B1325/#1E2432/#F5F7FA/#8A93A6/#00E676/#D4AF37/#E5484D; tipografia Inter+JetBrains Mono), layout WhatsApp, QR do menu.
+2. **Corr 4-5 (v1.8):** Notificacoes (canais, deep-link direto na conversa via fingerprint), audio, componentes visuais.
+3. **Corr 6-8 (v1.8.x):** Layout desktop 3 colunas (rail + lista + detalhe), listener E2E unificado (commonMain), mini-janela de notificacao desktop.
+4. **Corr 9 (v1.9.0):** Onboarding com gates (AgeGate, RecoverySeed, MasterPassword, BiometricOffer), wipe total por build.
+5. **Corr 10 (v1.9.0):** Home vazia (causa raiz: TTL de 48h do AddressBook expirando contatos), abas (Todas/Nao lidas/Favoritos), QR do menu.
+6. **Corr 11 (v1.9.1):** Insets do input (adjustResize + imePadding), busca (altura/padding), home em branco (causa raiz confirmada: TTL).
+7. **Corr 12 (v1.9.2):** Menu de item com Bloquear (ChannelListScreen).
+8. **Corr 13 (v1.9.3):** Permissao POST_NOTIFICATIONS no gate de onboarding (causa raiz: LaunchedEffect prematuro durante AgeGate), menu 3 pontos visivel + Bloquear na tela Contatos, paridade desktop.
+
+### Decisao do wipe total por build
+
+- **Decisao do Principal:** o wipe permanece TOTAL a cada atualizacao de versao (mantido por escolha deliberada do dono do produto).
+- **Justificativa:** fresh-start garante que nenhum dado residual sobreviva entre versoes; alinhado com a filosofia de efemeridade maxima.
+- **Impacto:** apos cada atualizacao, o usuario passa pelo onboarding completo (AgeGate -> RecoverySeed -> MasterPassword -> BiometricOffer -> NotificationPermission -> UNLOCKED).
