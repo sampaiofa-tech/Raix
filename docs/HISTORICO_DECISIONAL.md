@@ -156,3 +156,38 @@ Apos a homologacao da v1.6, o app foi submetido a testes fisicos intensivos pelo
 - **Decisao do Principal:** o wipe permanece TOTAL a cada atualizacao de versao (mantido por escolha deliberada do dono do produto).
 - **Justificativa:** fresh-start garante que nenhum dado residual sobreviva entre versoes; alinhado com a filosofia de efemeridade maxima.
 - **Impacto:** apos cada atualizacao, o usuario passa pelo onboarding completo (AgeGate -> RecoverySeed -> MasterPassword -> BiometricOffer -> NotificationPermission -> UNLOCKED).
+
+---
+
+## 9. SAGA DA NOTIFICACAO EM SEGUNDO PLANO (v1.9.4--v1.9.10, Set/2026)
+
+### Contexto
+
+Apos a homologacao da v1.9.4, testes fisicos no Android revelaram que mensagens em segundo plano nao geravam notificacao. O PC (Windows) funcionava via polling. A investigacao durou 6 builds (v1.9.5--v1.9.10) com multiplas hipoteses.
+
+### Hipoteses investigadas e descartadas
+
+1. **Hipotese 1 (v1.9.5): SyncMessageWorker vazio.** O `doWork()` era um TODO. Implementado o fetch real em background (buscar, descriptografar, cachear). **Parcialmente correta** -- era necessaria, mas nao suficiente.
+2. **Hipotese 2 (v1.9.6): Polling como fonte unica.** Removeu-se a notificacao do polling (E2EMessageListener) supondo que o FCM bastaria. **Incorreta** -- o PC nao tem FCM e dependia do polling. Revertido na v1.9.7.
+3. **Hipotese 3 (v1.9.7): Deduplicacao faltante.** Restaurou polling + FCM e adicionou dedup por ID. **Correta mas insuficiente** -- PC voltou a funcionar, Android continuou sem notificar em background.
+4. **Hipotese 4 (v1.9.8): Backend nao disparava push.** O campo `recipientUid` em `onMessageCreated.ts` nao existia no Firestore (o app grava `recipientId`). **Correta** -- causa raiz do push nunca ser enviado. Corrigido e deploy feito.
+5. **Hipotese 5 (v1.9.9): Token registrado sob chave errada.** Validou-se que `currentAuthUid` = Firebase Auth UID = chave em `devicePushTokens`. **Cadeia consistente**, nao era problema.
+6. **Hipotese 6 (v1.9.10): NotificationManagerCompat e hasNotificationPermission falhavam em background.** Investigada mas **descartada como causa isolada** -- o guard de permissao e o Compat podiam contribuir, mas nao eram a raiz.
+7. **Causa raiz real (v1.9.10): Canal de notificacao nao criado em processo recriado a frio pelo FCM.** Quando o Android mata o processo e o FCM o recria para entregar um push, o `Application.onCreate` nao e chamado da mesma forma, e `createNotificationChannels()` nao havia sido executado. Sem canal registrado no sistema, `NotificationManager.notify()` descartava silenciosamente a notificacao.
+
+### Causa raiz real (resolvida na v1.9.10)
+
+**Canal de notificacao inexistente em processo cold-start (recriado pelo FCM).**
+
+Quando o Android recria o processo para entregar um data message FCM, o canal de notificacao (`CHANNEL_NEW_CONVERSATIONS_ID`) podia nao existir ainda. O `NotificationManager.notify()` descarta silenciosamente notificacoes em canais inexistentes (Android 8.0+). O `catch (_: Throwable)` engolia qualquer erro sem log.
+
+### Correcao definitiva
+
+- Garantir `createNotificationChannels()` **antes de cada chamada** a `notify()` em `showPushNotification` (idempotente, custo zero se o canal ja existe).
+- Usar `NotificationManager` direto do sistema (robusto em qualquer contexto: Service, Worker, BroadcastReceiver).
+- Remover guard `hasNotificationPermission` de `showPushNotification` (desnecessario; o canal IMPORTANCE_HIGH ja garante entrega).
+- Adicionar log de diagnostico para rastrear sucesso/falha.
+
+### Resultado
+
+v1.9.10 homologada 100% em Android (primeiro plano e segundo plano) e PC (Windows). Notificacao unica, sem duplicacao, em todos os cenarios.

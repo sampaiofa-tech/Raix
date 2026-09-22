@@ -1,0 +1,5 @@
+brain/
+.gemini/
+node_modules/
+composeApp/build/
+build/

@@ -186,6 +186,11 @@ private suspend fun handleNormalMessage(
             cacheList.add(ephemeralMsg)
             InMemoryMessageCache.saveMessages(contactFingerprint, cacheList)
             FirestoreRestClient.deleteMessage(msg.id, authToken)
+            // Dedup: notifiedMessages.add() retorna true apenas na primeira vez.
+            // Desktop depende EXCLUSIVAMENTE desta notificacao (sem FCM).
+            // Android foreground: esta notificacao atende. Android background: FCM atende.
+            // O ID de notificacao (contactFingerprint) e o mesmo usado pelo FCM,
+            // portanto o sistema Android substitui em vez de duplicar.
             if (notifiedMessages.add(msg.id)) {
                 PushNotificationManager.showLocalNotification(
                     title = "Raix",
@@ -196,3 +201,4 @@ private suspend fun handleNormalMessage(
         }
     }
 }
+

@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -399,6 +400,7 @@ fun ContactChatScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -537,7 +539,6 @@ fun ContactChatScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .imePadding()
         ) {
             // Blocked Contact Banner
             if (isBlocked) {
@@ -1125,7 +1126,8 @@ fun ChatBottomInputBar(
 ) {
     Surface(
         color = Color(0xFF0D1B2A),
-        shadowElevation = 8.dp
+        shadowElevation = 8.dp,
+        modifier = Modifier.imePadding()
     ) {
         Column(modifier = Modifier
             .navigationBarsPadding()

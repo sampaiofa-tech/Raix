@@ -14,20 +14,20 @@ export const onMessageCreated = onDocumentCreated("messages/{messageId}", async 
   }
   
   const data = snapshot.data();
-  const recipientUid = data.recipientUid;
+  const recipientId = data.recipientId;
   
-  if (!recipientUid) {
-    logger.warn(`onMessageCreated: No recipientUid found for message ${event.params.messageId}`);
+  if (!recipientId) {
+    logger.warn(`onMessageCreated: No recipientId found for message ${event.params.messageId}`);
     return;
   }
 
   const db = admin.firestore();
   
   try {
-    const tokenDoc = await db.collection("devicePushTokens").doc(recipientUid).get();
+    const tokenDoc = await db.collection("devicePushTokens").doc(recipientId).get();
     
     if (!tokenDoc.exists) {
-      logger.info(`onMessageCreated: No push token registered for recipient ${recipientUid}`);
+      logger.info(`onMessageCreated: No push token registered for recipient ${recipientId}`);
       return;
     }
     
@@ -48,9 +48,9 @@ export const onMessageCreated = onDocumentCreated("messages/{messageId}", async 
           priority: "high"
         }
       });
-      logger.info(`onMessageCreated: Push notification sent to ${recipientUid} for message ${event.params.messageId}`);
+      logger.info(`onMessageCreated: Push notification sent to ${recipientId} for message ${event.params.messageId}`);
     }
   } catch (error) {
-    logger.error(`onMessageCreated: Error sending push notification to ${recipientUid}`, error);
+    logger.error(`onMessageCreated: Error sending push notification to ${recipientId}`, error);
   }
 });

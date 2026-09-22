@@ -156,6 +156,7 @@ fun ChannelListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
     var activeFilter by remember { mutableStateOf(0) }
+    var showDiagnostics by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(userFeedback) {
@@ -211,7 +212,8 @@ fun ChannelListScreen(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                         color = RaixTextPrimary,
-                        letterSpacing = 1.sp
+                        letterSpacing = 1.sp,
+                        modifier = Modifier.clickable { showDiagnostics = !showDiagnostics }
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -303,6 +305,13 @@ fun ChannelListScreen(
                 .padding(innerPadding)
                 .background(RaixBackground)
         ) {
+
+            // Painel de diagnostico push (temporario, para depuracao sem adb)
+            if (showDiagnostics) {
+                com.example.ui.components.PushDiagnosticsPanel(
+                    onDismiss = { showDiagnostics = false }
+                )
+            }
 
             // Search bar (expansivel)
             AnimatedVisibility(visible = searchQuery.isNotEmpty()) {

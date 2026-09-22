@@ -145,6 +145,8 @@ object NotificationHelper {
 
     /**
      * Dispatches a remote push notification received via FCM with high priority.
+     * Funciona tanto em foreground (Activity) quanto em background (Service/Worker).
+     * Usa NotificationManager direto do sistema para garantir entrega em background.
      */
     fun showPushNotification(
         context: Context,
@@ -152,7 +154,7 @@ object NotificationHelper {
         body: String = "Nova mensagem criptografada",
         roomId: String = ""
     ) {
-        if (!hasNotificationPermission(context)) return
+        // Garantir que o canal exista (necessario quando o processo e criado frio pelo FCM)
         createNotificationChannels(context)
 
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -186,9 +188,14 @@ object NotificationHelper {
             .build()
 
         try {
-            val notificationManager = NotificationManagerCompat.from(context)
+            // Usar NotificationManager direto do sistema -- funciona em qualquer contexto
+            // (Service, Worker, BroadcastReceiver), diferente do NotificationManagerCompat
+            // que pode falhar silenciosamente em background.
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(notifyId, notification)
-        } catch (_: Throwable) {
+            android.util.Log.d("NotificationHelper", "[DIAGNOSTICO] Notificacao postada com sucesso. id=$notifyId roomId=${roomId.take(8)}")
+        } catch (e: Throwable) {
+            android.util.Log.e("NotificationHelper", "[DIAGNOSTICO] Falha ao postar notificacao: ${e.message}")
         }
     }
 }

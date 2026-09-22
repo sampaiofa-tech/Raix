@@ -336,8 +336,10 @@ fun VanishApp(
       val idToken = authManager.getIdToken()
       if (idToken != null) {
         val pushToken = com.example.security.notification.PushNotificationManager.getPushToken()
+        com.example.util.PushDiagnostics.updateFcmToken(pushToken)
         if (pushToken != null) {
           com.example.data.network.IdentityNetworkClient.registerPushToken(pushToken, "android", idToken)
+          com.example.util.PushDiagnostics.markTokenRegistered()
           println("[DIAGNOSTICO] Push token registrado imediatamente apos onboarding")
         }
       }

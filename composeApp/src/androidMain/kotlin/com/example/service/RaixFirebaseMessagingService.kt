@@ -2,57 +2,57 @@ package com.example.service
 
 import android.util.Log
 import com.example.util.NotificationHelper
+import com.example.util.PushDiagnostics
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 /**
- * Raix Firebase Cloud Messaging Service (v1.6).
+ * Raix Firebase Cloud Messaging Service (v1.9.6).
  *
- * Implements:
- * 1. Zero-Knowledge Background Delivery: Only alerts the user that an ephemeral message
- *    is waiting on the server. Never parses, routes or handles message plaintext.
- * 2. High-Priority Display: Dispatches native Android Messaging Notifications via NotificationHelper.
- * 3. Token Rotation: Handles onNewToken and persists device push token.
+ * Pipeline de notificacao em segundo plano:
+ * 1. FCM acorda o app (onMessageReceived).
+ * 2. Enfileira SyncMessageWorker (fetch + descriptografia real em background).
+ * 3. Dispara notificacao imediata zero-knowledge (conteudo generico).
+ * 4. Quando o app volta ao foreground, as mensagens ja estao no InMemoryMessageCache.
+ *
+ * Canal UNICO de notificacao: somente este service dispara notificacoes.
+ * O polling (E2EMessageListenerEffect) NAO notifica para evitar duplicacao.
  */
 class RaixFirebaseMessagingService : FirebaseMessagingService() {
-
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d(TAG, "Raix FCM Token refreshed: ${token.take(8)}...")
-        // Save token locally for registration upon device authentication
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
             .edit()
             .putString(KEY_FCM_TOKEN, token)
             .apply()
+        PushDiagnostics.updateFcmToken(token)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        Log.d(TAG, "Raix FCM Push received from: ${remoteMessage.from}")
+        Log.d(TAG, "[DIAGNOSTICO] FCM Push recebido. from=${remoteMessage.from}")
 
-        // Zero-Knowledge check: never rely on plaintext in push payload
-        val type = remoteMessage.data["type"] ?: "new_message"
-        val messageId = remoteMessage.data["messageId"] ?: "unknown"
         val senderId = remoteMessage.data["senderId"] ?: remoteMessage.data["messageId"] ?: "unknown"
+        Log.d(TAG, "[DIAGNOSTICO] senderId=$senderId")
+        PushDiagnostics.markPushReceived(senderId)
 
-        // Enqueue background sync job for blind push
+        // 1. Enfileirar fetch real em background (SyncMessageWorker faz descriptografia)
         com.example.data.worker.SyncMessageWorker.enqueueSync(this)
+        Log.d(TAG, "[DIAGNOSTICO] SyncMessageWorker enfileirado")
 
-        if (NotificationHelper.hasNotificationPermission(this)) {
-            // Trigger high-priority notification with standard privacy-preserving copy
-            NotificationHelper.showPushNotification(
-                context = this,
-                title = "Raix",
-                body = "Nova mensagem criptografada",
-                roomId = senderId
-            )
-        }
+        // 2. Notificacao imediata (zero-knowledge, conteudo generico)
+        // Sem guard de permissao: showPushNotification usa NotificationManager direto,
+        // que funciona em qualquer contexto (Service, Worker, BroadcastReceiver).
+        NotificationHelper.showPushNotification(
+            context = this,
+            title = "Raix",
+            body = "Nova mensagem criptografada",
+            roomId = senderId
+        )
+        Log.d(TAG, "[DIAGNOSTICO] Notificacao disparada para roomId=$senderId")
+        PushDiagnostics.markNotificationFired("FCM")
     }
 
     companion object {
@@ -66,3 +66,4 @@ class RaixFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 }
+

@@ -204,8 +204,8 @@ extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "tech.sampaiofa.raix"
         minSdk = 24
         targetSdk = 36
-        versionCode = 40
-        versionName = "1.9.4"
+        versionCode = 46
+        versionName = "1.9.10"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -321,7 +321,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Raix"
-            packageVersion = "1.9.4"
+            packageVersion = "1.9.10"
             description = "Raix - Mensageiro Efêmero e Criptografado (Privacidade Forte por Design)"
             copyright = "© 2026 Raix"
             vendor = "Raix"

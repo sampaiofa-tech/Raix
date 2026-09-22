@@ -25,15 +25,15 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 
 ## 2. PRODUTOS (status)
 
-- **RAIX Messaging:** EM OPERACAO (Android, Windows, Web; iOS em homologacao) -- v1.9.4, zero-knowledge de conteudo, pos-quantica hibrida (ML-KEM-768 + ML-DSA-65)
-  - **Versao vigente:** v1.9.4 (versionCode 40), confirmada em `composeApp/build.gradle.kts`.
+- **RAIX Messaging:** EM OPERACAO (Android, Windows, Web; iOS em homologacao) -- v1.9.10, zero-knowledge de conteudo, pos-quantica hibrida (ML-KEM-768 + ML-DSA-65)
+  - **Versao vigente:** v1.9.10 (versionCode 46), confirmada em `composeApp/build.gradle.kts`.
   - **Data de referencia do ambiente:** 2026-09-22 (fuso UTC-03:00, Brasilia).
   - **Binarios autoritativos (build de 2026-09-22):**
-    - APK: `release-artifacts/Raix-1.9.4.apk` -- `C989D67053DC6B263A0A64AB39794065D5547BBD50B9D8516BEFFEE3EFCB8D69`
-    - AAB: `release-artifacts/Raix-1.9.4.aab` -- `8B1CFF971AF95D8D49402A47DEA24E885287D3570526C09C486ECB34BB6FE0CC`
-    - MSI: `release-artifacts/Raix-1.9.4.msi` -- `3765A1307B88D6449BB30DEEB8DA763E8190E03C47FED2A297F7569E9D0D0612`
+    - APK: `release-artifacts/Raix-1.9.10.apk` -- `88C5F92537C21D3842F9D0F0EEF7ADF58F90E35BD8792AAEBD3CFC84F04B33AD`
+    - AAB: `release-artifacts/Raix-1.9.10.aab` -- `749C2E7ADD36A131938471587ED5D52598F8A70414A27BDA3EF3F2481283C8DF`
+    - MSI: `release-artifacts/Raix-1.9.10.msi` -- `B4B08460A092F4598ABF8614103FFE588F1EE4E2DB87AF3D68BC626F9349E196`
   - **Checksums canonicos:** `docs/release-checksums.sha256`
-  - **Changelog v1.7--v1.9.4 (14 correcoes):** home vazia (TTL), abas, QR do menu, insets, busca, deep-link de notificacao, menu Bloquear, icone 3 pontos, permissao POST_NOTIFICATIONS no onboarding, paridade desktop, versionamento unificado, wipe-to-push token (registro imediato apos onboarding), preparacao enforceHybrid (pipeline PQC dormente).
+  - **Changelog v1.7--v1.9.10 (20+ correcoes):** home vazia (TTL), abas, QR do menu, insets, busca, deep-link de notificacao, menu Bloquear, icone 3 pontos, permissao POST_NOTIFICATIONS no onboarding, paridade desktop, versionamento unificado, wipe-to-push token, preparacao enforceHybrid (pipeline PQC dormente), backend recipientId (causa raiz push FCM), SyncMessageWorker (fetch em segundo plano), deduplicacao de notificacao, IME/teclado, canal unico de notificacao, NotificationManager direto para background, painel de diagnostico (oculto por padrao).
 - **Cartilhas:** publicadas (Android + iOS + Brasil/LGPD)
 - **Landing page:** publicada (redesign com 8 correções)
 - **Consultoria de privacidade:** registrada (pós-rodada)
