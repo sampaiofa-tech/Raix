@@ -48,13 +48,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.EphemeralMessage
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
 import kotlinx.coroutines.delay
 
 @Composable
@@ -102,7 +101,7 @@ fun AudioMessageBubble(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(ImmersiveCardVariant.copy(alpha = 0.7f))
+            .background(RaixSurfaceElevated.copy(alpha = 0.7f))
             .padding(8.dp)
     ) {
         // View-Once Badge header if applicable
@@ -112,14 +111,14 @@ fun AudioMessageBubble(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(6.dp))
-                    .background(EmberOrange.copy(alpha = 0.16f))
+                    .background(RaixError.copy(alpha = 0.16f))
                     .padding(horizontal = 8.dp, vertical = 3.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .size(16.dp)
                         .clip(CircleShape)
-                        .background(EmberOrange),
+                        .background(RaixError),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -134,14 +133,14 @@ fun AudioMessageBubble(
                     text = "ÁUDIO DE VISUALIZAÇÃO ÚNICA",
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
-                    color = EmberOrange,
+                    color = RaixError,
                     letterSpacing = 0.5.sp
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Default.LocalFireDepartment,
                     contentDescription = null,
-                    tint = EmberOrange,
+                    tint = RaixError,
                     modifier = Modifier.size(12.dp)
                 )
             }
@@ -158,7 +157,7 @@ fun AudioMessageBubble(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(if (message.isViewOnce) EmberOrange else ImmersivePrimary)
+                    .background(if (message.isViewOnce) RaixError else RaixActionPrimary)
                     .clickable {
                         isPlaying = !isPlaying
                     }
@@ -191,9 +190,9 @@ fun AudioMessageBubble(
                         val isPlayed = index <= playedBarsCount
                         val barHeight = (heightMultiplier * 24).coerceIn(4f, 24f).dp
                         val barColor = when {
-                            isPlayed && message.isViewOnce -> EmberOrange
-                            isPlayed -> ImmersivePrimary
-                            else -> ImmersiveMutedLight.copy(alpha = 0.45f)
+                            isPlayed && message.isViewOnce -> RaixError
+                            isPlayed -> RaixActionPrimary
+                            else -> RaixTextSecondary.copy(alpha = 0.45f)
                         }
 
                         Box(
@@ -223,14 +222,14 @@ fun AudioMessageBubble(
                         text = formattedTime,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
-                        color = ImmersiveMutedLight
+                        color = RaixTextSecondary
                     )
 
                     // Playback speed pill
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(4.dp))
-                            .background(ImmersiveOutline.copy(alpha = 0.3f))
+                            .background(RaixBorder.copy(alpha = 0.3f))
                             .clickable {
                                 playbackSpeed = when (playbackSpeed) {
                                     1.0f -> 1.5f
@@ -244,7 +243,7 @@ fun AudioMessageBubble(
                             text = "${playbackSpeed}x",
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (message.isViewOnce) EmberOrange else ImmersivePrimary
+                            color = if (message.isViewOnce) RaixError else RaixActionPrimary
                         )
                     }
                 }
@@ -257,7 +256,7 @@ fun AudioMessageBubble(
             Text(
                 text = "🔥 Auto-destruição imediata após reproduzir",
                 fontSize = 9.sp,
-                color = EmberOrange.copy(alpha = 0.85f),
+                color = RaixError.copy(alpha = 0.85f),
                 fontWeight = FontWeight.Medium
             )
         }

@@ -67,19 +67,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.components.PmsgLogoBadge
 import com.example.ui.components.PmsgWordmark
-import com.example.ui.theme.ElectricCyan
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnPrimary
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOnlineGreen
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersiveSurface
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBackground
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixPremiumGold
 
 import com.example.util.security.SecurePrefsHelper
 
@@ -234,7 +230,7 @@ fun BiometricLockScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ImmersiveSurface)
+            .background(RaixBackground)
             .statusBarsPadding()
             .testTag("biometric_lock_screen"),
         contentAlignment = Alignment.Center
@@ -255,7 +251,7 @@ fun BiometricLockScreen(
                 text = "APLICATIVO BLOQUEADO",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                color = ImmersivePrimary,
+                color = RaixActionPrimary,
                 letterSpacing = 1.5.sp
             )
 
@@ -268,38 +264,38 @@ fun BiometricLockScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(ImmersiveCardVariant)
-                        .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(20.dp))
+                        .background(RaixSurfaceElevated)
+                        .border(0.8.dp, RaixBorder, RoundedCornerShape(20.dp))
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Fingerprint,
                         contentDescription = "Impressão Digital",
-                        tint = ImmersivePrimary,
+                        tint = RaixActionPrimary,
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
                         text = "Digital",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = ImmersivePrimary
+                        color = RaixActionPrimary
                     )
                     Text(
                         text = "•",
                         fontSize = 12.sp,
-                        color = ImmersiveMuted
+                        color = RaixTextSecondary
                     )
                     Icon(
                         imageVector = Icons.Default.Face,
                         contentDescription = "Reconhecimento Facial",
-                        tint = ElectricCyan,
+                        tint = RaixPremiumGold,
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
                         text = "Facial",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = ElectricCyan
+                        color = RaixPremiumGold
                     )
                 }
 
@@ -316,14 +312,14 @@ fun BiometricLockScreen(
                             .size(130.dp)
                             .scale(pulseScale)
                             .clip(CircleShape)
-                            .background(ImmersivePrimary.copy(alpha = 0.12f))
+                            .background(RaixActionPrimary.copy(alpha = 0.12f))
                     )
                     Box(
                         modifier = Modifier
                             .size(105.dp)
                             .clip(CircleShape)
-                            .background(ImmersivePrimary.copy(alpha = 0.2f))
-                            .border(1.5.dp, ImmersivePrimary.copy(alpha = 0.5f), CircleShape)
+                            .background(RaixActionPrimary.copy(alpha = 0.2f))
+                            .border(1.5.dp, RaixActionPrimary.copy(alpha = 0.5f), CircleShape)
                     )
 
                     // Fingerprint Touch Button
@@ -333,7 +329,7 @@ fun BiometricLockScreen(
                             .clip(CircleShape)
                             .background(
                                 Brush.linearGradient(
-                                    listOf(ImmersivePrimary, ElectricCyan)
+                                    listOf(RaixActionPrimary, RaixPremiumGold)
                                 )
                             )
                             .clickable { performBiometricAuth() }
@@ -343,7 +339,7 @@ fun BiometricLockScreen(
                         Icon(
                             imageVector = Icons.Default.Fingerprint,
                             contentDescription = "Desbloquear com Biometria",
-                            tint = ImmersiveSurface,
+                            tint = RaixBackground,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -354,14 +350,14 @@ fun BiometricLockScreen(
                 Text(
                     text = "Toque para desbloqueio rápido",
                     fontSize = 15.sp,
-                    color = ImmersiveOnSurface,
+                    color = RaixTextPrimary,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Autenticação rápida por biometria digital ou facial",
                     fontSize = 12.sp,
-                    color = ImmersiveMutedLight,
+                    color = RaixTextSecondary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -370,7 +366,7 @@ fun BiometricLockScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = authError ?: "",
-                        color = EmberOrange,
+                        color = RaixError,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -380,7 +376,7 @@ fun BiometricLockScreen(
 
                 Button(
                     onClick = { performBiometricAuth() },
-                    colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
@@ -390,13 +386,13 @@ fun BiometricLockScreen(
                     Icon(
                         imageVector = Icons.Default.Fingerprint,
                         contentDescription = null,
-                        tint = ImmersiveOnPrimary,
+                        tint = RaixBackground,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Autenticar com Digital / Face",
-                        color = ImmersiveOnPrimary,
+                        color = RaixBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
                     )
@@ -410,13 +406,13 @@ fun BiometricLockScreen(
                     Icon(
                         imageVector = Icons.Default.Pin,
                         contentDescription = null,
-                        tint = ImmersiveMutedLight,
+                        tint = RaixTextSecondary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Usar PIN de Segurança",
-                        color = ImmersiveMutedLight,
+                        color = RaixTextSecondary,
                         fontSize = 12.sp
                     )
                 }
@@ -426,20 +422,20 @@ fun BiometricLockScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(ImmersiveCard)
-                        .border(1.dp, ImmersiveOutline, RoundedCornerShape(20.dp))
+                        .background(RaixSurface)
+                        .border(1.dp, RaixBorder, RoundedCornerShape(20.dp))
                         .padding(20.dp)
                 ) {
                     Text(
                         text = "Digite o PIN de Segurança",
                         fontWeight = FontWeight.Bold,
-                        color = ImmersiveOnSurface,
+                        color = RaixTextPrimary,
                         fontSize = 15.sp
                     )
                     Text(
                         text = "Auto-bloqueio de segurança ativo",
                         fontSize = 11.sp,
-                        color = ImmersiveMutedLight,
+                        color = RaixTextSecondary,
                         modifier = Modifier.padding(top = 2.dp)
                     )
 
@@ -447,7 +443,7 @@ fun BiometricLockScreen(
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = authError ?: "",
-                            color = EmberOrange,
+                            color = RaixError,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -467,11 +463,11 @@ fun BiometricLockScreen(
                                     .size(16.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (isFilled) ImmersivePrimary else ImmersiveCardVariant
+                                        if (isFilled) RaixActionPrimary else RaixSurfaceElevated
                                     )
                                     .border(
                                         1.5.dp,
-                                        if (isFilled) ImmersivePrimary else ImmersiveOutline,
+                                        if (isFilled) RaixActionPrimary else RaixBorder,
                                         CircleShape
                                     )
                             )
@@ -499,9 +495,9 @@ fun BiometricLockScreen(
                                         .size(54.dp)
                                         .clip(CircleShape)
                                         .background(
-                                            if (key == "Bio" || key == "Del") ImmersiveHeader else ImmersiveCardVariant
+                                            if (key == "Bio" || key == "Del") RaixSurface else RaixSurfaceElevated
                                         )
-                                        .border(0.8.dp, ImmersiveOutline, CircleShape)
+                                        .border(0.8.dp, RaixBorder, CircleShape)
                                         .clickable {
                                             when (key) {
                                                 "Del" -> if (pinInput.isNotEmpty()) pinInput = pinInput.dropLast(1)
@@ -512,9 +508,9 @@ fun BiometricLockScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     when (key) {
-                                        "Del" -> Icon(Icons.Default.Backspace, contentDescription = "Apagar", tint = ImmersiveMutedLight, modifier = Modifier.size(18.dp))
-                                        "Bio" -> Icon(Icons.Default.Fingerprint, contentDescription = "Biometria", tint = ImmersivePrimary, modifier = Modifier.size(22.dp))
-                                        else -> Text(text = key, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = ImmersiveOnSurface)
+                                        "Del" -> Icon(Icons.Default.Backspace, contentDescription = "Apagar", tint = RaixTextSecondary, modifier = Modifier.size(18.dp))
+                                        "Bio" -> Icon(Icons.Default.Fingerprint, contentDescription = "Biometria", tint = RaixActionPrimary, modifier = Modifier.size(22.dp))
+                                        else -> Text(text = key, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RaixTextPrimary)
                                     }
                                 }
                             }
@@ -524,7 +520,7 @@ fun BiometricLockScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     TextButton(onClick = { isPinMode = false }) {
-                        Text("Voltar para Biometria", color = ImmersivePrimary, fontSize = 12.sp)
+                        Text("Voltar para Biometria", color = RaixActionPrimary, fontSize = 12.sp)
                     }
                 }
             }
@@ -538,14 +534,14 @@ fun BiometricLockScreen(
                 Icon(
                     imageVector = Icons.Default.Shield,
                     contentDescription = null,
-                    tint = ImmersiveOnlineGreen,
+                    tint = RaixActionPrimary,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "Criptografia Local de Nível de Dispositivo",
                     fontSize = 11.sp,
-                    color = ImmersiveMuted
+                    color = RaixTextSecondary
                 )
             }
         }

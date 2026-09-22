@@ -87,20 +87,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.components.PmsgLogoBadge
 import com.example.ui.components.PmsgWordmark
-import com.example.ui.theme.ElectricCyan
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnlineGreen
-import com.example.ui.theme.ImmersiveOnPrimary
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersiveSurface
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixErrorContainer
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBackground
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixPremiumGold
 import com.example.util.BiometricAuthHelper
 import com.example.util.security.SecurePrefsHelper
 
@@ -148,6 +144,7 @@ fun SettingsScreen(
     var newPinInput by remember { mutableStateOf("") }
     var pinError by remember { mutableStateOf<String?>(null) }
     var showPanicConfirmDialog by remember { mutableStateOf(false) }
+    var showNotificationDiagnostics by remember { mutableStateOf(false) }
 
     // Duress PIN, Clipboard Auto-Purge & Privacy Curtain
     var isEditingDuressPin by remember { mutableStateOf(false) }
@@ -176,16 +173,26 @@ fun SettingsScreen(
         0 to "Imediato"
     )
 
+    // Tela de autodiagnostico de notificacoes (sobreposta)
+    if (showNotificationDiagnostics) {
+        NotificationDiagnosticsScreen(
+            onBack = { showNotificationDiagnostics = false },
+            onRequestPermission = onRequestNotificationPermission,
+            onTestNotification = onTestNotification
+        )
+        return
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        containerColor = ImmersiveSurface,
+        containerColor = RaixBackground,
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(ImmersiveHeader)
+                    .background(RaixSurface)
                     .statusBarsPadding()
-                    .border(width = 1.dp, color = ImmersiveOutline)
+                    .border(width = 1.dp, color = RaixBorder)
                     .padding(horizontal = 8.dp, vertical = 10.dp)
             ) {
                 Row(
@@ -201,7 +208,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Voltar",
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -218,20 +225,20 @@ fun SettingsScreen(
                                     text = "Configurações",
                                     fontSize = 17.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(4.dp))
-                                        .background(ImmersivePrimary.copy(alpha = 0.15f))
+                                        .background(RaixActionPrimary.copy(alpha = 0.15f))
                                         .padding(horizontal = 5.dp, vertical = 1.dp)
                                 ) {
                                     Text(
                                         text = "COFRE",
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Black,
-                                        color = ImmersivePrimary,
+                                        color = RaixActionPrimary,
                                         letterSpacing = 0.5.sp
                                     )
                                 }
@@ -239,7 +246,7 @@ fun SettingsScreen(
                             Text(
                                 text = "Privacidade, Bloqueio e Criptografia",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -249,13 +256,13 @@ fun SettingsScreen(
                         onClick = onLockNow,
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(ImmersiveCardVariant)
+                            .background(RaixSurfaceElevated)
                             .testTag("top_lock_app_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = "Bloquear Agora",
-                            tint = ImmersivePrimary,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -270,9 +277,9 @@ fun SettingsScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            ImmersivePrimary.copy(alpha = 0.05f),
+                            RaixActionPrimary.copy(alpha = 0.05f),
                             Color.Transparent,
-                            ImmersiveSurface
+                            RaixBackground
                         )
                     )
                 )
@@ -285,8 +292,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.ObsidianCard),
-                border = androidx.compose.foundation.BorderStroke(1.dp, com.example.ui.theme.SecurityEmerald.copy(alpha = 0.4f))
+                colors = CardDefaults.cardColors(containerColor = RaixSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, RaixActionPrimary.copy(alpha = 0.4f))
             ) {
                 Row(
                     modifier = Modifier
@@ -298,13 +305,13 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(CircleShape)
-                            .background(com.example.ui.theme.SecurityEmerald.copy(alpha = 0.15f)),
+                            .background(RaixActionPrimary.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Shield,
                             contentDescription = null,
-                            tint = com.example.ui.theme.SecurityEmerald,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(26.dp)
                         )
                     }
@@ -314,7 +321,7 @@ fun SettingsScreen(
                             text = "Proteção em Cascata de 512-bit (Dual-Layer)",
                             fontSize = 14.5.sp,
                             fontWeight = FontWeight.Medium,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
                         Text(
                             text = if (isHardwareBackedCrypto) {
@@ -323,7 +330,7 @@ fun SettingsScreen(
                                 "Criptografia em cascata de 512 bits (Dual-Layer) ativa. Zero rastro em repouso e exclusão anti-forense em memória."
                             },
                             fontSize = 11.sp,
-                            color = com.example.ui.theme.TitaniumMuted,
+                            color = RaixTextSecondary,
                             lineHeight = 15.sp
                         )
                     }
@@ -336,8 +343,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.ObsidianCardElevated),
-                border = androidx.compose.foundation.BorderStroke(1.dp, com.example.ui.theme.ObsidianBorder)
+                colors = CardDefaults.cardColors(containerColor = RaixSurfaceElevated),
+                border = androidx.compose.foundation.BorderStroke(1.dp, RaixBorder)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -349,7 +356,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.VpnKey,
                                 contentDescription = null,
-                                tint = com.example.ui.theme.TitaniumPrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -357,7 +364,7 @@ fun SettingsScreen(
                                 text = "Auditoria de Integridade do Dispositivo",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                         }
 
@@ -365,8 +372,8 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(6.dp))
                                 .background(
-                                    if (securityPosture.isDeviceSecure) com.example.ui.theme.SecurityEmerald.copy(alpha = 0.15f)
-                                    else com.example.ui.theme.IncinerateCrimsonBg
+                                    if (securityPosture.isDeviceSecure) RaixActionPrimary.copy(alpha = 0.15f)
+                                    else RaixErrorContainer
                                 )
                                 .padding(horizontal = 7.dp, vertical = 2.dp)
                         ) {
@@ -374,7 +381,7 @@ fun SettingsScreen(
                                 text = if (securityPosture.isDeviceSecure) "SEGURO" else "VULNERÁVEL",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = if (securityPosture.isDeviceSecure) com.example.ui.theme.SecurityEmerald else com.example.ui.theme.IncinerateCrimson
+                                color = if (securityPosture.isDeviceSecure) RaixActionPrimary else RaixError
                             )
                         }
                     }
@@ -390,13 +397,13 @@ fun SettingsScreen(
                         Text(
                             text = "Hardware KeyStore (TEE / StrongBox)",
                             fontSize = 11.5.sp,
-                            color = com.example.ui.theme.TitaniumSecondary
+                            color = RaixTextSecondary
                         )
                         Text(
                             text = if (securityPosture.hardwareKeyStoreSupported) "Ativo (Silício Seguro)" else "Software Keystore",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (securityPosture.hardwareKeyStoreSupported) com.example.ui.theme.SecurityEmerald else com.example.ui.theme.EmberFlame
+                            color = if (securityPosture.hardwareKeyStoreSupported) RaixActionPrimary else RaixError
                         )
                     }
 
@@ -411,13 +418,13 @@ fun SettingsScreen(
                         Text(
                             text = "Integridade do SO (Root / Magisk)",
                             fontSize = 11.5.sp,
-                            color = com.example.ui.theme.TitaniumSecondary
+                            color = RaixTextSecondary
                         )
                         Text(
                             text = if (!securityPosture.isRooted && !securityPosture.isTestKeysBuild) "Íntegro (Sem Root)" else "Dispositivo Modificado",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (!securityPosture.isRooted && !securityPosture.isTestKeysBuild) com.example.ui.theme.SecurityEmerald else com.example.ui.theme.IncinerateCrimson
+                            color = if (!securityPosture.isRooted && !securityPosture.isTestKeysBuild) RaixActionPrimary else RaixError
                         )
                     }
 
@@ -432,13 +439,13 @@ fun SettingsScreen(
                         Text(
                             text = "Proteção Anti-Debugging / Engenharia Reversa",
                             fontSize = 11.5.sp,
-                            color = com.example.ui.theme.TitaniumSecondary
+                            color = RaixTextSecondary
                         )
                         Text(
                             text = if (!securityPosture.isDebuggerAttached) "Protegido" else "Depurador Anexado!",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (!securityPosture.isDebuggerAttached) com.example.ui.theme.SecurityEmerald else com.example.ui.theme.IncinerateCrimson
+                            color = if (!securityPosture.isDebuggerAttached) RaixActionPrimary else RaixError
                         )
                     }
                 }
@@ -454,8 +461,8 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(ImmersiveCard)
-                    .border(1.dp, if (autoLockEnabled) ImmersivePrimary.copy(alpha = 0.4f) else ImmersiveOutline, RoundedCornerShape(16.dp))
+                    .background(RaixSurface)
+                    .border(1.dp, if (autoLockEnabled) RaixActionPrimary.copy(alpha = 0.4f) else RaixBorder, RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Row(
@@ -471,13 +478,13 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(ImmersivePrimary.copy(alpha = 0.15f)),
+                                .background(RaixActionPrimary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Timer,
                                 contentDescription = null,
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -487,12 +494,12 @@ fun SettingsScreen(
                                 text = "Auto-Bloqueio Automático",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                             Text(
                                 text = if (autoLockEnabled) "Bloqueia após $autoLockTimeoutMinutes min sem uso." else "Desativado.",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -500,10 +507,10 @@ fun SettingsScreen(
                         checked = autoLockEnabled,
                         onCheckedChange = { onToggleAutoLock(it) },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = ImmersiveSurface,
-                            checkedTrackColor = ImmersivePrimary,
-                            uncheckedThumbColor = ImmersiveMuted,
-                            uncheckedTrackColor = ImmersiveCardVariant
+                            checkedThumbColor = RaixBackground,
+                            checkedTrackColor = RaixActionPrimary,
+                            uncheckedThumbColor = RaixTextSecondary,
+                            uncheckedTrackColor = RaixSurfaceElevated
                         ),
                         modifier = Modifier.testTag("auto_lock_switch")
                     )
@@ -515,7 +522,7 @@ fun SettingsScreen(
                         text = "TEMPO DE INATIVIDADE PARA BLOQUEIO:",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
-                        color = ImmersivePrimary,
+                        color = RaixActionPrimary,
                         letterSpacing = 0.5.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -530,10 +537,10 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(if (isSelected) ImmersivePrimary else ImmersiveCardVariant)
+                                    .background(if (isSelected) RaixActionPrimary else RaixSurfaceElevated)
                                     .border(
                                         0.8.dp,
-                                        if (isSelected) ImmersivePrimary else ImmersiveOutline,
+                                        if (isSelected) RaixActionPrimary else RaixBorder,
                                         RoundedCornerShape(10.dp)
                                     )
                                     .clickable { onSetAutoLockTimeout(mins) }
@@ -544,7 +551,7 @@ fun SettingsScreen(
                                     text = if (mins == 5) "5m (Padrão)" else "${mins}m",
                                     fontSize = 10.sp,
                                     fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
-                                    color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
+                                    color = if (isSelected) RaixBackground else RaixTextPrimary,
                                     maxLines = 1
                                 )
                             }
@@ -560,10 +567,10 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(ImmersiveCard)
+                    .background(RaixSurface)
                     .border(
                         1.dp,
-                        if (biometricLockEnabled) ImmersivePrimary.copy(alpha = 0.4f) else ImmersiveOutline,
+                        if (biometricLockEnabled) RaixActionPrimary.copy(alpha = 0.4f) else RaixBorder,
                         RoundedCornerShape(16.dp)
                     )
                     .padding(16.dp)
@@ -581,13 +588,13 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(if (biometricLockEnabled) ImmersivePrimary.copy(alpha = 0.2f) else ImmersiveCardVariant),
+                                .background(if (biometricLockEnabled) RaixActionPrimary.copy(alpha = 0.2f) else RaixSurfaceElevated),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Fingerprint,
                                 contentDescription = null,
-                                tint = if (biometricLockEnabled) ImmersivePrimary else ImmersiveMuted,
+                                tint = if (biometricLockEnabled) RaixActionPrimary else RaixTextSecondary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -598,20 +605,20 @@ fun SettingsScreen(
                                     text = "Biometria (Digital / Facial)",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Icon(
                                     imageVector = Icons.Default.Face,
                                     contentDescription = "Facial",
-                                    tint = if (biometricLockEnabled) ElectricCyan else ImmersiveMuted,
+                                    tint = if (biometricLockEnabled) RaixPremiumGold else RaixTextSecondary,
                                     modifier = Modifier.size(15.dp)
                                 )
                             }
                             Text(
                                 text = if (biometricLockEnabled) "Desbloqueio rápido por biometria ou PIN." else "Desativado: usa apenas PIN numérico.",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -619,10 +626,10 @@ fun SettingsScreen(
                         checked = biometricLockEnabled,
                         onCheckedChange = { onToggleBiometricLock(it) },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = ImmersiveSurface,
-                            checkedTrackColor = ImmersivePrimary,
-                            uncheckedThumbColor = ImmersiveMuted,
-                            uncheckedTrackColor = ImmersiveCardVariant
+                            checkedThumbColor = RaixBackground,
+                            checkedTrackColor = RaixActionPrimary,
+                            uncheckedThumbColor = RaixTextSecondary,
+                            uncheckedTrackColor = RaixSurfaceElevated
                         ),
                         modifier = Modifier.testTag("biometric_lock_switch")
                     )
@@ -634,20 +641,20 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(ImmersiveSurface.copy(alpha = 0.5f))
+                            .background(RaixBackground.copy(alpha = 0.5f))
                             .padding(horizontal = 10.dp, vertical = 5.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .size(7.dp)
                                 .clip(CircleShape)
-                                .background(ImmersiveOnlineGreen)
+                                .background(RaixActionPrimary)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Status de Hardware: $biometricStatus",
                             fontSize = 11.sp,
-                            color = ImmersiveMutedLight,
+                            color = RaixTextSecondary,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -661,8 +668,8 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(ImmersiveCard)
-                    .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(16.dp))
+                    .background(RaixSurface)
+                    .border(0.8.dp, RaixBorder, RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Row(
@@ -675,13 +682,13 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(ImmersivePrimary.copy(alpha = 0.15f)),
+                                .background(RaixActionPrimary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Pin,
                                 contentDescription = null,
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -691,12 +698,12 @@ fun SettingsScreen(
                                 text = "PIN de Segurança",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                             Text(
                                 text = "Código numérico de 4 dígitos",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -707,23 +714,23 @@ fun SettingsScreen(
                             newPinInput = ""
                             pinError = null
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = ImmersiveCardVariant),
+                        colors = ButtonDefaults.buttonColors(containerColor = RaixSurfaceElevated),
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                         modifier = Modifier
                             .height(30.dp)
-                            .border(0.8.dp, ImmersivePrimary, RoundedCornerShape(8.dp))
+                            .border(0.8.dp, RaixActionPrimary, RoundedCornerShape(8.dp))
                     ) {
                         Icon(
                             imageVector = if (isEditingPin) Icons.Default.Check else Icons.Default.Edit,
                             contentDescription = null,
-                            tint = ImmersivePrimary,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = if (isEditingPin) "Cancelar" else "Alterar",
-                            color = ImmersivePrimary,
+                            color = RaixActionPrimary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -750,10 +757,10 @@ fun SettingsScreen(
                                 singleLine = true,
                                 modifier = Modifier.weight(1f),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = ImmersivePrimary,
-                                    unfocusedBorderColor = ImmersiveOutline,
-                                    focusedTextColor = ImmersiveOnSurface,
-                                    unfocusedTextColor = ImmersiveOnSurface
+                                    focusedBorderColor = RaixActionPrimary,
+                                    unfocusedBorderColor = RaixBorder,
+                                    focusedTextColor = RaixTextPrimary,
+                                    unfocusedTextColor = RaixTextPrimary
                                 )
                             )
 
@@ -768,13 +775,13 @@ fun SettingsScreen(
                                     }
                                 },
                                 enabled = newPinInput.length == 4,
-                                colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                                colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.height(48.dp)
                             ) {
                                 Text(
                                     "Salvar",
-                                    color = ImmersiveOnPrimary,
+                                    color = RaixBackground,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -783,7 +790,7 @@ fun SettingsScreen(
                         if (pinError != null) {
                             Text(
                                 text = pinError ?: "",
-                                color = EmberOrange,
+                                color = RaixError,
                                 fontSize = 11.sp,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
@@ -799,10 +806,10 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(com.example.ui.theme.ObsidianCard)
+                    .background(RaixSurface)
                     .border(
                         1.dp,
-                        if (hasDuressPin) com.example.ui.theme.IncinerateCrimson.copy(alpha = 0.5f) else com.example.ui.theme.ObsidianBorder,
+                        if (hasDuressPin) RaixError.copy(alpha = 0.5f) else RaixBorder,
                         RoundedCornerShape(16.dp)
                     )
                     .padding(16.dp)
@@ -820,13 +827,13 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(com.example.ui.theme.IncinerateCrimsonBg),
+                                .background(RaixErrorContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.VisibilityOff,
                                 contentDescription = null,
-                                tint = com.example.ui.theme.IncinerateCrimson,
+                                tint = RaixError,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -837,19 +844,19 @@ fun SettingsScreen(
                                     text = "PIN de Coerção (Duress PIN)",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 if (hasDuressPin) {
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(4.dp))
-                                            .background(com.example.ui.theme.IncinerateCrimsonBg)
+                                            .background(RaixErrorContainer)
                                             .padding(horizontal = 5.dp, vertical = 1.dp)
                                     ) {
                                         Text(
                                             text = "ARMADO",
-                                            color = com.example.ui.theme.IncinerateCrimson,
+                                            color = RaixError,
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -859,7 +866,7 @@ fun SettingsScreen(
                             Text(
                                 text = "Abre o app vazio e tritura todos os dados silenciosamente sob ameaça.",
                                 fontSize = 11.sp,
-                                color = com.example.ui.theme.TitaniumMuted,
+                                color = RaixTextSecondary,
                                 lineHeight = 15.sp
                             )
                         }
@@ -871,16 +878,16 @@ fun SettingsScreen(
                             duressPinInput = ""
                             duressPinError = null
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.ObsidianCardElevated),
+                        colors = ButtonDefaults.buttonColors(containerColor = RaixSurfaceElevated),
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                         modifier = Modifier
                             .height(30.dp)
-                            .border(0.8.dp, com.example.ui.theme.ObsidianBorder, RoundedCornerShape(8.dp))
+                            .border(0.8.dp, RaixBorder, RoundedCornerShape(8.dp))
                     ) {
                         Text(
                             text = if (isEditingDuressPin) "Cancelar" else if (hasDuressPin) "Alterar" else "Configurar",
-                            color = com.example.ui.theme.TitaniumPrimary,
+                            color = RaixActionPrimary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -907,10 +914,10 @@ fun SettingsScreen(
                                 singleLine = true,
                                 modifier = Modifier.weight(1f),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = com.example.ui.theme.IncinerateCrimson,
-                                    unfocusedBorderColor = com.example.ui.theme.ObsidianBorder,
-                                    focusedTextColor = ImmersiveOnSurface,
-                                    unfocusedTextColor = ImmersiveOnSurface
+                                    focusedBorderColor = RaixError,
+                                    unfocusedBorderColor = RaixBorder,
+                                    focusedTextColor = RaixTextPrimary,
+                                    unfocusedTextColor = RaixTextPrimary
                                 )
                             )
 
@@ -930,7 +937,7 @@ fun SettingsScreen(
                                     }
                                 },
                                 enabled = duressPinInput.length == 4,
-                                colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.IncinerateCrimson),
+                                colors = ButtonDefaults.buttonColors(containerColor = RaixError),
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.height(48.dp)
                             ) {
@@ -952,14 +959,14 @@ fun SettingsScreen(
                                     isEditingDuressPin = false
                                 }
                             ) {
-                                Text("Remover PIN de Coerção", color = com.example.ui.theme.IncinerateCrimson, fontSize = 11.sp)
+                                Text("Remover PIN de Coerção", color = RaixError, fontSize = 11.sp)
                             }
                         }
 
                         if (duressPinError != null) {
                             Text(
                                 text = duressPinError ?: "",
-                                color = com.example.ui.theme.IncinerateCrimson,
+                                color = RaixError,
                                 fontSize = 11.sp,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
@@ -975,8 +982,8 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(com.example.ui.theme.ObsidianCard)
-                    .border(1.dp, com.example.ui.theme.ObsidianBorder, RoundedCornerShape(16.dp))
+                    .background(RaixSurface)
+                    .border(1.dp, RaixBorder, RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Row(
@@ -987,13 +994,13 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(com.example.ui.theme.SecurityEmerald.copy(alpha = 0.15f)),
+                            .background(RaixActionPrimary.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.DeleteSweep,
                             contentDescription = null,
-                            tint = com.example.ui.theme.SecurityEmerald,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -1003,12 +1010,12 @@ fun SettingsScreen(
                             text = "Auto-Limpeza da Área de Transferência",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
                         Text(
                             text = "Apaga textos copiados do clipboard do sistema para evitar espionagem por outros aplicativos.",
                             fontSize = 11.sp,
-                            color = com.example.ui.theme.TitaniumMuted,
+                            color = RaixTextSecondary,
                             lineHeight = 15.sp
                         )
                     }
@@ -1027,12 +1034,12 @@ fun SettingsScreen(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    if (isSelected) com.example.ui.theme.TitaniumPrimary
-                                    else com.example.ui.theme.ObsidianCardElevated
+                                    if (isSelected) RaixActionPrimary
+                                    else RaixSurfaceElevated
                                 )
                                 .border(
                                     0.8.dp,
-                                    if (isSelected) com.example.ui.theme.TitaniumPrimary else com.example.ui.theme.ObsidianBorder,
+                                    if (isSelected) RaixActionPrimary else RaixBorder,
                                     RoundedCornerShape(10.dp)
                                 )
                                 .clickable {
@@ -1046,7 +1053,7 @@ fun SettingsScreen(
                                 text = label,
                                 fontSize = 10.sp,
                                 fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
-                                color = if (isSelected) com.example.ui.theme.ObsidianBlack else ImmersiveOnSurface,
+                                color = if (isSelected) RaixBackground else RaixTextPrimary,
                                 maxLines = 1
                             )
                         }
@@ -1061,10 +1068,10 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(com.example.ui.theme.ObsidianCard)
+                    .background(RaixSurface)
                     .border(
                         1.dp,
-                        if (privacyCurtainEnabled) com.example.ui.theme.SecurityEmerald.copy(alpha = 0.4f) else com.example.ui.theme.ObsidianBorder,
+                        if (privacyCurtainEnabled) RaixActionPrimary.copy(alpha = 0.4f) else RaixBorder,
                         RoundedCornerShape(16.dp)
                     )
                     .padding(16.dp)
@@ -1082,13 +1089,13 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(com.example.ui.theme.SecurityEmerald.copy(alpha = 0.15f)),
+                                .background(RaixActionPrimary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Shield,
                                 contentDescription = null,
-                                tint = com.example.ui.theme.SecurityEmerald,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -1098,12 +1105,12 @@ fun SettingsScreen(
                                 text = "Cortina no Alternador de Aplicativos",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                             Text(
                                 text = if (privacyCurtainEnabled) "Oculta miniatura no alternador de apps recentes." else "Miniatura visível no sistema.",
                                 fontSize = 11.sp,
-                                color = com.example.ui.theme.TitaniumMuted
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -1114,10 +1121,10 @@ fun SettingsScreen(
                             privacyCurtainEnabled = it
                         },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = com.example.ui.theme.ObsidianBlack,
-                            checkedTrackColor = com.example.ui.theme.SecurityEmerald,
-                            uncheckedThumbColor = com.example.ui.theme.TitaniumMuted,
-                            uncheckedTrackColor = com.example.ui.theme.ObsidianCardElevated
+                            checkedThumbColor = RaixBackground,
+                            checkedTrackColor = RaixActionPrimary,
+                            uncheckedThumbColor = RaixTextSecondary,
+                            uncheckedTrackColor = RaixSurfaceElevated
                         ),
                         modifier = Modifier.testTag("privacy_curtain_switch")
                     )
@@ -1133,8 +1140,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ImmersiveCard),
-                border = androidx.compose.foundation.BorderStroke(0.8.dp, if (readReceiptsEnabled) ImmersivePrimary.copy(alpha = 0.4f) else ImmersiveOutline)
+                colors = CardDefaults.cardColors(containerColor = RaixSurface),
+                border = androidx.compose.foundation.BorderStroke(0.8.dp, if (readReceiptsEnabled) RaixActionPrimary.copy(alpha = 0.4f) else RaixBorder)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -1150,13 +1157,13 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(if (readReceiptsEnabled) ImmersivePrimary.copy(alpha = 0.15f) else ImmersiveCardVariant),
+                                    .background(if (readReceiptsEnabled) RaixActionPrimary.copy(alpha = 0.15f) else RaixSurfaceElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.DoneAll,
                                     contentDescription = null,
-                                    tint = if (readReceiptsEnabled) ImmersivePrimary else ImmersiveMuted,
+                                    tint = if (readReceiptsEnabled) RaixActionPrimary else RaixTextSecondary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -1166,12 +1173,12 @@ fun SettingsScreen(
                                     text = "Confirmação de Leitura",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = if (readReceiptsEnabled) "Exibe check duplo e efeito de desintegração ao ler." else "Status de leitura desativado.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -1179,10 +1186,10 @@ fun SettingsScreen(
                             checked = readReceiptsEnabled,
                             onCheckedChange = { onToggleReadReceipts(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = ImmersiveSurface,
-                                checkedTrackColor = ImmersivePrimary,
-                                uncheckedThumbColor = ImmersiveMuted,
-                                uncheckedTrackColor = ImmersiveCardVariant
+                                checkedThumbColor = RaixBackground,
+                                checkedTrackColor = RaixActionPrimary,
+                                uncheckedThumbColor = RaixTextSecondary,
+                                uncheckedTrackColor = RaixSurfaceElevated
                             )
                         )
                     }
@@ -1193,7 +1200,7 @@ fun SettingsScreen(
                             text = "DESAPARECER APÓS LEITURA (EFEITO VISUAL):",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium,
-                            color = ImmersivePrimary,
+                            color = RaixActionPrimary,
                             letterSpacing = 0.5.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -1216,10 +1223,10 @@ fun SettingsScreen(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(10.dp))
-                                        .background(if (isSelected) ImmersivePrimary else ImmersiveCardVariant)
+                                        .background(if (isSelected) RaixActionPrimary else RaixSurfaceElevated)
                                         .border(
                                             0.8.dp,
-                                            if (isSelected) ImmersivePrimary else ImmersiveOutline,
+                                            if (isSelected) RaixActionPrimary else RaixBorder,
                                             RoundedCornerShape(10.dp)
                                         )
                                         .clickable { onSetVanishAfterReadPresetSeconds(secs) }
@@ -1230,7 +1237,7 @@ fun SettingsScreen(
                                         text = if (secs == 0) "Off" else "${secs}s",
                                         fontSize = 10.sp,
                                         fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
-                                        color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
+                                        color = if (isSelected) RaixBackground else RaixTextPrimary,
                                         maxLines = 1
                                     )
                                 }
@@ -1243,14 +1250,14 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = Icons.Default.LocalFireDepartment,
                                     contentDescription = null,
-                                    tint = ImmersiveExpiring,
+                                    tint = RaixError,
                                     modifier = Modifier.size(13.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "Mensagens lidas desintegram e evaporam em $vanishAfterReadPresetSeconds segundos com partículas.",
                                     fontSize = 10.sp,
-                                    color = ImmersiveExpiring
+                                    color = RaixError
                                 )
                             }
                         }
@@ -1264,8 +1271,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ImmersiveCard),
-                border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersiveOutline)
+                colors = CardDefaults.cardColors(containerColor = RaixSurface),
+                border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixBorder)
             ) {
                 Row(
                     modifier = Modifier
@@ -1282,13 +1289,13 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(ImmersivePrimary.copy(alpha = 0.15f)),
+                                .background(RaixActionPrimary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.NoPhotography,
                                 contentDescription = null,
-                                tint = if (screenProtectionEnabled) ImmersivePrimary else ImmersiveMuted,
+                                tint = if (screenProtectionEnabled) RaixActionPrimary else RaixTextSecondary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -1298,12 +1305,12 @@ fun SettingsScreen(
                                 text = "Anti-Captura (FLAG_SECURE)",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                             Text(
                                 text = if (screenProtectionEnabled) "Ativo: bloqueia gravação e print da tela." else "Desativado para permitir prints no sistema.",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -1311,10 +1318,10 @@ fun SettingsScreen(
                         checked = screenProtectionEnabled,
                         onCheckedChange = { onToggleScreenProtection() },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = ImmersiveSurface,
-                            checkedTrackColor = ImmersivePrimary,
-                            uncheckedThumbColor = ImmersiveMuted,
-                            uncheckedTrackColor = ImmersiveCardVariant
+                            checkedThumbColor = RaixBackground,
+                            checkedTrackColor = RaixActionPrimary,
+                            uncheckedThumbColor = RaixTextSecondary,
+                            uncheckedTrackColor = RaixSurfaceElevated
                         )
                     )
                 }
@@ -1326,8 +1333,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ImmersiveCard),
-                border = androidx.compose.foundation.BorderStroke(0.8.dp, if (screenshotDetectionEnabled) ImmersivePrimary.copy(alpha = 0.4f) else ImmersiveOutline)
+                colors = CardDefaults.cardColors(containerColor = RaixSurface),
+                border = androidx.compose.foundation.BorderStroke(0.8.dp, if (screenshotDetectionEnabled) RaixActionPrimary.copy(alpha = 0.4f) else RaixBorder)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -1343,13 +1350,13 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(if (screenshotDetectionEnabled) ImmersivePrimary.copy(alpha = 0.15f) else ImmersiveCardVariant),
+                                    .background(if (screenshotDetectionEnabled) RaixActionPrimary.copy(alpha = 0.15f) else RaixSurfaceElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.PhotoCamera,
                                     contentDescription = null,
-                                    tint = if (screenshotDetectionEnabled) ImmersivePrimary else ImmersiveMuted,
+                                    tint = if (screenshotDetectionEnabled) RaixActionPrimary else RaixTextSecondary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -1359,12 +1366,12 @@ fun SettingsScreen(
                                     text = "Detector de Screenshots",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = if (screenshotDetectionEnabled) "Alerta nos chats quando prints forem tirados (Android 14+ / MediaStore)." else "Detecção desativada.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -1372,17 +1379,17 @@ fun SettingsScreen(
                             checked = screenshotDetectionEnabled,
                             onCheckedChange = { onToggleScreenshotDetection(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = ImmersiveSurface,
-                                checkedTrackColor = ImmersivePrimary,
-                                uncheckedThumbColor = ImmersiveMuted,
-                                uncheckedTrackColor = ImmersiveCardVariant
+                                checkedThumbColor = RaixBackground,
+                                checkedTrackColor = RaixActionPrimary,
+                                uncheckedThumbColor = RaixTextSecondary,
+                                uncheckedTrackColor = RaixSurfaceElevated
                             )
                         )
                     }
 
                     if (screenshotDetectionEnabled) {
                         Spacer(modifier = Modifier.height(12.dp))
-                        HorizontalDivider(color = ImmersiveOutline.copy(alpha = 0.5f), thickness = 0.8.dp)
+                        HorizontalDivider(color = RaixBorder.copy(alpha = 0.5f), thickness = 0.8.dp)
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Sensitive Content Lockdown on Screenshot
@@ -1399,13 +1406,13 @@ fun SettingsScreen(
                                     modifier = Modifier
                                         .size(32.dp)
                                         .clip(CircleShape)
-                                        .background(if (blockSensitiveOnScreenshot) EmberOrange.copy(alpha = 0.15f) else ImmersiveCardVariant),
+                                        .background(if (blockSensitiveOnScreenshot) RaixError.copy(alpha = 0.15f) else RaixSurfaceElevated),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Shield,
                                         contentDescription = null,
-                                        tint = if (blockSensitiveOnScreenshot) EmberOrange else ImmersiveMuted,
+                                        tint = if (blockSensitiveOnScreenshot) RaixError else RaixTextSecondary,
                                         modifier = Modifier.size(17.dp)
                                     )
                                 }
@@ -1415,12 +1422,12 @@ fun SettingsScreen(
                                         text = "Bloqueio de Conteúdo Sensível",
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = ImmersiveOnSurface
+                                        color = RaixTextPrimary
                                     )
                                     Text(
                                         text = if (blockSensitiveOnScreenshot) "Bloqueia fotos 1x e notas secretas ao detectar print." else "Não bloqueia conteúdos.",
                                         fontSize = 11.sp,
-                                        color = ImmersiveMutedLight
+                                        color = RaixTextSecondary
                                     )
                                 }
                             }
@@ -1428,10 +1435,10 @@ fun SettingsScreen(
                                 checked = blockSensitiveOnScreenshot,
                                 onCheckedChange = { onToggleBlockSensitiveOnScreenshot(it) },
                                 colors = SwitchDefaults.colors(
-                                    checkedThumbColor = ImmersiveSurface,
-                                    checkedTrackColor = EmberOrange,
-                                    uncheckedThumbColor = ImmersiveMuted,
-                                    uncheckedTrackColor = ImmersiveCardVariant
+                                    checkedThumbColor = RaixBackground,
+                                    checkedTrackColor = RaixError,
+                                    uncheckedThumbColor = RaixTextSecondary,
+                                    uncheckedTrackColor = RaixSurfaceElevated
                                 )
                             )
                         }
@@ -1443,12 +1450,12 @@ fun SettingsScreen(
                             onClick = onSimulateScreenshot,
                             modifier = Modifier.fillMaxWidth().height(36.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(0.8.dp, EmberOrange.copy(alpha = 0.7f)),
+                            border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixError.copy(alpha = 0.7f)),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                         ) {
-                            Icon(Icons.Default.Warning, contentDescription = null, tint = EmberOrange, modifier = Modifier.size(15.dp))
+                            Icon(Icons.Default.Warning, contentDescription = null, tint = RaixError, modifier = Modifier.size(15.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Simular Detecção de Print (Teste)", color = EmberOrange, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                            Text("Simular Detecção de Print (Teste)", color = RaixError, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -1460,8 +1467,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ImmersiveCard),
-                border = androidx.compose.foundation.BorderStroke(0.8.dp, if (shakeToClearEnabled) ImmersivePrimary.copy(alpha = 0.4f) else ImmersiveOutline)
+                colors = CardDefaults.cardColors(containerColor = RaixSurface),
+                border = androidx.compose.foundation.BorderStroke(0.8.dp, if (shakeToClearEnabled) RaixActionPrimary.copy(alpha = 0.4f) else RaixBorder)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -1477,13 +1484,13 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(if (shakeToClearEnabled) ImmersivePrimary.copy(alpha = 0.15f) else ImmersiveCardVariant),
+                                    .background(if (shakeToClearEnabled) RaixActionPrimary.copy(alpha = 0.15f) else RaixSurfaceElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Vibration,
                                     contentDescription = null,
-                                    tint = if (shakeToClearEnabled) ImmersivePrimary else ImmersiveMuted,
+                                    tint = if (shakeToClearEnabled) RaixActionPrimary else RaixTextSecondary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -1493,12 +1500,12 @@ fun SettingsScreen(
                                     text = "Shake to Clear (Chacoalhar)",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = if (shakeToClearEnabled) "Chacoalhe para limpar instantaneamente o chat aberto." else "Detecção por acelerômetro desativada.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -1506,10 +1513,10 @@ fun SettingsScreen(
                             checked = shakeToClearEnabled,
                             onCheckedChange = { onToggleShakeToClear(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = ImmersiveSurface,
-                                checkedTrackColor = ImmersivePrimary,
-                                uncheckedThumbColor = ImmersiveMuted,
-                                uncheckedTrackColor = ImmersiveCardVariant
+                                checkedThumbColor = RaixBackground,
+                                checkedTrackColor = RaixActionPrimary,
+                                uncheckedThumbColor = RaixTextSecondary,
+                                uncheckedTrackColor = RaixSurfaceElevated
                             )
                         )
                     }
@@ -1520,7 +1527,7 @@ fun SettingsScreen(
                             text = "SENSIBILIDADE DO MOVIMENTO:",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium,
-                            color = ImmersivePrimary,
+                            color = RaixActionPrimary,
                             letterSpacing = 0.5.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -1541,10 +1548,10 @@ fun SettingsScreen(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(10.dp))
-                                        .background(if (isSelected) ImmersivePrimary else ImmersiveCardVariant)
+                                        .background(if (isSelected) RaixActionPrimary else RaixSurfaceElevated)
                                         .border(
                                             0.8.dp,
-                                            if (isSelected) ImmersivePrimary else ImmersiveOutline,
+                                            if (isSelected) RaixActionPrimary else RaixBorder,
                                             RoundedCornerShape(10.dp)
                                         )
                                         .clickable { onSetShakeSensitivity(key) }
@@ -1555,7 +1562,7 @@ fun SettingsScreen(
                                         text = label,
                                         fontSize = 10.sp,
                                         fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
-                                        color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
+                                        color = if (isSelected) RaixBackground else RaixTextPrimary,
                                         maxLines = 1
                                     )
                                 }
@@ -1575,22 +1582,22 @@ fun SettingsScreen(
                                     text = "Pedir confirmação antes de apagar",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = if (shakeRequiresConfirmation) "Exibe aviso antes de apagar o chat." else "Limpeza instantânea sem diálogo (Zero Trace).",
                                     fontSize = 10.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                             Switch(
                                 checked = shakeRequiresConfirmation,
                                 onCheckedChange = { onToggleShakeRequiresConfirmation(it) },
                                 colors = SwitchDefaults.colors(
-                                    checkedThumbColor = ImmersiveSurface,
-                                    checkedTrackColor = ImmersivePrimary,
-                                    uncheckedThumbColor = ImmersiveMuted,
-                                    uncheckedTrackColor = ImmersiveCardVariant
+                                    checkedThumbColor = RaixBackground,
+                                    checkedTrackColor = RaixActionPrimary,
+                                    uncheckedThumbColor = RaixTextSecondary,
+                                    uncheckedTrackColor = RaixSurfaceElevated
                                 )
                             )
                         }
@@ -1602,12 +1609,12 @@ fun SettingsScreen(
                             onClick = onSimulateShake,
                             modifier = Modifier.fillMaxWidth().height(36.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersivePrimary.copy(alpha = 0.7f)),
+                            border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixActionPrimary.copy(alpha = 0.7f)),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                         ) {
-                            Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(15.dp))
+                            Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(15.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Simular Chacoalhar (Teste de Limpeza)", color = ImmersivePrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                            Text("Simular Chacoalhar (Teste de Limpeza)", color = RaixActionPrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -1619,8 +1626,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ImmersiveCard),
-                border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersiveOutline)
+                colors = CardDefaults.cardColors(containerColor = RaixSurface),
+                border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixBorder)
             ) {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     Row(
@@ -1636,13 +1643,13 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(if (notificationsEnabled) ImmersivePrimary.copy(alpha = 0.15f) else ImmersiveCardVariant),
+                                    .background(if (notificationsEnabled) RaixActionPrimary.copy(alpha = 0.15f) else RaixSurfaceElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = if (notificationsEnabled) Icons.Default.NotificationsActive else Icons.Default.Notifications,
                                     contentDescription = null,
-                                    tint = if (notificationsEnabled) ImmersivePrimary else ImmersiveMuted,
+                                    tint = if (notificationsEnabled) RaixActionPrimary else RaixTextSecondary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -1652,12 +1659,12 @@ fun SettingsScreen(
                                     text = "Permissão de Notificações",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = if (notificationsEnabled) "Autorizado no sistema Android" else "Desativadas no sistema.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -1665,28 +1672,28 @@ fun SettingsScreen(
                         if (!notificationsEnabled) {
                             Button(
                                 onClick = onRequestNotificationPermission,
-                                colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                                colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                                 shape = RoundedCornerShape(8.dp),
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                                 modifier = Modifier.height(32.dp).testTag("enable_notifications_button")
                             ) {
-                                Text("Ativar", color = ImmersiveOnPrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                                Text("Ativar", color = RaixBackground, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                             }
                         } else {
                             OutlinedButton(
                                 onClick = onTestNotification,
                                 shape = RoundedCornerShape(8.dp),
-                                border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersivePrimary),
+                                border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixActionPrimary),
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                                 modifier = Modifier.height(32.dp).testTag("test_notification_button")
                             ) {
-                                Text("Testar", color = ImmersivePrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                                Text("Testar", color = RaixActionPrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                             }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider(color = ImmersiveOutline, thickness = 0.6.dp)
+                    HorizontalDivider(color = RaixBorder, thickness = 0.6.dp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Toggle: Notificar quando uma nova conversa for iniciada (Desativado por padrão)
@@ -1700,7 +1707,7 @@ fun SettingsScreen(
                                 text = "Notificar novas conversas iniciadas",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                             Text(
                                 text = if (notifyOnNewConversation)
@@ -1708,7 +1715,7 @@ fun SettingsScreen(
                                 else
                                     "Silencioso: Não notificar quando uma nova conversa for iniciada.",
                                 fontSize = 11.sp,
-                                color = if (notifyOnNewConversation) ImmersivePrimary else ImmersiveMutedLight
+                                color = if (notifyOnNewConversation) RaixActionPrimary else RaixTextSecondary
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -1716,12 +1723,42 @@ fun SettingsScreen(
                             checked = notifyOnNewConversation,
                             onCheckedChange = onToggleNotifyOnNewConversation,
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = ImmersivePrimary,
-                                checkedTrackColor = ImmersivePrimary.copy(alpha = 0.3f),
-                                uncheckedThumbColor = ImmersiveMuted,
-                                uncheckedTrackColor = ImmersiveCardVariant
+                                checkedThumbColor = RaixActionPrimary,
+                                checkedTrackColor = RaixActionPrimary.copy(alpha = 0.3f),
+                                uncheckedThumbColor = RaixTextSecondary,
+                                uncheckedTrackColor = RaixSurfaceElevated
                             ),
                             modifier = Modifier.testTag("notify_on_new_conversation_switch")
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(color = RaixBorder, thickness = 0.6.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Botao: Diagnostico de Notificacoes
+                    OutlinedButton(
+                        onClick = { showNotificationDiagnostics = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(36.dp)
+                            .testTag("open_notification_diagnostics_button"),
+                        shape = RoundedCornerShape(8.dp),
+                        border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixBorder),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Notifications,
+                            contentDescription = null,
+                            tint = RaixTextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Diagnostico de Notificacoes",
+                            color = RaixTextSecondary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -1744,8 +1781,8 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = ImmersiveCardVariant),
-                border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersiveOutline)
+                colors = CardDefaults.cardColors(containerColor = RaixSurfaceElevated),
+                border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixBorder)
             ) {
                 Column(modifier = Modifier.fillMaxWidth().padding(14.dp)) {
                     Row(
@@ -1758,13 +1795,13 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(ElectricCyan.copy(alpha = 0.15f)),
+                                    .background(RaixPremiumGold.copy(alpha = 0.15f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.DeleteSweep,
                                     contentDescription = null,
-                                    tint = ElectricCyan,
+                                    tint = RaixPremiumGold,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -1774,12 +1811,12 @@ fun SettingsScreen(
                                     text = "Limpeza Room (WorkManager)",
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = "Status: Agendado e ativo em segundo plano (cada 15m)",
                                     fontSize = 11.sp,
-                                    color = ImmersiveOnlineGreen
+                                    color = RaixActionPrimary
                                 )
                             }
                         }
@@ -1792,19 +1829,19 @@ fun SettingsScreen(
                             .height(36.dp)
                             .testTag("trigger_workmanager_cleanup_button"),
                         shape = RoundedCornerShape(10.dp),
-                        border = androidx.compose.foundation.BorderStroke(0.8.dp, ElectricCyan.copy(alpha = 0.8f)),
+                        border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixPremiumGold.copy(alpha = 0.8f)),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.DeleteSweep,
                             contentDescription = null,
-                            tint = ElectricCyan,
+                            tint = RaixPremiumGold,
                             modifier = Modifier.size(15.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Executar Varredura de Limpeza Agora",
-                            color = ElectricCyan,
+                            color = RaixPremiumGold,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -1832,20 +1869,20 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .height(48.dp)
                     .testTag("lock_app_now_button"),
-                border = androidx.compose.foundation.BorderStroke(1.2.dp, ImmersivePrimary),
+                border = androidx.compose.foundation.BorderStroke(1.2.dp, RaixActionPrimary),
                 shape = RoundedCornerShape(14.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    tint = ImmersivePrimary,
+                    tint = RaixActionPrimary,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Bloquear Aplicativo Agora",
                     fontWeight = FontWeight.Medium,
-                    color = ImmersivePrimary,
+                    color = RaixActionPrimary,
                     fontSize = 13.sp
                 )
             }
@@ -1859,7 +1896,7 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .height(50.dp)
                     .testTag("panic_wipe_button_settings"),
-                colors = ButtonDefaults.buttonColors(containerColor = ImmersiveExpiring),
+                colors = ButtonDefaults.buttonColors(containerColor = RaixError),
                 shape = RoundedCornerShape(14.dp)
             ) {
                 Icon(
@@ -1900,7 +1937,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth().testTag("app_version_label"),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 fontSize = 11.sp,
-                color = ImmersiveMutedLight.copy(alpha = 0.6f),
+                color = RaixTextSecondary.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Normal
             )
 
@@ -1911,13 +1948,13 @@ fun SettingsScreen(
     if (showPanicConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showPanicConfirmDialog = false },
-            containerColor = ImmersiveHeader,
-            titleContentColor = EmberOrange,
+            containerColor = RaixSurface,
+            titleContentColor = RaixError,
             icon = {
                 Icon(
                     imageVector = Icons.Default.LocalFireDepartment,
                     contentDescription = null,
-                    tint = EmberOrange,
+                    tint = RaixError,
                     modifier = Modifier.size(36.dp)
                 )
             },
@@ -1931,7 +1968,7 @@ fun SettingsScreen(
             text = {
                 Text(
                     text = "Atenção: Esta ação irá apagar instantaneamente todas as mensagens, mídias, áudios e canais locais com sobrescrita criptográfica permanente.\n\nEsta operação NÃO pode ser desfeita.",
-                    color = ImmersiveOnSurface,
+                    color = RaixTextPrimary,
                     fontSize = 13.sp,
                     lineHeight = 18.sp
                 )
@@ -1943,14 +1980,14 @@ fun SettingsScreen(
                         onPanicWipe()
                         onBack()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = EmberOrange)
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixError)
                 ) {
                     Text("VAPORIZAR TUDO AGORA", fontWeight = FontWeight.Medium, color = Color(0xFF601410))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPanicConfirmDialog = false }) {
-                    Text("Cancelar", color = ImmersiveMutedLight)
+                    Text("Cancelar", color = RaixTextSecondary)
                 }
             }
         )
@@ -1963,7 +2000,7 @@ private fun SectionTitle(title: String) {
         text = title,
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
-        color = ImmersivePrimary,
+        color = RaixActionPrimary,
         letterSpacing = 1.sp,
         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
     )
@@ -1978,8 +2015,8 @@ private fun InfoProtocolCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ImmersiveCardVariant),
-        border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersiveOutline)
+        colors = CardDefaults.cardColors(containerColor = RaixSurfaceElevated),
+        border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixBorder)
     ) {
         Row(
             modifier = Modifier
@@ -1991,13 +2028,13 @@ private fun InfoProtocolCard(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(ImmersivePrimary.copy(alpha = 0.15f)),
+                    .background(RaixActionPrimary.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = ImmersivePrimary,
+                    tint = RaixActionPrimary,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -2007,12 +2044,12 @@ private fun InfoProtocolCard(
                     text = title,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    color = ImmersiveOnSurface
+                    color = RaixTextPrimary
                 )
                 Text(
                     text = description,
                     fontSize = 11.sp,
-                    color = ImmersiveMutedLight,
+                    color = RaixTextSecondary,
                     lineHeight = 15.sp
                 )
             }

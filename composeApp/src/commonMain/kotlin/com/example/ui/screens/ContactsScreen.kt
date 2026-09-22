@@ -25,12 +25,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -43,10 +45,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -95,35 +99,63 @@ fun ContactsScreen(
     val contacts by contactRepository.getContacts().collectAsState(initial = emptyList())
     var showPanicDialog by remember { mutableStateOf(false) }
     var activeFilter by remember { mutableStateOf("Todos") }
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchVisible by remember { mutableStateOf(false) }
 
     // Derive categories from contacts
     val categories = remember(contacts) {
         contacts.mapNotNull { it.category }.distinct().sorted()
     }
 
-    // Filter and sort: favorites first, then alphabetical
-    val filteredContacts = remember(contacts, activeFilter) {
+    // Filter, search and sort: favorites first, then alphabetical
+    val filteredContacts = remember(contacts, activeFilter, searchQuery) {
         val filtered = when (activeFilter) {
             "Todos" -> contacts
             "Favoritos" -> contacts.filter { it.isFavorite }
             else -> contacts.filter { it.category == activeFilter }
         }
-        filtered.sortedWith(
+        val searched = if (searchQuery.isBlank()) filtered else {
+            filtered.filter {
+                (it.nickname ?: it.displayName).contains(searchQuery, ignoreCase = true) ||
+                it.fingerprint.contains(searchQuery, ignoreCase = true)
+            }
+        }
+        searched.sortedWith(
             compareByDescending<ContactItem> { it.isFavorite }
                 .thenBy { (it.nickname ?: it.displayName).lowercase() }
         )
     }
 
+    // Separate favorites from others for section headers
+    val favoriteContacts = remember(filteredContacts) { filteredContacts.filter { it.isFavorite } }
+    val otherContacts = remember(filteredContacts) { filteredContacts.filter { !it.isFavorite } }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Contatos",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    Column {
+                        Text(
+                            text = "Contatos",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        if (contacts.isNotEmpty()) {
+                            Text(
+                                text = "${contacts.size} contato${if (contacts.size != 1) "s" else ""}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 },
                 actions = {
+                    IconButton(onClick = { isSearchVisible = !isSearchVisible }) {
+                        Icon(
+                            imageVector = if (isSearchVisible) Icons.Default.Close else Icons.Default.Search,
+                            contentDescription = "Buscar",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     var expanded by remember { mutableStateOf(false) }
                     IconButton(onClick = { expanded = true }) {
                         Icon(
@@ -229,11 +261,49 @@ fun ContactsScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Search bar (animated visibility)
+            if (isSearchVisible) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Buscar contatos...") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Limpar",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = Color.Transparent
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+
             if (contacts.isEmpty()) {
                 EmptyContactsView(
                     onAddContactModelA = onAddContactModelA,
@@ -242,8 +312,7 @@ fun ContactsScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(vertical = 4.dp)
                 ) {
                     // Filter chips row
                     item {
@@ -255,8 +324,60 @@ fun ContactsScreen(
                         )
                     }
 
-                    items(filteredContacts, key = { it.fingerprint }) { contact ->
-                        ContactRowItem(
+                    // Favorites section header
+                    if (favoriteContacts.isNotEmpty() && activeFilter != "Favoritos") {
+                        item {
+                            SectionHeader(title = "Favoritos")
+                        }
+                        items(favoriteContacts, key = { "fav_${it.fingerprint}" }) { contact ->
+                            ContactRowWhatsApp(
+                                contact = contact,
+                                onClick = { onContactSelected(contact) },
+                                onVerifyClick = { onCompareSafetyNumber(contact) },
+                                onRename = { newName ->
+                                    coroutineScope.launch {
+                                        contactRepository.renameContact(contact.fingerprint, newName)
+                                    }
+                                },
+                                onDelete = {
+                                    coroutineScope.launch {
+                                        contactRepository.deleteContact(contact.fingerprint)
+                                    }
+                                },
+                                onToggleFavorite = {
+                                    coroutineScope.launch {
+                                        contactRepository.setFavorite(contact.fingerprint, !contact.isFavorite)
+                                    }
+                                },
+                                onSetCategory = { category ->
+                                    coroutineScope.launch {
+                                        contactRepository.setCategory(contact.fingerprint, category)
+                                    }
+                                },
+                                onBlock = {
+                                    coroutineScope.launch {
+                                        contactRepository.blockContact(contact.fingerprint)
+                                    }
+                                }
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier.padding(start = 76.dp),
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                            )
+                        }
+                    }
+
+                    // All/Other contacts section header
+                    if (otherContacts.isNotEmpty() && favoriteContacts.isNotEmpty() && activeFilter != "Favoritos") {
+                        item {
+                            SectionHeader(title = "Todos os contatos")
+                        }
+                    }
+
+                    val displayList = if (activeFilter == "Favoritos") filteredContacts else otherContacts
+                    items(displayList, key = { it.fingerprint }) { contact ->
+                        ContactRowWhatsApp(
                             contact = contact,
                             onClick = { onContactSelected(contact) },
                             onVerifyClick = { onCompareSafetyNumber(contact) },
@@ -279,7 +400,17 @@ fun ContactsScreen(
                                 coroutineScope.launch {
                                     contactRepository.setCategory(contact.fingerprint, category)
                                 }
+                            },
+                            onBlock = {
+                                coroutineScope.launch {
+                                    contactRepository.blockContact(contact.fingerprint)
+                                }
                             }
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 76.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
                         )
                     }
 
@@ -324,6 +455,16 @@ fun ContactsScreen(
     }
 }
 
+@Composable
+private fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContactFilterChips(
@@ -332,253 +473,281 @@ private fun ContactFilterChips(
     contactCount: Int,
     onFilterChanged: (String) -> Unit
 ) {
-    Column {
-        // Metadata: contact count (discrete, not prominent)
-        Text(
-            text = "$contactCount contato(s)",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            item {
-                FilterChip(
-                    selected = activeFilter == "Todos",
-                    onClick = { onFilterChanged("Todos") },
-                    label = { Text("Todos") },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                        selectedLabelColor = MaterialTheme.colorScheme.primary
-                    )
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = activeFilter == "Todos",
+                onClick = { onFilterChanged("Todos") },
+                label = { Text("Todos") },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                    selectedLabelColor = MaterialTheme.colorScheme.primary
                 )
-            }
-            item {
-                FilterChip(
-                    selected = activeFilter == "Favoritos",
-                    onClick = { onFilterChanged("Favoritos") },
-                    label = { Text("Favoritos") },
-                    leadingIcon = if (activeFilter == "Favoritos") {
-                        { Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                    } else null,
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
-                        selectedLabelColor = MaterialTheme.colorScheme.tertiary
-                    )
-                )
-            }
-            items(categories) { category ->
-                FilterChip(
-                    selected = activeFilter == category,
-                    onClick = { onFilterChanged(category) },
-                    label = { Text(category) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                        selectedLabelColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
+            )
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
+        item {
+            FilterChip(
+                selected = activeFilter == "Favoritos",
+                onClick = { onFilterChanged("Favoritos") },
+                label = { Text("Favoritos") },
+                leadingIcon = if (activeFilter == "Favoritos") {
+                    { Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                } else null,
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
+                    selectedLabelColor = MaterialTheme.colorScheme.tertiary
+                )
+            )
+        }
+        items(categories) { category ->
+            FilterChip(
+                selected = activeFilter == category,
+                onClick = { onFilterChanged(category) },
+                label = { Text(category) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                    selectedLabelColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
     }
 }
 
+/**
+ * WhatsApp-style flat contact row: 48dp avatar, name + fingerprint, divider at 76dp start.
+ * Long-press opens context menu with rename/delete/favorite/category.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ContactRowItem(
+private fun ContactRowWhatsApp(
     contact: ContactItem,
     onClick: () -> Unit,
     onVerifyClick: () -> Unit,
     onRename: (String) -> Unit,
     onDelete: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onSetCategory: (String?) -> Unit
+    onSetCategory: (String?) -> Unit,
+    onBlock: () -> Unit = {}
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
 
-    ElevatedCard(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = { showContextMenu = true }
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        // Avatar 48dp (WhatsApp standard)
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(
+                    if (contact.verified)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant
+                ),
+            contentAlignment = Alignment.Center
         ) {
-            // Avatar
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (contact.verified)
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                        else
-                            MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                contentAlignment = Alignment.Center
+            Text(
+                text = (contact.nickname ?: contact.displayName).take(1).uppercase(),
+                color = if (contact.verified)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Contact info: name (line 1) + fingerprint preview (line 2)
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = contact.nickname ?: contact.displayName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+
+                // Favorite star inline
+                if (contact.isFavorite) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Favorito",
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+
+                // Verification badge inline
+                if (contact.verified) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Verificado",
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Fingerprint preview (line 2 — secondary)
+                Text(
+                    text = contact.fingerprint.take(16) + "...",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+
+                // Category tag
+                if (contact.category != null) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Text(
+                            text = contact.category,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Action: verify button for unverified contacts
+        if (!contact.verified) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.error.copy(alpha = 0.10f),
+                modifier = Modifier.clickable { onVerifyClick() }
             ) {
                 Text(
-                    text = (contact.nickname ?: contact.displayName).take(1).uppercase(),
-                    color = if (contact.verified)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Contact Info (Level 1: name + badge; Level 2: fingerprint)
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Favorite star
-                    if (contact.isFavorite) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Favorito",
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
-
-                    Text(
-                        text = contact.nickname ?: contact.displayName,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    // Verification badge
-                    if (contact.verified) {
-                        VerificationBadge(verified = true, onClick = onVerifyClick)
-                    }
-
-                    // Category label (if set)
-                    if (contact.category != null) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        ) {
-                            Text(
-                                text = contact.category,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp)
-                            )
-                        }
-                    }
-                }
-
-                // Level 2: Fingerprint (monospace)
-                Text(
-                    text = "${contact.fingerprint.take(12)}...${contact.fingerprint.takeLast(6)}",
+                    text = "Verificar",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                 )
             }
+        }
 
-            // Unverified indicator (clickable to verify)
-            if (!contact.verified) {
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.10f),
-                    modifier = Modifier.clickable { onVerifyClick() }
-                ) {
-                    Text(
-                        text = "Verificar",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
+        // Icone de 3 pontos para abrir menu
+        Spacer(modifier = Modifier.width(4.dp))
+        Box {
+            IconButton(
+                onClick = { showContextMenu = true },
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Opcoes",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
+    }
 
-        // Context Menu (long-press)
-        DropdownMenu(
-            expanded = showContextMenu,
-            onDismissRequest = { showContextMenu = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text(if (contact.isFavorite) "Desfavoritar" else "Favoritar") },
-                onClick = {
-                    showContextMenu = false
-                    onToggleFavorite()
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = if (contact.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Renomear") },
-                onClick = {
-                    showContextMenu = false
-                    showRenameDialog = true
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Categoria") },
-                onClick = {
-                    showContextMenu = false
-                    showCategoryDialog = true
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Label,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Excluir", color = MaterialTheme.colorScheme.error) },
-                onClick = {
-                    showContextMenu = false
-                    showDeleteDialog = true
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            )
-        }
+    // Context Menu (long-press)
+    DropdownMenu(
+        expanded = showContextMenu,
+        onDismissRequest = { showContextMenu = false }
+    ) {
+        DropdownMenuItem(
+            text = { Text(if (contact.isFavorite) "Desfavoritar" else "Favoritar") },
+            onClick = {
+                showContextMenu = false
+                onToggleFavorite()
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = if (contact.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+            }
+        )
+        DropdownMenuItem(
+            text = { Text("Renomear") },
+            onClick = {
+                showContextMenu = false
+                showRenameDialog = true
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        )
+        DropdownMenuItem(
+            text = { Text("Categoria") },
+            onClick = {
+                showContextMenu = false
+                showCategoryDialog = true
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Label,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        )
+        DropdownMenuItem(
+            text = { Text("Excluir", color = MaterialTheme.colorScheme.error) },
+            onClick = {
+                showContextMenu = false
+                showDeleteDialog = true
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        )
+        DropdownMenuItem(
+            text = { Text("Bloquear", color = MaterialTheme.colorScheme.error) },
+            onClick = {
+                showContextMenu = false
+                onBlock()
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Block,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        )
     }
 
     // Rename Dialog

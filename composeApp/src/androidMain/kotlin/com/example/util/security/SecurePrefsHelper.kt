@@ -53,6 +53,14 @@ object SecurePrefsHelper {
     }
 
     /**
+     * Returns true if the user has explicitly set a PIN (hash exists in prefs).
+     */
+    fun isPinSet(context: Context): Boolean {
+        val prefs = getPrefs(context)
+        return prefs.contains(KEY_PIN_HASH) || prefs.contains(KEY_PIN_HASH_LEGACY)
+    }
+
+    /**
      * Initializes default PIN hash if none exists.
      */
     fun ensurePinInitialized(context: Context) {
@@ -287,7 +295,7 @@ object SecurePrefsHelper {
         getPrefs(context).edit().putBoolean(KEY_BIOMETRIC_LOCK, enabled).apply()
 
     fun isAutoLockEnabled(context: Context): Boolean =
-        getPrefs(context).getBoolean(KEY_AUTO_LOCK, true)
+        getPrefs(context).getBoolean(KEY_AUTO_LOCK, false)
 
     fun setAutoLockEnabled(context: Context, enabled: Boolean) =
         getPrefs(context).edit().putBoolean(KEY_AUTO_LOCK, enabled).apply()

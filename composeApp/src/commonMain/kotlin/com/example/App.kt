@@ -6,11 +6,29 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import kotlinx.coroutines.flow.first
 import androidx.compose.runtime.getValue
@@ -33,10 +51,7 @@ import com.example.ui.screens.DataPrivacyScreen
 import com.example.ui.screens.IdentityScreen
 import com.example.ui.screens.RecoverySeedScreen
 import com.example.ui.screens.SafetyNumberScreen
-import kotlinx.coroutines.delay
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import androidx.compose.runtime.LaunchedEffect
+import com.example.security.E2EMessageListenerEffect
 
 sealed interface AppDestination {
     data object AppLock : AppDestination
@@ -83,145 +98,17 @@ fun App() {
         )
     }
 
-    val notifiedMessages = remember { mutableSetOf<String>() }
-
-    @OptIn(ExperimentalEncodingApi::class)
-    LaunchedEffect(Unit) {
-        var pushTokenRegistered = false
-        while (true) {
-            try {
-                val authManager = com.example.security.DeviceAuthManager
-                val myToken = authManager.getIdToken()
-                val myUid = authManager.getUserId()
-                
-                if (myToken != null) {
-                    if (!pushTokenRegistered) {
-                        try {
-                            val token = com.example.security.notification.PushNotificationManager.getPushToken()
-                            if (token != null) {
-                                // Envia "android" por padrão, o backend aceita e apenas loga.
-                                com.example.data.network.IdentityNetworkClient.registerPushToken(token, "android", myToken)
-                                pushTokenRegistered = true
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                    if (currentDestination != AppDestination.AppLock && currentDestination != AppDestination.AgeGate && currentDestination != AppDestination.RecoverySeed) {
-                        val pendingResult = com.example.data.network.FirestoreRestClient.fetchPendingMessages(myUid, myToken)
-                        if (pendingResult.isSuccess) {
-                            val pending = pendingResult.getOrThrow()
-                            for (msg in pending) {
-                                val keyResult = com.example.data.network.KeyStoreClient.getMessageKey(msg.id, myToken)
-                                if (keyResult.success && keyResult.ephemeralPubKey != null && keyResult.wrappedDek != null) {
-                                    val myPrivKey = com.example.security.identity.IdentityManager.getIdentity()?.privateKey
-                                    if (myPrivKey != null) {
-                                    val env = com.example.security.identity.SealedBoxEnvelope(
-                                        ephemeralPubKeyHex = keyResult.ephemeralPubKey,
-                                        wrappedDekBase64 = keyResult.wrappedDek
-                                    )
-                                    val dek = com.example.security.identity.SealedBox.unseal(env, myPrivKey)
-                                    val cipherBytes = Base64.decode(msg.ciphertext)
-                                    val ivBytes = Base64.decode(msg.iv)
-                                    val decryptedBytes = com.example.security.identity.AesGcm.decrypt(cipherBytes, dek, ivBytes)
-                                    val decryptedText = decryptedBytes.decodeToString()
-                                    
-                                    if (decryptedText.startsWith("[AUTO-HANDSHAKE] ")) {
-                                        val uri = decryptedText.substringAfter("[AUTO-HANDSHAKE] ").trim()
-                                        val parseRes = com.example.security.identity.IdentityManager.parseContactUri(uri)
-                                        if (parseRes.isSuccess) {
-                                            val contactData = parseRes.getOrThrow()
-                                            val existing = contactRepository.getContact(contactData.fingerprintHex)
-                                            if (existing == null) {
-                                                val myIdentity = com.example.security.identity.IdentityManager.getIdentity()
-                                                val pairSafetyNumber = com.example.security.identity.IdentityCryptoManager.computePairSafetyNumber(
-                                                    myPubKey = myIdentity!!.publicKey,
-                                                    peerPubKey = contactData.publicKeyBytes
-                                                )
-                                                val newContact = ContactItem(
-                                                    fingerprint = contactData.fingerprintHex,
-                                                    pubKey = contactData.publicKeyBase64,
-                                                    currentAuthUid = contactData.authUid,
-                                                    displayName = "Contato_${contactData.fingerprintHex.take(6)}",
-                                                    securityNumber = pairSafetyNumber,
-                                                    verified = false,
-                                                    addedAt = com.example.data.network.PlatformEnvironment.currentTimeMillis()
-                                                )
-                                                contactRepository.saveContact(newContact)
-                                            }
-                                            // Exclui a mensagem (Vanish-after-read)
-                                            com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
-                                        }
-                                    } else {
-                                        // É uma mensagem normal recebida em 2º plano no desktop
-                                        val allContacts = contactRepository.getContacts().first()
-                                        val existingContact = allContacts.find { it.currentAuthUid == msg.senderId || it.fingerprint == msg.senderId }
-                                        val contactFingerprint = existingContact?.fingerprint ?: msg.senderId
-                                        
-                                        val openChatFingerprint = (currentDestination as? AppDestination.Chat)?.contact?.fingerprint
-                                        
-                                        if (contactFingerprint != openChatFingerprint) {
-                                            // A conversa NÃO está aberta. Salva no cache local e notifica.
-                                            if (existingContact != null && contactRepository.isContactBlocked(contactFingerprint)) {
-                                                contactRepository.recordBlockedPurge(contactFingerprint)
-                                                com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
-                                            } else {
-                                                val now = com.example.data.network.PlatformEnvironment.currentTimeMillis()
-                                                val remainingTtl = (msg.expiresAt - now).coerceAtLeast(10_000L)
-                                                val ephemeralMsg = com.example.ui.screens.EphemeralUiMessage(
-                                                    id = msg.id,
-                                                    senderId = contactFingerprint,
-                                                    senderName = existingContact?.displayName ?: "Desconhecido",
-                                                    isMe = false,
-                                                    text = decryptedText,
-                                                    timestamp = now,
-                                                    ttlMillis = remainingTtl,
-                                                    expiresAt = msg.expiresAt
-                                                )
-                                                
-                                                val cacheList = com.example.ui.screens.InMemoryMessageCache.getMessages(contactFingerprint)
-                                                if (cacheList.none { it.id == msg.id }) {
-                                                    cacheList.add(ephemeralMsg)
-                                                    com.example.ui.screens.InMemoryMessageCache.saveMessages(contactFingerprint, cacheList)
-                                                    com.example.data.network.FirestoreRestClient.deleteMessage(msg.id, myToken)
-                                                    
-                                                    if (notifiedMessages.add(msg.id)) {
-                                                        com.example.security.notification.PushNotificationManager.showLocalNotification(
-                                                            title = "Raix",
-                                                            body = "Nova mensagem criptografada",
-                                                            messageId = contactFingerprint
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        }
-                        val clickedFingerprint = com.example.security.notification.PushNotificationManager.getClickedNotificationMessageId()
-                        if (clickedFingerprint != null) {
-                            val allContacts = contactRepository.getContacts().first()
-                            val contactToOpen = allContacts.find { it.fingerprint == clickedFingerprint || it.currentAuthUid == clickedFingerprint }
-                            if (contactToOpen != null) {
-                                currentDestination = AppDestination.Chat(contactToOpen)
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                // Fail silently to not disrupt the UI
-                println("[DIAGNOSTICO] Exceção no listener: ${e.message}")
-            }
-            println("[DIAGNOSTICO] app vivo na bandeja + heartbeat do listener")
-            delay(3000L) // Verifica a cada 3s (global listener)
+    // Listener E2E unificado (commonMain)
+    E2EMessageListenerEffect(
+        contactRepository = contactRepository,
+        onNavigateToContact = { contact ->
+            currentDestination = AppDestination.Chat(contact)
         }
-    }
+    )
 
     MaterialTheme(colorScheme = RaixDarkColors, typography = com.example.ui.theme.getRaixTypography()) {
         Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding(), color = MaterialTheme.colorScheme.background) {
-            
+
             com.example.ui.components.BackHandler(enabled = currentDestination != AppDestination.Contacts && currentDestination != AppDestination.AppLock && currentDestination != AppDestination.AgeGate && currentDestination != AppDestination.RecoverySeed) {
                 if (currentDestination == AppDestination.Agenda) {
                     currentDestination = AppDestination.Contacts
@@ -230,6 +117,100 @@ fun App() {
                 }
             }
 
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val isDesktop = maxWidth >= androidx.compose.ui.unit.Dp(900f)
+
+                if (isDesktop && currentDestination !is AppDestination.AppLock && currentDestination !is AppDestination.AgeGate && currentDestination !is AppDestination.RecoverySeed) {
+                    // Desktop 3-column layout: Rail | List | Detail
+                    var selectedRailIndex by remember { mutableStateOf(0) }
+                    // O detalhe sobreposto pelo rail (nao-Chat):
+                    // null = mostra o destino do currentDestination normal
+                    var desktopDetailOverride by remember { mutableStateOf<AppDestination?>(null) }
+
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        // Column 1: Navigation Rail (64dp)
+                        DesktopNavigationRail(
+                            selectedIndex = selectedRailIndex,
+                            onSelectIndex = { index ->
+                                selectedRailIndex = index
+                                when (index) {
+                                    0 -> desktopDetailOverride = null // Chat: detalhe segue selecao
+                                    1 -> desktopDetailOverride = AppDestination.Agenda
+                                    2 -> desktopDetailOverride = AppDestination.Identity
+                                    3 -> desktopDetailOverride = AppDestination.DataPrivacy
+                                }
+                            }
+                        )
+
+                        VerticalDivider(
+                            modifier = Modifier.fillMaxHeight(),
+                            thickness = androidx.compose.ui.unit.Dp(1f),
+                            color = Color(0xFF1E2432)
+                        )
+
+                        // Column 2: Lista de conversas (320dp) — SEMPRE ContactsScreen
+                        Surface(
+                            modifier = Modifier.width(androidx.compose.ui.unit.Dp(320f)).fillMaxHeight(),
+                            color = Color(0xFF111827)
+                        ) {
+                            ContactsScreen(
+                                contactRepository = contactRepository,
+                                onContactSelected = { contact ->
+                                    selectedRailIndex = 0
+                                    desktopDetailOverride = null
+                                    currentDestination = AppDestination.Chat(contact)
+                                },
+                                onOpenIdentity = {
+                                    selectedRailIndex = 2
+                                    desktopDetailOverride = AppDestination.Identity
+                                },
+                                onOpenDataPrivacy = {
+                                    selectedRailIndex = 3
+                                    desktopDetailOverride = AppDestination.DataPrivacy
+                                },
+                                onOpenBlockedContacts = {
+                                    desktopDetailOverride = AppDestination.BlockedContacts
+                                },
+                                onOpenAgenda = {
+                                    selectedRailIndex = 1
+                                    desktopDetailOverride = AppDestination.Agenda
+                                },
+                                onAddContactModelA = {
+                                    desktopDetailOverride = AppDestination.AddModelA
+                                },
+                                onCompareSafetyNumber = { contact ->
+                                    desktopDetailOverride = AppDestination.SafetyNumber(contact)
+                                }
+                            )
+                        }
+
+                        VerticalDivider(
+                            modifier = Modifier.fillMaxHeight(),
+                            thickness = androidx.compose.ui.unit.Dp(1f),
+                            color = Color(0xFF1E2432)
+                        )
+
+                        // Column 3: Detail pane — segue o rail ou a selecao de conversa
+                        Surface(
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            DesktopDetailPane(
+                                destination = desktopDetailOverride ?: currentDestination,
+                                contactRepository = contactRepository,
+                                onNavigate = { dest ->
+                                    if (dest == AppDestination.Contacts) {
+                                        desktopDetailOverride = null
+                                        selectedRailIndex = 0
+                                    } else {
+                                        currentDestination = dest
+                                        desktopDetailOverride = null
+                                    }
+                                }
+                            )
+                        }
+                    }
+                } else {
             AnimatedContent(
                 targetState = currentDestination,
                 transitionSpec = {
@@ -381,6 +362,132 @@ fun App() {
                             }
                         )
                     }
+                }
+            }
+                } // else
+            } // BoxWithConstraints
+        }
+    }
+}
+
+/**
+ * Navigation Rail desacoplado para desktop (64dp).
+ */
+@Composable
+private fun DesktopNavigationRail(
+    selectedIndex: Int,
+    onSelectIndex: (Int) -> Unit
+) {
+    NavigationRail(
+        containerColor = Color(0xFF0B1325),
+        contentColor = Color(0xFFF5F7FA),
+        modifier = Modifier.width(androidx.compose.ui.unit.Dp(64f)).fillMaxHeight()
+    ) {
+        Spacer(Modifier.height(androidx.compose.ui.unit.Dp(16f)))
+        NavigationRailItem(
+            selected = selectedIndex == 0,
+            onClick = { onSelectIndex(0) },
+            icon = { Icon(Icons.Default.Chat, contentDescription = "Conversas", tint = if (selectedIndex == 0) Color(0xFF00E676) else Color(0xFF8A93A6)) },
+            label = { Text("Chat", fontSize = 10.sp, color = if (selectedIndex == 0) Color(0xFF00E676) else Color(0xFF8A93A6)) }
+        )
+        NavigationRailItem(
+            selected = selectedIndex == 1,
+            onClick = { onSelectIndex(1) },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Contatos", tint = if (selectedIndex == 1) Color(0xFF00E676) else Color(0xFF8A93A6)) },
+            label = { Text("Agenda", fontSize = 10.sp, color = if (selectedIndex == 1) Color(0xFF00E676) else Color(0xFF8A93A6)) }
+        )
+        NavigationRailItem(
+            selected = selectedIndex == 2,
+            onClick = { onSelectIndex(2) },
+            icon = { Icon(Icons.Default.Security, contentDescription = "Identidade", tint = if (selectedIndex == 2) Color(0xFF00E676) else Color(0xFF8A93A6)) },
+            label = { Text("ID", fontSize = 10.sp, color = if (selectedIndex == 2) Color(0xFF00E676) else Color(0xFF8A93A6)) }
+        )
+        NavigationRailItem(
+            selected = selectedIndex == 3,
+            onClick = { onSelectIndex(3) },
+            icon = { Icon(Icons.Default.Settings, contentDescription = "Config", tint = if (selectedIndex == 3) Color(0xFF00E676) else Color(0xFF8A93A6)) },
+            label = { Text("Config", fontSize = 10.sp, color = if (selectedIndex == 3) Color(0xFF00E676) else Color(0xFF8A93A6)) }
+        )
+    }
+}
+
+/**
+ * Detail pane desacoplado para desktop — renderiza a tela de detalhe conforme destino.
+ */
+@Composable
+private fun DesktopDetailPane(
+    destination: AppDestination,
+    contactRepository: com.example.data.repository.ContactRepository,
+    onNavigate: (AppDestination) -> Unit
+) {
+    when (destination) {
+        is AppDestination.Chat -> {
+            ContactChatScreen(
+                contact = destination.contact,
+                onBack = { onNavigate(AppDestination.Contacts) },
+                onCompareSafetyNumber = { onNavigate(AppDestination.SafetyNumber(destination.contact)) }
+            )
+        }
+        is AppDestination.Identity -> {
+            IdentityScreen(
+                onBack = { onNavigate(AppDestination.Contacts) },
+                onProvisioned = { onNavigate(AppDestination.Contacts) },
+                onOpenDataPrivacy = { onNavigate(AppDestination.DataPrivacy) }
+            )
+        }
+        is AppDestination.DataPrivacy -> {
+            DataPrivacyScreen(onBack = { onNavigate(AppDestination.Contacts) })
+        }
+        is AppDestination.SafetyNumber -> {
+            SafetyNumberScreen(
+                contact = destination.contact,
+                contactRepository = contactRepository,
+                onBack = { onNavigate(AppDestination.Contacts) },
+                onVerifiedComplete = { onNavigate(AppDestination.Contacts) }
+            )
+        }
+        is AppDestination.AddModelA -> {
+            AddContactModelAScreen(
+                contactRepository = contactRepository,
+                onBack = { onNavigate(AppDestination.Contacts) },
+                onContactCreated = { newContact -> onNavigate(AppDestination.SafetyNumber(newContact)) }
+            )
+        }
+        is AppDestination.BlockedContacts -> {
+            BlockedContactsScreen(
+                contactRepository = contactRepository,
+                onBack = { onNavigate(AppDestination.Contacts) }
+            )
+        }
+        is AppDestination.Agenda -> {
+            com.example.ui.screens.AgendaScreen(
+                contactRepository = contactRepository,
+                onBack = { onNavigate(AppDestination.Contacts) },
+                onCompareSafetyNumber = { contact -> onNavigate(AppDestination.SafetyNumber(contact)) }
+            )
+        }
+        is AppDestination.QrHandshake -> {
+            com.example.ui.screens.QrHandshakeScreen(
+                onHandshakeSuccess = { onNavigate(AppDestination.Contacts) },
+                onBack = { onNavigate(AppDestination.Contacts) }
+            )
+        }
+        else -> {
+            // Contacts destination no detail — show placeholder
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color(0xFF0B1325)
+            ) {
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    Text(
+                        text = "Selecione uma conversa",
+                        color = Color(0xFF8A93A6),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    )
                 }
             }
         }

@@ -42,10 +42,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersivePrimary
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixActionPrimary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -99,8 +98,8 @@ fun DisappearingParticleOverlay(
         }
     }
 
-    val baseCyan = ImmersivePrimary // 0xFF00E5FF
-    val emberOrange = EmberOrange
+    val baseCyan = RaixActionPrimary // 0xFF00E5FF
+    val urgentColor = RaixError
     val purpleGlow = Color(0xFFD946EF)
 
     Canvas(modifier = modifier.fillMaxSize()) {
@@ -113,7 +112,7 @@ fun DisappearingParticleOverlay(
             val sweepBrush = Brush.linearGradient(
                 colors = listOf(
                     Color.Transparent,
-                    (if (isUrgent) emberOrange else baseCyan).copy(alpha = 0.28f),
+                    (if (isUrgent) urgentColor else baseCyan).copy(alpha = 0.28f),
                     Color.Transparent
                 ),
                 start = Offset(sweepX - 80f, 0f),
@@ -135,8 +134,8 @@ fun DisappearingParticleOverlay(
 
             val particleColor = when (p.colorType) {
                 0 -> baseCyan.copy(alpha = alpha)
-                1 -> if (isUrgent) emberOrange.copy(alpha = alpha) else Color(0xFF67E8F9).copy(alpha = alpha)
-                else -> if (isUrgent) ImmersiveExpiring.copy(alpha = alpha) else purpleGlow.copy(alpha = alpha * 0.8f)
+                1 -> if (isUrgent) urgentColor.copy(alpha = alpha) else Color(0xFF67E8F9).copy(alpha = alpha)
+                else -> if (isUrgent) RaixError.copy(alpha = alpha) else purpleGlow.copy(alpha = alpha * 0.8f)
             }
 
             drawCircle(
@@ -192,13 +191,13 @@ fun ReadReceiptStatusBadge(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(ImmersivePrimary.copy(alpha = 0.12f))
+                            .background(RaixActionPrimary.copy(alpha = 0.12f))
                             .padding(horizontal = 5.dp, vertical = 2.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.DoneAll,
                             contentDescription = "Lido pelo destinatário",
-                            tint = ImmersivePrimary,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(3.dp))
@@ -206,7 +205,7 @@ fun ReadReceiptStatusBadge(
                             text = if (formattedReadTime != null) "Lido $formattedReadTime" else "Lido",
                             fontSize = 9.5.sp,
                             fontWeight = FontWeight.Bold,
-                            color = ImmersivePrimary
+                            color = RaixActionPrimary
                         )
 
                         if (disappearAfterReadSeconds > 0) {
@@ -214,7 +213,7 @@ fun ReadReceiptStatusBadge(
                             Icon(
                                 imageVector = Icons.Default.LocalFireDepartment,
                                 contentDescription = "Desaparecendo",
-                                tint = EmberOrange,
+                                tint = RaixError,
                                 modifier = Modifier.size(11.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
@@ -222,7 +221,7 @@ fun ReadReceiptStatusBadge(
                                 text = "${secondsRemaining}s",
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Black,
-                                color = EmberOrange
+                                color = RaixError
                             )
                         }
                     }
@@ -233,13 +232,13 @@ fun ReadReceiptStatusBadge(
                         Text(
                             text = formattedSentTime,
                             fontSize = 10.sp,
-                            color = ImmersiveMutedLight
+                            color = RaixTextSecondary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             imageVector = Icons.Default.DoneAll,
                             contentDescription = "Entregue",
-                            tint = ImmersiveMutedLight,
+                            tint = RaixTextSecondary,
                             modifier = Modifier.size(13.dp)
                         )
                     }
@@ -250,13 +249,13 @@ fun ReadReceiptStatusBadge(
                         Text(
                             text = formattedSentTime,
                             fontSize = 10.sp,
-                            color = ImmersiveMutedLight
+                            color = RaixTextSecondary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "Enviado",
-                            tint = ImmersiveMutedLight,
+                            tint = RaixTextSecondary,
                             modifier = Modifier.size(13.dp)
                         )
                     }
@@ -268,7 +267,7 @@ fun ReadReceiptStatusBadge(
                 Text(
                     text = formattedSentTime,
                     fontSize = 10.sp,
-                    color = ImmersiveMutedLight
+                    color = RaixTextSecondary
                 )
 
                 if (isRead && disappearAfterReadSeconds > 0) {
@@ -277,13 +276,13 @@ fun ReadReceiptStatusBadge(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(EmberOrange.copy(alpha = 0.15f))
+                            .background(RaixError.copy(alpha = 0.15f))
                             .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocalFireDepartment,
                             contentDescription = "Desaparecendo",
-                            tint = EmberOrange,
+                            tint = RaixError,
                             modifier = Modifier.size(10.dp)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
@@ -291,7 +290,7 @@ fun ReadReceiptStatusBadge(
                             text = "Some em ${secondsRemaining}s",
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = EmberOrange
+                            color = RaixError
                         )
                     }
                 }

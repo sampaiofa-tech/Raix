@@ -49,12 +49,11 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.data.model.EphemeralMessage
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
 import kotlinx.coroutines.delay
 
 @Composable
@@ -111,21 +110,21 @@ fun ViewOnceViewerDialog(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(20.dp))
-                                .background(ImmersiveHeader)
-                                .border(1.dp, EmberOrange.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                                .background(RaixSurface)
+                                .border(1.dp, RaixError.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
                                 .padding(24.dp)
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(EmberOrange.copy(alpha = 0.2f)),
+                                    .background(RaixError.copy(alpha = 0.2f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.LocalFireDepartment,
                                     contentDescription = null,
-                                    tint = EmberOrange,
+                                    tint = RaixError,
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
@@ -134,14 +133,14 @@ fun ViewOnceViewerDialog(
                                 text = "MENSAGEM SECRETA",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = EmberOrange,
+                                color = RaixError,
                                 letterSpacing = 1.sp
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = message.content.ifBlank { "Conteúdo confidencial protegido." },
                                 fontSize = 16.sp,
-                                color = ImmersiveOnSurface,
+                                color = RaixTextPrimary,
                                 textAlign = TextAlign.Center,
                                 lineHeight = 22.sp
                             )
@@ -172,7 +171,7 @@ fun ViewOnceViewerDialog(
                             modifier = Modifier
                                 .size(24.dp)
                                 .clip(CircleShape)
-                                .background(EmberOrange),
+                                .background(RaixError),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -192,7 +191,7 @@ fun ViewOnceViewerDialog(
                             )
                             Text(
                                 text = "Apagando em ${secondsLeft}s...",
-                                color = EmberOrange,
+                                color = RaixError,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -226,7 +225,7 @@ fun ViewOnceViewerDialog(
                         .fillMaxWidth()
                         .height(3.dp)
                         .clip(RoundedCornerShape(2.dp)),
-                    color = EmberOrange,
+                    color = RaixError,
                     trackColor = Color.White.copy(alpha = 0.2f)
                 )
             }
@@ -243,21 +242,21 @@ fun ViewOnceViewerDialog(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .background(Color.Black.copy(alpha = 0.75f))
-                        .border(1.dp, EmberOrange.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .border(1.dp, RaixError.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.LocalFireDepartment,
                             contentDescription = null,
-                            tint = EmberOrange,
+                            tint = RaixError,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Essa mídia desaparecerá para sempre ao fechar",
                             fontSize = 11.sp,
-                            color = EmberOrange,
+                            color = RaixError,
                             fontWeight = FontWeight.Medium
                         )
                     }

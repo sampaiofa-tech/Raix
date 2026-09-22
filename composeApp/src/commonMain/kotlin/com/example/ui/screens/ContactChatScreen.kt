@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -1119,7 +1120,10 @@ fun ChatBottomInputBar(
         color = Color(0xFF0D1B2A),
         shadowElevation = 8.dp
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier
+            .navigationBarsPadding()
+            .padding(12.dp)
+        ) {
             if (isBlocked) {
                 Surface(
                     color = Color(0xFF261818),

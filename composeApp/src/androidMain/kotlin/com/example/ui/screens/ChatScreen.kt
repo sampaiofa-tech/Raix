@@ -101,20 +101,18 @@ import com.example.ui.components.AudioRecordingBar
 import com.example.ui.components.CallType
 import com.example.ui.components.EncryptedCallDialog
 import com.example.ui.components.MessageBubble
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveAvatarDeep
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnPrimary
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOnlineGreen
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersiveSurface
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixErrorContainer
+import com.example.ui.theme.RaixAvatarBg
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBackground
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixBubbleSent
+import com.example.ui.theme.RaixBubbleReceived
 import com.example.ui.viewmodel.TtlPreset
 import java.util.Locale
 
@@ -238,15 +236,15 @@ fun ChatScreen(
                 modifier = Modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)
             )
         },
-        containerColor = ImmersiveSurface,
+        containerColor = RaixBackground,
         topBar = {
-            // Immersive Top App Bar
+        
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(com.example.ui.theme.ObsidianSurface)
+                    .background(RaixSurface)
                     .statusBarsPadding()
-                    .border(0.5.dp, com.example.ui.theme.ObsidianBorder)
+                    .border(0.5.dp, RaixBorder)
                     .padding(horizontal = 8.dp, vertical = 6.dp)
             ) {
                 Row(
@@ -263,13 +261,13 @@ fun ChatScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(com.example.ui.theme.ObsidianCardElevated)
+                                .background(RaixSurfaceElevated)
                                 .testTag("chat_back_button")
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Voltar",
-                                tint = com.example.ui.theme.TitaniumPrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(19.dp)
                             )
                         }
@@ -284,19 +282,19 @@ fun ChatScreen(
                                 .background(
                                     Brush.linearGradient(
                                         listOf(
-                                            com.example.ui.theme.SecurityEmerald.copy(alpha = 0.2f),
-                                            com.example.ui.theme.ObsidianCardElevated
+                                            RaixActionPrimary.copy(alpha = 0.2f),
+                                            RaixSurfaceElevated
                                         )
                                     )
                                 )
-                                .border(1.dp, com.example.ui.theme.SecurityEmerald.copy(alpha = 0.6f), CircleShape),
+                                .border(1.dp, RaixActionPrimary.copy(alpha = 0.6f), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = channel.name.take(2).uppercase(Locale.getDefault()),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp,
-                                color = com.example.ui.theme.TitaniumPrimary
+                                color = RaixActionPrimary
                             )
                         }
 
@@ -307,7 +305,7 @@ fun ChatScreen(
                                 text = channel.name,
                                 fontSize = 14.5.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = ImmersiveOnSurface,
+                                color = RaixTextPrimary,
                                 maxLines = 1
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -315,14 +313,14 @@ fun ChatScreen(
                                     modifier = Modifier
                                         .size(5.dp)
                                         .clip(CircleShape)
-                                        .background(com.example.ui.theme.SecurityEmerald)
+                                        .background(RaixActionPrimary)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "E2EE • HARDWARE TEE",
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = com.example.ui.theme.SecurityEmerald,
+                                    color = RaixActionPrimary,
                                     letterSpacing = 0.5.sp,
                                     maxLines = 1
                                 )
@@ -345,7 +343,7 @@ fun ChatScreen(
                             Icon(
                                 imageVector = Icons.Default.Call,
                                 contentDescription = "Chamada de Voz",
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(19.dp)
                             )
                         }
@@ -360,7 +358,7 @@ fun ChatScreen(
                             Icon(
                                 imageVector = Icons.Default.Videocam,
                                 contentDescription = "Chamada de Vídeo",
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -369,8 +367,8 @@ fun ChatScreen(
                             Row(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(ImmersiveCardVariant)
-                                    .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(8.dp))
+                                    .background(RaixSurfaceElevated)
+                                    .border(0.8.dp, RaixBorder, RoundedCornerShape(8.dp))
                                     .clickable { showTtlMenu = true }
                                     .padding(horizontal = 6.dp, vertical = 4.dp)
                                     .testTag("ttl_selector_button"),
@@ -379,7 +377,7 @@ fun ChatScreen(
                                 Icon(
                                     imageVector = Icons.Default.Timer,
                                     contentDescription = "Configurar TTL",
-                                    tint = ImmersivePrimary,
+                                    tint = RaixActionPrimary,
                                     modifier = Modifier.size(12.dp)
                                 )
                                 Spacer(modifier = Modifier.width(3.dp))
@@ -392,7 +390,7 @@ fun ChatScreen(
                                     text = compactTtlLabel,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ImmersivePrimary,
+                                    color = RaixActionPrimary,
                                     maxLines = 1
                                 )
                             }
@@ -401,13 +399,13 @@ fun ChatScreen(
                             DropdownMenu(
                                 expanded = showTtlMenu,
                                 onDismissRequest = { showTtlMenu = false },
-                                modifier = Modifier.background(ImmersiveHeader)
+                                modifier = Modifier.background(RaixSurface)
                             ) {
                                 Text(
                                     text = "TEMPO DE EXPIRAÇÃO",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ImmersiveMuted,
+                                    color = RaixTextSecondary,
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                                 )
                                 ttlPresets.forEach { preset ->
@@ -417,13 +415,13 @@ fun ChatScreen(
                                                 Text(
                                                     text = preset.label,
                                                     fontWeight = if (preset == selectedTtl) FontWeight.Bold else FontWeight.Normal,
-                                                    color = if (preset == selectedTtl) ImmersivePrimary else ImmersiveOnSurface,
+                                                    color = if (preset == selectedTtl) RaixActionPrimary else RaixTextPrimary,
                                                     fontSize = 13.sp
                                                 )
                                                 Text(
                                                     text = preset.description,
                                                     fontSize = 10.sp,
-                                                    color = ImmersiveMutedLight
+                                                    color = RaixTextSecondary
                                                 )
                                             }
                                         },
@@ -442,12 +440,12 @@ fun ChatScreen(
                                 onClick = { showOptionsMenu = true },
                                 modifier = Modifier.size(34.dp)
                             ) {
-                                Icon(Icons.Default.MoreVert, contentDescription = "Opções", tint = ImmersiveOnSurface, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.MoreVert, contentDescription = "Opções", tint = RaixTextPrimary, modifier = Modifier.size(18.dp))
                             }
                             DropdownMenu(
                                 expanded = showOptionsMenu,
                                 onDismissRequest = { showOptionsMenu = false },
-                                modifier = Modifier.background(ImmersiveHeader)
+                                modifier = Modifier.background(RaixSurface)
                             ) {
                                 // Simulate Recipient Read Receipt for first unread sent message
                                 val unreadSentMessage = messages.findLast { it.senderId == "ME" && !it.isRead }
@@ -455,9 +453,9 @@ fun ChatScreen(
                                     DropdownMenuItem(
                                         text = {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(Icons.Default.DoneAll, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(16.dp))
+                                                Icon(Icons.Default.DoneAll, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(16.dp))
                                                 Spacer(modifier = Modifier.width(6.dp))
-                                                Text("Simular Leitura do Destinatário", color = ImmersivePrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                                Text("Simular Leitura do Destinatário", color = RaixActionPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                             }
                                         },
                                         onClick = {
@@ -470,9 +468,9 @@ fun ChatScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(16.dp))
+                                            Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(16.dp))
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Limpar Chat (Shake to Clear)", color = ImmersivePrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                            Text("Limpar Chat (Shake to Clear)", color = RaixActionPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                         }
                                     },
                                     onClick = {
@@ -483,9 +481,9 @@ fun ChatScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.PhotoCamera, contentDescription = null, tint = EmberOrange, modifier = Modifier.size(16.dp))
+                                            Icon(Icons.Default.PhotoCamera, contentDescription = null, tint = RaixError, modifier = Modifier.size(16.dp))
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Simular Captura de Tela (Teste)", color = EmberOrange, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                            Text("Simular Captura de Tela (Teste)", color = RaixError, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                         }
                                     },
                                     onClick = {
@@ -496,9 +494,9 @@ fun ChatScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = ImmersiveExpiring, modifier = Modifier.size(16.dp))
+                                            Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = RaixError, modifier = Modifier.size(16.dp))
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Incinerar Conversa", color = ImmersiveExpiring, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                            Text("Incinerar Conversa", color = RaixError, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                         }
                                     },
                                     onClick = {
@@ -520,7 +518,7 @@ fun ChatScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            ImmersivePrimary.copy(alpha = 0.08f),
+                            RaixActionPrimary.copy(alpha = 0.08f),
                             Color.Transparent,
                             Color.Transparent
                         )
@@ -540,10 +538,10 @@ fun ChatScreen(
                             .clip(RoundedCornerShape(14.dp))
                             .background(
                                 Brush.verticalGradient(
-                                    listOf(ImmersiveExpiring.copy(alpha = 0.25f), ImmersiveCard)
+                                    listOf(RaixError.copy(alpha = 0.25f), RaixSurface)
                                 )
                             )
-                            .border(1.2.dp, ImmersiveExpiring.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
+                            .border(1.2.dp, RaixError.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
                             .padding(12.dp)
                     ) {
                         Row(
@@ -554,7 +552,7 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .size(28.dp)
                                     .clip(CircleShape)
-                                    .background(ImmersiveExpiring),
+                                    .background(RaixError),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -570,13 +568,13 @@ fun ChatScreen(
                                     text = "BLOQUEIO DE SEGURANÇA ATIVO",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Black,
-                                    color = ImmersiveExpiring,
+                                    color = RaixError,
                                     letterSpacing = 0.5.sp
                                 )
                                 Text(
                                     text = "Captura de tela detectada. Fotos 1x e notas secretas foram bloqueadas preventivamente.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveOnSurface,
+                                    color = RaixTextPrimary,
                                     lineHeight = 14.sp
                                 )
                             }
@@ -592,7 +590,7 @@ fun ChatScreen(
                             Button(
                                 onClick = onDismissScreenshotLockdown,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = ImmersiveExpiring,
+                                    containerColor = RaixError,
                                     contentColor = Color.White
                                 ),
                                 shape = RoundedCornerShape(8.dp),
@@ -616,8 +614,8 @@ fun ChatScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .background(ImmersiveCardVariant)
-                            .border(1.dp, ImmersiveOutline, RoundedCornerShape(50))
+                            .background(RaixSurfaceElevated)
+                            .border(1.dp, RaixBorder, RoundedCornerShape(50))
                             .padding(horizontal = 14.dp, vertical = 5.dp)
                     ) {
                         Row(
@@ -626,14 +624,14 @@ fun ChatScreen(
                             Icon(
                                 imageVector = Icons.Default.History,
                                 contentDescription = null,
-                                tint = ImmersiveMutedLight,
+                                tint = RaixTextSecondary,
                                 modifier = Modifier.size(13.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "As mensagens expiram em ${selectedTtl.label} após o envio",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
@@ -653,14 +651,14 @@ fun ChatScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
-                            .background(ImmersiveCard)
-                            .border(1.dp, ImmersiveOutline, RoundedCornerShape(20.dp))
+                            .background(RaixSurface)
+                            .border(1.dp, RaixBorder, RoundedCornerShape(20.dp))
                             .padding(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.AutoDelete,
                             contentDescription = null,
-                            tint = ImmersivePrimary,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(44.dp)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
@@ -668,13 +666,13 @@ fun ChatScreen(
                             text = "Histórico Limpo",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = "Nenhuma mensagem ativa. Mensagens, fotos e arquivos somem automaticamente sem deixar vestígios.",
                             fontSize = 12.sp,
-                            color = ImmersiveMuted,
+                            color = RaixTextSecondary,
                             lineHeight = 16.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
@@ -711,8 +709,8 @@ fun ChatScreen(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(ImmersivePrimary.copy(alpha = 0.1f))
-                        .border(0.8.dp, ImmersivePrimary.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                        .background(RaixActionPrimary.copy(alpha = 0.1f))
+                        .border(0.8.dp, RaixActionPrimary.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
                         .clickable { onSimulateReply() }
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                         .testTag("simulate_reply_button"),
@@ -721,7 +719,7 @@ fun ChatScreen(
                     Icon(
                         imageVector = Icons.Default.QuestionAnswer,
                         contentDescription = "Simular Resposta",
-                        tint = ImmersivePrimary,
+                        tint = RaixActionPrimary,
                         modifier = Modifier.size(12.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -729,7 +727,7 @@ fun ChatScreen(
                         text = "Simular Resposta",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = ImmersivePrimary,
+                        color = RaixActionPrimary,
                         maxLines = 1
                     )
                 }
@@ -739,7 +737,7 @@ fun ChatScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(ImmersiveSurface)
+                    .background(RaixBackground)
                     .imePadding()
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(horizontal = 10.dp, vertical = 6.dp)
@@ -767,14 +765,14 @@ fun ChatScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(com.example.ui.theme.ObsidianCardElevated)
-                                .border(1.dp, com.example.ui.theme.ObsidianBorder, CircleShape)
+                                .background(RaixSurfaceElevated)
+                                .border(1.dp, RaixBorder, CircleShape)
                                 .testTag("attachment_menu_button")
                         ) {
                             Icon(
                                 imageVector = Icons.Default.AttachFile,
                                 contentDescription = "Anexar Mídia",
-                                tint = com.example.ui.theme.TitaniumPrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(19.dp)
                             )
                         }
@@ -786,11 +784,11 @@ fun ChatScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(26.dp))
-                                .background(com.example.ui.theme.ObsidianCard)
+                                .background(RaixSurface)
                                 .border(
                                     1.dp,
-                                    if (isViewOnceMessage || isBurnerNoteMode) com.example.ui.theme.EmberFlame.copy(alpha = 0.7f)
-                                    else com.example.ui.theme.ObsidianBorder,
+                                    if (isViewOnceMessage || isBurnerNoteMode) RaixError.copy(alpha = 0.7f)
+                                    else RaixBorder,
                                     RoundedCornerShape(26.dp)
                                 )
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
@@ -804,10 +802,10 @@ fun ChatScreen(
                                     modifier = Modifier
                                         .size(28.dp)
                                         .clip(CircleShape)
-                                        .background(if (isViewOnceMessage) com.example.ui.theme.EmberFlame else Color.Transparent)
+                                        .background(if (isViewOnceMessage) RaixError else Color.Transparent)
                                         .border(
                                             0.8.dp,
-                                            if (isViewOnceMessage) com.example.ui.theme.EmberFlame else com.example.ui.theme.ObsidianBorder,
+                                            if (isViewOnceMessage) RaixError else RaixBorder,
                                             CircleShape
                                         )
                                         .clickable { isViewOnceMessage = !isViewOnceMessage }
@@ -818,7 +816,7 @@ fun ChatScreen(
                                         text = "1x",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Black,
-                                        color = if (isViewOnceMessage) Color.Black else com.example.ui.theme.TitaniumMuted
+                                        color = if (isViewOnceMessage) Color.Black else RaixTextSecondary
                                     )
                                 }
 
@@ -830,13 +828,13 @@ fun ChatScreen(
                                     modifier = Modifier
                                         .size(28.dp)
                                         .clip(CircleShape)
-                                        .background(if (isBurnerNoteMode) com.example.ui.theme.EmberFlame.copy(alpha = 0.25f) else Color.Transparent)
+                                        .background(if (isBurnerNoteMode) RaixError.copy(alpha = 0.25f) else Color.Transparent)
                                         .testTag("burner_note_toggle")
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.LocalFireDepartment,
                                         contentDescription = "Nota Secreta",
-                                        tint = if (isBurnerNoteMode) com.example.ui.theme.EmberFlame else com.example.ui.theme.TitaniumMuted,
+                                        tint = if (isBurnerNoteMode) RaixError else RaixTextSecondary,
                                         modifier = Modifier.size(15.dp)
                                     )
                                 }
@@ -852,14 +850,14 @@ fun ChatScreen(
                                                 isBurnerNoteMode -> "Nota secreta temporária..."
                                                 else -> "Mensagem protegida..."
                                             },
-                                            color = if (isViewOnceMessage) com.example.ui.theme.EmberFlame.copy(alpha = 0.8f) else com.example.ui.theme.TitaniumMuted,
+                                            color = if (isViewOnceMessage) RaixError.copy(alpha = 0.8f) else RaixTextSecondary,
                                             fontSize = 13.sp,
                                             maxLines = 1
                                         )
                                     },
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedTextColor = ImmersiveOnSurface,
-                                        unfocusedTextColor = ImmersiveOnSurface,
+                                        focusedTextColor = RaixTextPrimary,
+                                        unfocusedTextColor = RaixTextPrimary,
                                         focusedBorderColor = Color.Transparent,
                                         unfocusedBorderColor = Color.Transparent,
                                         focusedContainerColor = Color.Transparent,
@@ -888,15 +886,15 @@ fun ChatScreen(
                                     .size(42.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (isViewOnceMessage || isBurnerNoteMode) com.example.ui.theme.EmberFlame
-                                        else com.example.ui.theme.TitaniumPrimary
+                                        if (isViewOnceMessage || isBurnerNoteMode) RaixError
+                                        else RaixActionPrimary
                                     )
                                     .testTag("send_message_button")
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Send,
                                     contentDescription = "Enviar",
-                                    tint = if (isViewOnceMessage || isBurnerNoteMode) Color.Black else com.example.ui.theme.ObsidianBlack,
+                                    tint = if (isViewOnceMessage || isBurnerNoteMode) Color.Black else RaixBackground,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -906,14 +904,14 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .size(42.dp)
                                     .clip(CircleShape)
-                                    .background(com.example.ui.theme.ObsidianCardElevated)
-                                    .border(1.dp, com.example.ui.theme.ObsidianBorder, CircleShape)
+                                    .background(RaixSurfaceElevated)
+                                    .border(1.dp, RaixBorder, CircleShape)
                                     .testTag("mic_record_button")
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Mic,
                                     contentDescription = "Gravar Áudio",
-                                    tint = com.example.ui.theme.TitaniumPrimary,
+                                    tint = RaixActionPrimary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -930,7 +928,7 @@ fun ChatScreen(
                         .width(70.dp)
                         .height(3.dp)
                         .clip(RoundedCornerShape(2.dp))
-                        .background(ImmersiveOutline.copy(alpha = 0.4f))
+                        .background(RaixBorder.copy(alpha = 0.4f))
                 )
             }
         }
@@ -941,7 +939,7 @@ fun ChatScreen(
         ModalBottomSheet(
             onDismissRequest = { showAttachmentSheet = false },
             sheetState = sheetState,
-            containerColor = ImmersiveHeader,
+            containerColor = RaixSurface,
             scrimColor = Color.Black.copy(alpha = 0.6f)
         ) {
             Column(
@@ -953,7 +951,7 @@ fun ChatScreen(
                     text = "ENVIAR MÍDIA PROTEGIDA",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = ImmersiveMuted,
+                    color = RaixTextSecondary,
                     letterSpacing = 0.8.sp
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -1002,7 +1000,7 @@ fun ChatScreen(
                     text = "EXEMPLOS RÁPIDOS DE DEMONSTRAÇÃO",
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
-                    color = ImmersivePrimary,
+                    color = RaixActionPrimary,
                     letterSpacing = 0.5.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -1053,8 +1051,8 @@ fun ChatScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
-                    .background(ImmersiveHeader)
-                    .border(1.dp, ImmersiveOutline, RoundedCornerShape(20.dp))
+                    .background(RaixSurface)
+                    .border(1.dp, RaixBorder, RoundedCornerShape(20.dp))
                     .padding(18.dp)
             ) {
                 Column(
@@ -1068,14 +1066,14 @@ fun ChatScreen(
                         Text(
                             text = "Enviar ${when(attachment.mediaType) { "IMAGE" -> "Foto"; "VIDEO" -> "Vídeo"; else -> "Arquivo" }}",
                             fontWeight = FontWeight.Bold,
-                            color = ImmersiveOnSurface,
+                            color = RaixTextPrimary,
                             fontSize = 16.sp
                         )
                         IconButton(
                             onClick = { pendingAttachment = null },
                             modifier = Modifier.size(28.dp)
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancelar", tint = ImmersiveMutedLight)
+                            Icon(Icons.Default.Close, contentDescription = "Cancelar", tint = RaixTextSecondary)
                         }
                     }
 
@@ -1087,7 +1085,7 @@ fun ChatScreen(
                                 .fillMaxWidth()
                                 .height(160.dp)
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(ImmersiveCardVariant)
+                                .background(RaixSurfaceElevated)
                         ) {
                             AsyncImage(
                                 model = attachment.mediaUri,
@@ -1101,15 +1099,15 @@ fun ChatScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(ImmersiveCardVariant)
-                                .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(12.dp))
+                                .background(RaixSurfaceElevated)
+                                .border(0.8.dp, RaixBorder, RoundedCornerShape(12.dp))
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = if (attachment.mediaType == "VIDEO") Icons.Default.VideoFile else Icons.Default.InsertDriveFile,
                                 contentDescription = null,
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(32.dp)
                             )
                             Spacer(modifier = Modifier.width(10.dp))
@@ -1118,13 +1116,13 @@ fun ChatScreen(
                                     text = attachment.fileName,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ImmersiveOnSurface,
+                                    color = RaixTextPrimary,
                                     maxLines = 1
                                 )
                                 Text(
                                     text = "${attachment.fileSize} • Expira em ${selectedTtl.label}",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -1137,8 +1135,8 @@ fun ChatScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (attachment.isViewOnce) EmberOrange.copy(alpha = 0.15f) else ImmersiveCardVariant)
-                            .border(1.dp, if (attachment.isViewOnce) EmberOrange.copy(alpha = 0.6f) else ImmersiveOutline, RoundedCornerShape(12.dp))
+                            .background(if (attachment.isViewOnce) RaixError.copy(alpha = 0.15f) else RaixSurfaceElevated)
+                            .border(1.dp, if (attachment.isViewOnce) RaixError.copy(alpha = 0.6f) else RaixBorder, RoundedCornerShape(12.dp))
                             .clickable {
                                 pendingAttachment = attachment.copy(isViewOnce = !attachment.isViewOnce)
                             }
@@ -1152,14 +1150,14 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .size(26.dp)
                                     .clip(CircleShape)
-                                    .background(if (attachment.isViewOnce) EmberOrange else ImmersiveCard),
+                                    .background(if (attachment.isViewOnce) RaixError else RaixSurface),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "1x",
                                     fontWeight = FontWeight.Black,
                                     fontSize = 11.sp,
-                                    color = if (attachment.isViewOnce) Color.Black else ImmersiveMutedLight
+                                    color = if (attachment.isViewOnce) Color.Black else RaixTextSecondary
                                 )
                             }
                             Spacer(modifier = Modifier.width(10.dp))
@@ -1168,12 +1166,12 @@ fun ChatScreen(
                                     text = "Visualização Única (1x)",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
-                                    color = if (attachment.isViewOnce) EmberOrange else ImmersiveOnSurface
+                                    color = if (attachment.isViewOnce) RaixError else RaixTextPrimary
                                 )
                                 Text(
                                     text = "Destrói após abrir uma vez",
                                     fontSize = 10.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -1182,7 +1180,7 @@ fun ChatScreen(
                             text = if (attachment.isViewOnce) "ATIVADO" else "DESATIVADO",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (attachment.isViewOnce) EmberOrange else ImmersiveMutedLight
+                            color = if (attachment.isViewOnce) RaixError else RaixTextSecondary
                         )
                     }
 
@@ -1200,8 +1198,8 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isSelected) ImmersivePrimary.copy(alpha = 0.2f) else ImmersiveCardVariant)
-                                    .border(0.8.dp, if (isSelected) ImmersivePrimary else ImmersiveOutline, RoundedCornerShape(8.dp))
+                                    .background(if (isSelected) RaixActionPrimary.copy(alpha = 0.2f) else RaixSurfaceElevated)
+                                    .border(0.8.dp, if (isSelected) RaixActionPrimary else RaixBorder, RoundedCornerShape(8.dp))
                                     .clickable {
                                         pendingAttachment = attachment.copy(customTtlHours = preset.hours)
                                     }
@@ -1212,7 +1210,7 @@ fun ChatScreen(
                                     text = preset.label,
                                     fontSize = 10.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) ImmersivePrimary else ImmersiveMutedLight
+                                    color = if (isSelected) RaixActionPrimary else RaixTextSecondary
                                 )
                             }
                         }
@@ -1223,14 +1221,14 @@ fun ChatScreen(
                     OutlinedTextField(
                         value = attachmentCaption,
                         onValueChange = { attachmentCaption = it },
-                        placeholder = { Text("Adicionar legenda (opcional)...", fontSize = 12.sp, color = ImmersiveMuted) },
+                        placeholder = { Text("Adicionar legenda (opcional)...", fontSize = 12.sp, color = RaixTextSecondary) },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = ImmersiveOnSurface,
-                            unfocusedTextColor = ImmersiveOnSurface,
-                            focusedBorderColor = ImmersivePrimary,
-                            unfocusedBorderColor = ImmersiveOutline,
-                            focusedContainerColor = ImmersiveCardVariant,
-                            unfocusedContainerColor = ImmersiveCardVariant
+                            focusedTextColor = RaixTextPrimary,
+                            unfocusedTextColor = RaixTextPrimary,
+                            focusedBorderColor = RaixActionPrimary,
+                            unfocusedBorderColor = RaixBorder,
+                            focusedContainerColor = RaixSurfaceElevated,
+                            unfocusedContainerColor = RaixSurfaceElevated
                         ),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -1246,7 +1244,7 @@ fun ChatScreen(
                             onClick = { pendingAttachment = null },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Cancelar", color = ImmersiveMutedLight)
+                            Text("Cancelar", color = RaixTextSecondary)
                         }
 
                         Button(
@@ -1263,13 +1261,13 @@ fun ChatScreen(
                                 pendingAttachment = null
                                 attachmentCaption = ""
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1.5f).testTag("confirm_send_media_button")
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, modifier = Modifier.size(16.dp), tint = ImmersiveOnPrimary)
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, modifier = Modifier.size(16.dp), tint = RaixBackground)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Enviar Agora", color = ImmersiveOnPrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Text("Enviar Agora", color = RaixBackground, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         }
                     }
                 }
@@ -1281,17 +1279,17 @@ fun ChatScreen(
     if (showIncinerateDialog) {
         AlertDialog(
             onDismissRequest = { showIncinerateDialog = false },
-            containerColor = ImmersiveHeader,
+            containerColor = RaixSurface,
             icon = {
-                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = ImmersiveExpiring, modifier = Modifier.size(32.dp))
+                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = RaixError, modifier = Modifier.size(32.dp))
             },
             title = {
-                Text("Incinerar Conversa e Contato?", fontWeight = FontWeight.Bold, color = ImmersiveExpiring, fontSize = 17.sp)
+                Text("Incinerar Conversa e Contato?", fontWeight = FontWeight.Bold, color = RaixError, fontSize = 17.sp)
             },
             text = {
                 Text(
                     "Esta conversa e todas as mensagens trocadas serão excluídas e sobrescritas imediatamente. Nenhum registro ou histórico do contato permanecerá no aplicativo.",
-                    color = ImmersiveOnSurface,
+                    color = RaixTextPrimary,
                     fontSize = 13.sp
                 )
             },
@@ -1301,7 +1299,7 @@ fun ChatScreen(
                         showIncinerateDialog = false
                         onIncinerateRoom(channel.id)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = ImmersiveExpiring),
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixError),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("Incinerar Agora", color = Color(0xFF601410), fontWeight = FontWeight.Bold)
@@ -1309,7 +1307,7 @@ fun ChatScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showIncinerateDialog = false }) {
-                    Text("Cancelar", color = ImmersiveMutedLight)
+                    Text("Cancelar", color = RaixTextSecondary)
                 }
             }
         )
@@ -1319,17 +1317,17 @@ fun ChatScreen(
     if (shakeDialogVisible) {
         AlertDialog(
             onDismissRequest = { onDismissShakeDialog() },
-            containerColor = ImmersiveHeader,
+            containerColor = RaixSurface,
             icon = {
-                Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(36.dp))
+                Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(36.dp))
             },
             title = {
-                Text("📳 Shake to Clear Detectado", fontWeight = FontWeight.Bold, color = ImmersivePrimary, fontSize = 17.sp)
+                Text("📳 Shake to Clear Detectado", fontWeight = FontWeight.Bold, color = RaixActionPrimary, fontSize = 17.sp)
             },
             text = {
                 Text(
                     "Chacoalhar detectado! Deseja apagar permanentemente todas as mensagens e mídias desta conversa aberta? Esta ação limpa o chat instantaneamente sem deixar vestígios (Zero Trace).",
-                    color = ImmersiveOnSurface,
+                    color = RaixTextPrimary,
                     fontSize = 13.sp
                 )
             },
@@ -1338,15 +1336,15 @@ fun ChatScreen(
                     onClick = {
                         onTriggerShakeWipe()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Limpar Histórico Agora", color = ImmersiveOnPrimary, fontWeight = FontWeight.Bold)
+                    Text("Limpar Histórico Agora", color = RaixBackground, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onDismissShakeDialog() }) {
-                    Text("Cancelar", color = ImmersiveMutedLight)
+                    Text("Cancelar", color = RaixTextSecondary)
                 }
             }
         )
@@ -1379,14 +1377,14 @@ fun AttachmentOptionItem(
             modifier = Modifier
                 .size(54.dp)
                 .clip(CircleShape)
-                .background(ImmersivePrimary.copy(alpha = 0.15f))
-                .border(1.dp, ImmersivePrimary.copy(alpha = 0.4f), CircleShape),
+                .background(RaixActionPrimary.copy(alpha = 0.15f))
+                .border(1.dp, RaixActionPrimary.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = ImmersivePrimary,
+                tint = RaixActionPrimary,
                 modifier = Modifier.size(26.dp)
             )
         }
@@ -1395,7 +1393,7 @@ fun AttachmentOptionItem(
             text = title,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            color = ImmersiveOnSurface
+            color = RaixTextPrimary
         )
     }
 }
@@ -1409,8 +1407,8 @@ fun QuickMediaChip(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(ImmersiveCardVariant)
-            .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(10.dp))
+            .background(RaixSurfaceElevated)
+            .border(0.8.dp, RaixBorder, RoundedCornerShape(10.dp))
             .clickable { onClick() }
             .padding(vertical = 8.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center
@@ -1419,7 +1417,7 @@ fun QuickMediaChip(
             text = label,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
-            color = ImmersiveOnSurface,
+            color = RaixTextPrimary,
             maxLines = 1
         )
     }

@@ -62,17 +62,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnPrimary
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersiveSurface
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBackground
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixPremiumGold
 
 @Composable
 fun SecurityVaultDialog(
@@ -112,8 +110,8 @@ fun SecurityVaultDialog(
                 .padding(16.dp)
                 .testTag("security_vault_dialog"),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = ImmersiveHeader),
-            border = androidx.compose.foundation.BorderStroke(1.dp, ImmersiveOutline)
+            colors = CardDefaults.cardColors(containerColor = RaixSurface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, RaixBorder)
         ) {
             Column(
                 modifier = Modifier
@@ -141,23 +139,23 @@ fun SecurityVaultDialog(
                                     text = "• Segurança",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                             }
                             Text(
                                 text = "Protocolo de Proteção e Auto-Bloqueio",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
                         }
                     }
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Fechar", tint = ImmersiveMutedLight)
+                        Icon(Icons.Default.Close, contentDescription = "Fechar", tint = RaixTextSecondary)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = ImmersiveOutline)
+                HorizontalDivider(color = RaixBorder)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Auto-Lock Section (Requested: Auto-lock every 5 min by default, customizable)
@@ -165,8 +163,8 @@ fun SecurityVaultDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .background(ImmersiveCardVariant)
-                        .border(1.dp, ImmersivePrimary.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                        .background(RaixSurfaceElevated)
+                        .border(1.dp, RaixActionPrimary.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
                         .padding(12.dp)
                 ) {
                     Row(
@@ -182,13 +180,13 @@ fun SecurityVaultDialog(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(ImmersivePrimary.copy(alpha = 0.2f)),
+                                    .background(RaixActionPrimary.copy(alpha = 0.2f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Timer,
                                     contentDescription = null,
-                                    tint = ImmersivePrimary,
+                                    tint = RaixActionPrimary,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -198,12 +196,12 @@ fun SecurityVaultDialog(
                                     text = "Auto-Bloqueio Automático",
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = if (autoLockEnabled) "Bloqueia e pede senha a cada $autoLockTimeoutMinutes min de inatividade." else "Desativado.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight,
+                                    color = RaixTextSecondary,
                                     lineHeight = 14.sp
                                 )
                             }
@@ -212,10 +210,10 @@ fun SecurityVaultDialog(
                             checked = autoLockEnabled,
                             onCheckedChange = { onToggleAutoLock(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = ImmersiveSurface,
-                                checkedTrackColor = ImmersivePrimary,
-                                uncheckedThumbColor = ImmersiveMuted,
-                                uncheckedTrackColor = ImmersiveCard
+                                checkedThumbColor = RaixBackground,
+                                checkedTrackColor = RaixActionPrimary,
+                                uncheckedThumbColor = RaixTextSecondary,
+                                uncheckedTrackColor = RaixSurface
                             ),
                             modifier = Modifier.testTag("auto_lock_switch")
                         )
@@ -227,7 +225,7 @@ fun SecurityVaultDialog(
                             text = "TEMPO PARA BLOQUEAR AUTOMATICAMENTE:",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = ImmersivePrimary,
+                            color = RaixActionPrimary,
                             letterSpacing = 0.5.sp
                         )
                         Spacer(modifier = Modifier.height(6.dp))
@@ -243,10 +241,10 @@ fun SecurityVaultDialog(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(if (isSelected) ImmersivePrimary else ImmersiveCard)
+                                        .background(if (isSelected) RaixActionPrimary else RaixSurface)
                                         .border(
                                             0.8.dp,
-                                            if (isSelected) ImmersivePrimary else ImmersiveOutline,
+                                            if (isSelected) RaixActionPrimary else RaixBorder,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable {
@@ -259,7 +257,7 @@ fun SecurityVaultDialog(
                                         text = if (mins == 5) "5m (Padrão)" else "${mins}m",
                                         fontSize = 10.sp,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
+                                        color = if (isSelected) RaixBackground else RaixTextPrimary,
                                         maxLines = 1
                                     )
                                 }
@@ -275,8 +273,8 @@ fun SecurityVaultDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .background(ImmersiveCardVariant)
-                        .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(14.dp))
+                        .background(RaixSurfaceElevated)
+                        .border(0.8.dp, RaixBorder, RoundedCornerShape(14.dp))
                         .padding(12.dp)
                 ) {
                     Row(
@@ -288,7 +286,7 @@ fun SecurityVaultDialog(
                             Icon(
                                 imageVector = Icons.Default.Pin,
                                 contentDescription = null,
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(10.dp))
@@ -297,12 +295,12 @@ fun SecurityVaultDialog(
                                     text = "PIN de Segurança",
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Text(
                                     text = "PIN Atual: •••• (Toque para alterar)",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                             }
                         }
@@ -313,12 +311,12 @@ fun SecurityVaultDialog(
                                 newPinInput = ""
                                 pinError = null
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = ImmersiveCard),
+                            colors = ButtonDefaults.buttonColors(containerColor = RaixSurface),
                             shape = RoundedCornerShape(8.dp),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                            modifier = Modifier.height(28.dp).border(0.8.dp, ImmersivePrimary, RoundedCornerShape(8.dp))
+                            modifier = Modifier.height(28.dp).border(0.8.dp, RaixActionPrimary, RoundedCornerShape(8.dp))
                         ) {
-                            Text(if (isEditingPin) "Cancelar" else "Alterar", color = ImmersivePrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text(if (isEditingPin) "Cancelar" else "Alterar", color = RaixActionPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -336,10 +334,10 @@ fun SecurityVaultDialog(
                                 singleLine = true,
                                 modifier = Modifier.weight(1f),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = ImmersivePrimary,
-                                    unfocusedBorderColor = ImmersiveOutline,
-                                    focusedTextColor = ImmersiveOnSurface,
-                                    unfocusedTextColor = ImmersiveOnSurface
+                                    focusedBorderColor = RaixActionPrimary,
+                                    unfocusedBorderColor = RaixBorder,
+                                    focusedTextColor = RaixTextPrimary,
+                                    unfocusedTextColor = RaixTextPrimary
                                 )
                             )
 
@@ -354,15 +352,15 @@ fun SecurityVaultDialog(
                                     }
                                 },
                                 enabled = newPinInput.length == 4,
-                                colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                                colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.height(44.dp)
                             ) {
-                                Text("Salvar", color = ImmersiveOnPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("Salvar", color = RaixBackground, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                         if (pinError != null) {
-                            Text(text = pinError ?: "", color = com.example.ui.theme.EmberOrange, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
+                            Text(text = pinError ?: "", color = RaixError, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
                         }
                     }
                 }
@@ -376,10 +374,10 @@ fun SecurityVaultDialog(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(ImmersiveCardVariant, RoundedCornerShape(14.dp))
+                        .background(RaixSurfaceElevated, RoundedCornerShape(14.dp))
                         .border(
                             if (biometricLockEnabled) 1.dp else 0.8.dp,
-                            if (biometricLockEnabled) ImmersivePrimary.copy(alpha = 0.5f) else ImmersiveOutline,
+                            if (biometricLockEnabled) RaixActionPrimary.copy(alpha = 0.5f) else RaixBorder,
                             RoundedCornerShape(14.dp)
                         )
                         .padding(12.dp)
@@ -397,13 +395,13 @@ fun SecurityVaultDialog(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(if (biometricLockEnabled) ImmersivePrimary.copy(alpha = 0.2f) else ImmersiveCard),
+                                    .background(if (biometricLockEnabled) RaixActionPrimary.copy(alpha = 0.2f) else RaixSurface),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Fingerprint,
                                     contentDescription = null,
-                                    tint = if (biometricLockEnabled) ImmersivePrimary else ImmersiveMuted,
+                                    tint = if (biometricLockEnabled) RaixActionPrimary else RaixTextSecondary,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
@@ -414,20 +412,20 @@ fun SecurityVaultDialog(
                                         text = "Autenticação Biométrica",
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = ImmersiveOnSurface
+                                        color = RaixTextPrimary
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Icon(
                                         imageVector = Icons.Default.Face,
                                         contentDescription = "Facial",
-                                        tint = if (biometricLockEnabled) com.example.ui.theme.ElectricCyan else ImmersiveMuted,
+                                        tint = if (biometricLockEnabled) RaixPremiumGold else RaixTextSecondary,
                                         modifier = Modifier.size(14.dp)
                                     )
                                 }
                                 Text(
                                     text = if (biometricLockEnabled) "Desbloqueio rápido por impressão digital ou reconhecimento facial." else "Desativado: desbloqueio requer PIN.",
                                     fontSize = 11.sp,
-                                    color = ImmersiveMutedLight,
+                                    color = RaixTextSecondary,
                                     lineHeight = 14.sp
                                 )
                             }
@@ -436,10 +434,10 @@ fun SecurityVaultDialog(
                             checked = biometricLockEnabled,
                             onCheckedChange = { onToggleBiometricLock(it) },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = ImmersiveSurface,
-                                checkedTrackColor = ImmersivePrimary,
-                                uncheckedThumbColor = ImmersiveMuted,
-                                uncheckedTrackColor = ImmersiveCard
+                                checkedThumbColor = RaixBackground,
+                                checkedTrackColor = RaixActionPrimary,
+                                uncheckedThumbColor = RaixTextSecondary,
+                                uncheckedTrackColor = RaixSurface
                             ),
                             modifier = Modifier.testTag("biometric_lock_switch")
                         )
@@ -451,20 +449,20 @@ fun SecurityVaultDialog(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(ImmersiveSurface.copy(alpha = 0.5f))
+                                .background(RaixBackground.copy(alpha = 0.5f))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(6.dp)
                                     .clip(CircleShape)
-                                    .background(com.example.ui.theme.ImmersiveOnlineGreen)
+                                    .background(RaixActionPrimary)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "Status: $biometricStatus",
                                 fontSize = 10.sp,
-                                color = ImmersiveMutedLight,
+                                color = RaixTextSecondary,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -477,8 +475,8 @@ fun SecurityVaultDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(ImmersiveCardVariant, RoundedCornerShape(14.dp))
-                        .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(14.dp))
+                        .background(RaixSurfaceElevated, RoundedCornerShape(14.dp))
+                        .border(0.8.dp, RaixBorder, RoundedCornerShape(14.dp))
                         .padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -490,7 +488,7 @@ fun SecurityVaultDialog(
                         Icon(
                             imageVector = Icons.Default.NoPhotography,
                             contentDescription = null,
-                            tint = if (screenProtectionEnabled) ImmersivePrimary else ImmersiveMuted,
+                            tint = if (screenProtectionEnabled) RaixActionPrimary else RaixTextSecondary,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -499,13 +497,13 @@ fun SecurityVaultDialog(
                                 text = "Anti-Captura (FLAG_SECURE)",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = ImmersiveOnSurface,
+                                color = RaixTextPrimary,
                                 maxLines = 1
                             )
                             Text(
                                 text = if (screenProtectionEnabled) "Ativo: bloqueia capturas em aparelhos físicos." else "Desativado para exibição fluida no preview.",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight,
+                                color = RaixTextSecondary,
                                 lineHeight = 14.sp
                             )
                         }
@@ -514,10 +512,10 @@ fun SecurityVaultDialog(
                         checked = screenProtectionEnabled,
                         onCheckedChange = { onToggleScreenProtection() },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = ImmersiveSurface,
-                            checkedTrackColor = ImmersivePrimary,
-                            uncheckedThumbColor = ImmersiveMuted,
-                            uncheckedTrackColor = ImmersiveCard
+                            checkedThumbColor = RaixBackground,
+                            checkedTrackColor = RaixActionPrimary,
+                            uncheckedThumbColor = RaixTextSecondary,
+                            uncheckedTrackColor = RaixSurface
                         )
                     )
                 }
@@ -528,8 +526,8 @@ fun SecurityVaultDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(ImmersiveCardVariant, RoundedCornerShape(14.dp))
-                        .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(14.dp))
+                        .background(RaixSurfaceElevated, RoundedCornerShape(14.dp))
+                        .border(0.8.dp, RaixBorder, RoundedCornerShape(14.dp))
                         .padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -541,7 +539,7 @@ fun SecurityVaultDialog(
                         Icon(
                             imageVector = if (notificationsEnabled) Icons.Default.NotificationsActive else Icons.Default.Notifications,
                             contentDescription = null,
-                            tint = if (notificationsEnabled) ImmersivePrimary else ImmersiveMuted,
+                            tint = if (notificationsEnabled) RaixActionPrimary else RaixTextSecondary,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -550,13 +548,13 @@ fun SecurityVaultDialog(
                                 text = "Notificações",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = ImmersiveOnSurface,
+                                color = RaixTextPrimary,
                                 maxLines = 1
                             )
                             Text(
                                 text = if (notificationsEnabled) "Autorizado. Modo discreto ativo: não notifica ao iniciar conversas." else "Toque para autorizar avisos.",
                                 fontSize = 11.sp,
-                                color = ImmersiveMutedLight,
+                                color = RaixTextSecondary,
                                 lineHeight = 14.sp
                             )
                         }
@@ -565,22 +563,22 @@ fun SecurityVaultDialog(
                     if (!notificationsEnabled) {
                         Button(
                             onClick = onRequestNotificationPermission,
-                            colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                             shape = RoundedCornerShape(8.dp),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                             modifier = Modifier.height(28.dp).testTag("enable_notifications_button")
                         ) {
-                            Text("Permitir", color = ImmersiveOnPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                            Text("Permitir", color = RaixBackground, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                         }
                     } else {
                         OutlinedButton(
                             onClick = onTestNotification,
                             shape = RoundedCornerShape(8.dp),
-                            border = androidx.compose.foundation.BorderStroke(0.8.dp, ImmersivePrimary),
+                            border = androidx.compose.foundation.BorderStroke(0.8.dp, RaixActionPrimary),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                             modifier = Modifier.height(28.dp).testTag("test_notification_button")
                         ) {
-                            Text("Testar", color = ImmersivePrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                            Text("Testar", color = RaixActionPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                         }
                     }
                 }
@@ -597,20 +595,20 @@ fun SecurityVaultDialog(
                         .fillMaxWidth()
                         .height(40.dp)
                         .testTag("lock_app_now_button"),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, ImmersivePrimary),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, RaixActionPrimary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Lock,
                         contentDescription = null,
-                        tint = ImmersivePrimary,
+                        tint = RaixActionPrimary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Bloquear Aplicativo Agora",
                         fontWeight = FontWeight.Bold,
-                        color = ImmersivePrimary,
+                        color = RaixActionPrimary,
                         fontSize = 12.sp
                     )
                 }
@@ -627,7 +625,7 @@ fun SecurityVaultDialog(
                         .fillMaxWidth()
                         .height(44.dp)
                         .testTag("panic_wipe_button_dialog"),
-                    colors = ButtonDefaults.buttonColors(containerColor = ImmersiveExpiring),
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixError),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
@@ -660,8 +658,8 @@ private fun SecurityFeatureRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ImmersiveCardVariant, RoundedCornerShape(14.dp))
-            .border(1.dp, ImmersiveOutline, RoundedCornerShape(14.dp))
+            .background(RaixSurfaceElevated, RoundedCornerShape(14.dp))
+            .border(1.dp, RaixBorder, RoundedCornerShape(14.dp))
             .padding(12.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -680,13 +678,13 @@ private fun SecurityFeatureRow(
                 text = title,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
-                color = ImmersiveOnSurface
+                color = RaixTextPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = description,
                 fontSize = 11.sp,
-                color = ImmersiveMutedLight,
+                color = RaixTextSecondary,
                 lineHeight = 16.sp
             )
         }

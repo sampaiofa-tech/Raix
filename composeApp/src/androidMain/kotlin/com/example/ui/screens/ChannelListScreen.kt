@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -23,23 +24,28 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoDelete
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
@@ -47,6 +53,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,20 +89,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.BurnerChannel
+import com.example.data.model.ContactItem
 import com.example.data.model.PmsgContact
-import com.example.ui.theme.ImmersiveAvatarDeep
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnPrimary
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOnlineGreen
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersiveSurface
+import com.example.ui.theme.RaixAvatarBg
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixErrorContainer
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBackground
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixBadgeBg
+import com.example.ui.theme.RaixBadgeText
+import com.example.ui.theme.RaixDivider
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -103,6 +112,7 @@ import java.util.Locale
 fun ChannelListScreen(
     channels: List<BurnerChannel>,
     contacts: List<PmsgContact> = emptyList(),
+    e2eContacts: List<ContactItem> = emptyList(),
     currentTime: Long,
     screenProtectionEnabled: Boolean,
     biometricLockEnabled: Boolean = false,
@@ -115,6 +125,7 @@ fun ChannelListScreen(
     onSelectChannel: (BurnerChannel) -> Unit,
     onCreateChannel: (String, String, Float) -> Unit,
     onStartChatWithContact: (PmsgContact) -> Unit = {},
+    onSelectE2eContact: (ContactItem) -> Unit = {},
     onDeleteChannel: (String) -> Unit,
     onPanicWipe: () -> Unit,
     onToggleScreenProtection: () -> Unit,
@@ -129,12 +140,22 @@ fun ChannelListScreen(
     onSimulateIncomingNewConversation: () -> Unit = {},
     onTestNotification: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
+    onOpenContacts: () -> Unit = {},
+    onOpenIdentity: () -> Unit = {},
+    onOpenQrHandshake: () -> Unit = {},
+    onOpenAddContact: () -> Unit = {},
+    onToggleFavorite: (ContactItem) -> Unit = {},
+    onRenameContact: (ContactItem, String) -> Unit = { _, _ -> },
+    onDeleteContact: (ContactItem) -> Unit = {},
+    onBlockContact: (ContactItem) -> Unit = {},
     onClearFeedback: () -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var showPanicDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var showMenu by remember { mutableStateOf(false) }
+    var activeFilter by remember { mutableStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(userFeedback) {
@@ -144,9 +165,17 @@ fun ChannelListScreen(
         }
     }
 
-    val filteredChannels = remember(channels, searchQuery) {
-        if (searchQuery.isBlank()) channels
-        else channels.filter { it.name.contains(searchQuery, ignoreCase = true) || it.customCode.contains(searchQuery, ignoreCase = true) }
+    val filteredE2eContacts = remember(e2eContacts, searchQuery, activeFilter) {
+        val searchFiltered = if (searchQuery.isBlank()) e2eContacts
+        else e2eContacts.filter {
+            it.displayName.contains(searchQuery, ignoreCase = true) ||
+            (it.nickname ?: "").contains(searchQuery, ignoreCase = true)
+        }
+        when (activeFilter) {
+            1 -> searchFiltered.filter { !it.verified } // Pendentes
+            2 -> searchFiltered.filter { it.isFavorite } // Favoritos
+            else -> searchFiltered // Todas
+        }
     }
 
     val filteredContacts = remember(contacts, searchQuery) {
@@ -155,46 +184,116 @@ fun ChannelListScreen(
     }
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         },
-        containerColor = ImmersiveSurface,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    if (selectedTab == 1) {
-                        showCreateDialog = true
-                    } else {
-                        showCreateDialog = true
-                    }
-                },
-                containerColor = ImmersivePrimary,
-                contentColor = ImmersiveOnPrimary,
-                shape = RoundedCornerShape(20.dp),
+        containerColor = RaixBackground,
+        topBar = {
+            Column(
                 modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .testTag("create_channel_fab")
+                    .fillMaxWidth()
+                    .background(RaixSurface)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .height(56.dp)
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        imageVector = if (selectedTab == 0) Icons.Default.Add else Icons.Default.PersonAdd,
-                        contentDescription = "Novo Chat",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (selectedTab == 0) "Novo Chat" else "Novo Contato",
+                        text = "RAIX",
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 13.sp
+                        color = RaixTextPrimary,
+                        letterSpacing = 1.sp
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(
+                            onClick = { searchQuery = if (searchQuery.isEmpty()) " " else "" },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Buscar",
+                                tint = RaixTextPrimary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        Box {
+                            IconButton(
+                                onClick = { showMenu = true },
+                                modifier = Modifier.size(40.dp).testTag("menu_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Menu",
+                                    tint = RaixTextPrimary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false },
+                                containerColor = RaixSurfaceElevated
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Contatos", color = RaixTextPrimary) },
+                                    onClick = { showMenu = false; onOpenContacts() },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Contacts, contentDescription = null, tint = RaixTextSecondary)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Identidade", color = RaixTextPrimary) },
+                                    onClick = { showMenu = false; onOpenIdentity() },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Security, contentDescription = null, tint = RaixTextSecondary)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Adicionar Contato", color = RaixTextPrimary) },
+                                    onClick = { showMenu = false; onOpenAddContact() },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.PersonAdd, contentDescription = null, tint = RaixTextSecondary)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Configuracoes", color = RaixTextPrimary) },
+                                    onClick = { showMenu = false; onOpenSettings() },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Settings, contentDescription = null, tint = RaixTextSecondary)
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showCreateDialog = true },
+                containerColor = RaixActionPrimary,
+                contentColor = RaixBackground,
+                shape = CircleShape,
+                modifier = Modifier
+                    .size(56.dp)
+                    .testTag("create_channel_fab")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Nova conversa",
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     ) { innerPadding ->
@@ -202,298 +301,116 @@ fun ChannelListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            ImmersivePrimary.copy(alpha = 0.08f),
-                            Color.Transparent
-                        )
-                    )
-                )
+                .background(RaixBackground)
         ) {
-            // Sleek Immersive Top Bar with statusBarsPadding
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(com.example.ui.theme.ObsidianSurface)
-                    .statusBarsPadding()
-                    .border(width = 1.dp, color = com.example.ui.theme.ObsidianBorder)
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        com.example.ui.components.PmsgLogoBadge(
-                            size = 38.dp,
-                            iconSize = 24.dp,
-                            shapeRadius = 11.dp
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            com.example.ui.components.PmsgWordmark(
-                                fontSize = 18.sp
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(6.dp)
-                                        .clip(CircleShape)
-                                        .background(com.example.ui.theme.SecurityEmerald)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "Zero Rastro • Hardware TEE",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = com.example.ui.theme.TitaniumMuted
-                                )
-                            }
-                        }
-                    }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        // Settings & Security Vault Page Button
-                        IconButton(
-                            onClick = onOpenSettings,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(com.example.ui.theme.ObsidianCardElevated)
-                                .testTag("security_vault_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Security,
-                                contentDescription = "Configurações e Cofre",
-                                tint = com.example.ui.theme.TitaniumPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-
-                        // Refined PANIC WIPE Button
-                        Button(
-                            onClick = { showPanicDialog = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = com.example.ui.theme.IncinerateCrimsonBg,
-                                contentColor = com.example.ui.theme.IncinerateCrimson
-                            ),
-                            border = BorderStroke(1.dp, com.example.ui.theme.IncinerateCrimson.copy(alpha = 0.5f)),
-                            shape = RoundedCornerShape(10.dp),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                            modifier = Modifier
-                                .height(36.dp)
-                                .testTag("panic_wipe_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocalFireDepartment,
-                                contentDescription = "Pânico",
-                                tint = com.example.ui.theme.IncinerateCrimson,
-                                modifier = Modifier.size(15.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "INCINERAR",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = com.example.ui.theme.IncinerateCrimson,
-                                letterSpacing = 0.5.sp
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Modern Sliding Pill Tab Selector
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(com.example.ui.theme.ObsidianCard)
-                    .border(1.dp, com.example.ui.theme.ObsidianBorder, RoundedCornerShape(14.dp))
-                    .padding(3.dp)
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    // Conversas Tab Pill
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(11.dp))
-                            .background(
-                                if (selectedTab == 0) com.example.ui.theme.ObsidianCardElevated
-                                else Color.Transparent
-                            )
-                            .border(
-                                width = if (selectedTab == 0) 1.dp else 0.dp,
-                                color = if (selectedTab == 0) com.example.ui.theme.ObsidianBorder else Color.Transparent,
-                                shape = RoundedCornerShape(11.dp)
-                            )
-                            .clickable { selectedTab = 0 }
-                            .padding(vertical = 8.dp)
-                            .testTag("tab_conversations"),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Forum,
-                                contentDescription = null,
-                                modifier = Modifier.size(15.dp),
-                                tint = if (selectedTab == 0) com.example.ui.theme.TitaniumPrimary else com.example.ui.theme.TitaniumMuted
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Conversas (${channels.size})",
-                                fontWeight = if (selectedTab == 0) FontWeight.SemiBold else FontWeight.Normal,
-                                fontSize = 12.5.sp,
-                                color = if (selectedTab == 0) com.example.ui.theme.TitaniumPrimary else com.example.ui.theme.TitaniumMuted
-                            )
-                        }
-                    }
-
-                    // Contatos Tab Pill
-                    val pmsgCount = contacts.count { it.hasPmsgInstalled }
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(11.dp))
-                            .background(
-                                if (selectedTab == 1) com.example.ui.theme.ObsidianCardElevated
-                                else Color.Transparent
-                            )
-                            .border(
-                                width = if (selectedTab == 1) 1.dp else 0.dp,
-                                color = if (selectedTab == 1) com.example.ui.theme.ObsidianBorder else Color.Transparent,
-                                shape = RoundedCornerShape(11.dp)
-                            )
-                            .clickable { selectedTab = 1 }
-                            .padding(vertical = 8.dp)
-                            .testTag("tab_contacts"),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Contacts,
-                                contentDescription = null,
-                                modifier = Modifier.size(15.dp),
-                                tint = if (selectedTab == 1) com.example.ui.theme.TitaniumPrimary else com.example.ui.theme.TitaniumMuted
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Contatos ($pmsgCount)",
-                                fontWeight = if (selectedTab == 1) FontWeight.SemiBold else FontWeight.Normal,
-                                fontSize = 12.5.sp,
-                                color = if (selectedTab == 1) com.example.ui.theme.TitaniumPrimary else com.example.ui.theme.TitaniumMuted
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Harmonious Search Bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 2.dp)
-            ) {
+            // Search bar (expansivel)
+            AnimatedVisibility(visible = searchQuery.isNotEmpty()) {
                 OutlinedTextField(
-                    value = searchQuery,
+                    value = searchQuery.trim(),
                     onValueChange = { searchQuery = it },
                     placeholder = {
                         Text(
-                            text = if (selectedTab == 0) "Buscar conversas ativas..." else "Buscar contatos com Pmsg...",
-                            fontSize = 12.5.sp,
-                            color = com.example.ui.theme.TitaniumMuted
+                            text = if (selectedTab == 0) "Buscar conversas..." else "Buscar contatos...",
+                            fontSize = 13.sp,
+                            color = RaixTextSecondary
                         )
                     },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = com.example.ui.theme.TitaniumMuted,
-                            modifier = Modifier.size(18.dp)
-                        )
+                        Icon(Icons.Default.Search, null, tint = RaixTextSecondary, modifier = Modifier.size(18.dp))
                     },
                     trailingIcon = {
-                        if (selectedTab == 1) {
-                            IconButton(onClick = onRefreshContacts) {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Atualizar Contatos",
-                                    tint = com.example.ui.theme.TitaniumPrimary,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        } else if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
-                                Icon(
-                                    imageVector = Icons.Default.DeleteOutline,
-                                    contentDescription = "Limpar busca",
-                                    tint = com.example.ui.theme.TitaniumMuted,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(Icons.Default.DeleteOutline, "Limpar", tint = RaixTextSecondary, modifier = Modifier.size(16.dp))
                         }
                     },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = ImmersiveOnSurface,
-                        unfocusedTextColor = ImmersiveOnSurface,
-                        focusedBorderColor = com.example.ui.theme.TitaniumSecondary,
-                        unfocusedBorderColor = com.example.ui.theme.ObsidianBorder,
-                        focusedContainerColor = com.example.ui.theme.ObsidianCard,
-                        unfocusedContainerColor = com.example.ui.theme.ObsidianCard
+                        focusedTextColor = RaixTextPrimary,
+                        unfocusedTextColor = RaixTextPrimary,
+                        focusedBorderColor = RaixTextSecondary,
+                        unfocusedBorderColor = RaixBorder,
+                        focusedContainerColor = RaixSurface,
+                        unfocusedContainerColor = RaixSurface
                     ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).heightIn(min = 48.dp)
                 )
             }
 
+            // Filtros — 48dp: "Todas" (ativo), "Nao lidas", "Favoritos"
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf("Todas", "Pendentes", "Favoritos").forEachIndexed { index, label ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(
+                                if (activeFilter == index) RaixActionPrimary
+                                else Color.Transparent
+                            )
+                            .clickable { activeFilter = index }
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                            .testTag("filter_$label"),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = label,
+                            fontSize = 13.sp,
+                            fontWeight = if (activeFilter == index) FontWeight.SemiBold else FontWeight.Normal,
+                            color = if (activeFilter == index) RaixBackground else RaixTextSecondary
+                        )
+                    }
+                }
+            }
+
             if (selectedTab == 0) {
-                // TAB 0: CONVERSAS ATIVAS
-                if (filteredChannels.isEmpty()) {
+                // TAB 0: CONVERSAS E2E
+                if (filteredE2eContacts.isEmpty()) {
+                    // Estado vazio centralizado
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
-                            .padding(32.dp),
+                            .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
-                                imageVector = Icons.Default.Shield,
+                                imageVector = Icons.Default.Forum,
                                 contentDescription = null,
-                                tint = ImmersiveMuted,
-                                modifier = Modifier.size(50.dp)
+                                tint = RaixTextSecondary.copy(alpha = 0.4f),
+                                modifier = Modifier.size(64.dp)
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Nenhuma conversa ativa no momento",
-                                fontSize = 15.sp,
+                                text = "Nenhuma conversa",
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = ImmersiveMutedLight
+                                color = RaixTextSecondary
                             )
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Acesse a aba 'Contatos Pmsg' ou crie um novo chat.",
-                                fontSize = 12.sp,
-                                color = ImmersiveMuted
+                                text = "Adicione um contato para iniciar uma conversa criptografada.",
+                                fontSize = 13.sp,
+                                color = RaixTextSecondary.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(horizontal = 32.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(
-                                onClick = { selectedTab = 1 },
-                                colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
-                                shape = RoundedCornerShape(10.dp)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            OutlinedButton(
+                                onClick = onOpenAddContact,
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, RaixActionPrimary)
                             ) {
-                                Icon(Icons.Default.Contacts, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Ver Contatos com Pmsg", color = ImmersiveOnPrimary, fontWeight = FontWeight.Medium, fontSize = 12.sp)
+                                Icon(Icons.Default.PersonAdd, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Adicionar Contato", color = RaixActionPrimary, fontSize = 14.sp)
                             }
                         }
                     }
@@ -502,15 +419,15 @@ fun ChannelListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(filteredChannels, key = { it.id }) { channel ->
-                            ChannelListItem(
-                                channel = channel,
-                                currentTime = currentTime,
-                                onClick = { onSelectChannel(channel) },
-                                onDelete = { onDeleteChannel(channel.id) }
+                        items(filteredE2eContacts, key = { it.fingerprint }) { contact ->
+                            E2eContactRow(
+                                contact = contact,
+                                onClick = { onSelectE2eContact(contact) },
+                                onToggleFavorite = { onToggleFavorite(contact) },
+                                onRename = { newName -> onRenameContact(contact, newName) },
+                                onDelete = { onDeleteContact(contact) },
+                                onBlock = { onBlockContact(contact) }
                             )
                         }
                         item {
@@ -531,8 +448,8 @@ fun ChannelListScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(ImmersiveCardVariant)
-                            .border(1.dp, ImmersiveOutline, RoundedCornerShape(12.dp))
+                            .background(RaixSurfaceElevated)
+                            .border(1.dp, RaixBorder, RoundedCornerShape(12.dp))
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -541,7 +458,7 @@ fun ChannelListScreen(
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
-                                tint = ImmersivePrimary,
+                                tint = RaixActionPrimary,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -549,7 +466,7 @@ fun ChannelListScreen(
                                 text = "Identificação de contatos com Pmsg",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = ImmersiveOnSurface
+                                color = RaixTextPrimary
                             )
                         }
 
@@ -557,13 +474,13 @@ fun ChannelListScreen(
                         OutlinedButton(
                             onClick = onSimulateIncomingNewConversation,
                             shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, ImmersivePrimary),
+                            border = BorderStroke(1.dp, RaixActionPrimary),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                             modifier = Modifier.height(30.dp).testTag("simulate_new_conv_button")
                         ) {
-                            Icon(Icons.Default.Forum, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.Forum, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Simular Chegada", color = ImmersivePrimary, fontSize = 10.sp, fontWeight = FontWeight.Medium)
+                            Text("Simular Chegada", color = RaixActionPrimary, fontSize = 10.sp, fontWeight = FontWeight.Medium)
                         }
                     }
 
@@ -573,8 +490,8 @@ fun ChannelListScreen(
                                 .fillMaxWidth()
                                 .padding(16.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(ImmersiveCard)
-                                .border(1.dp, ImmersivePrimary.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                                .background(RaixSurface)
+                                .border(1.dp, RaixActionPrimary.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
                                 .padding(16.dp)
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -582,21 +499,21 @@ fun ChannelListScreen(
                                     text = "Permissão de Contatos Necessária",
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 14.sp,
-                                    color = ImmersiveOnSurface
+                                    color = RaixTextPrimary
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "Permita o acesso aos contatos para verificar quais amigos já utilizam o Pmsg e iniciar conversas criptografadas.",
                                     fontSize = 12.sp,
-                                    color = ImmersiveMutedLight
+                                    color = RaixTextSecondary
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Button(
                                     onClick = onRequestContactsPermission,
-                                    colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                                    colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("Autorizar Contatos", color = ImmersiveOnPrimary, fontWeight = FontWeight.Medium, fontSize = 12.sp)
+                                    Text("Autorizar Contatos", color = RaixBackground, fontWeight = FontWeight.Medium, fontSize = 12.sp)
                                 }
                             }
                         }
@@ -641,20 +558,20 @@ fun ChannelListScreen(
 
         AlertDialog(
             onDismissRequest = { showCreateDialog = false },
-            containerColor = ImmersiveHeader,
+            containerColor = RaixSurface,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Timer,
                         contentDescription = null,
-                        tint = ImmersivePrimary,
+                        tint = RaixActionPrimary,
                         modifier = Modifier.size(22.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Novo Chat",
                         fontWeight = FontWeight.Medium,
-                        color = ImmersiveOnSurface,
+                        color = RaixTextPrimary,
                         fontSize = 18.sp
                     )
                 }
@@ -664,7 +581,7 @@ fun ChannelListScreen(
                     Text(
                         text = "Informe o nome da pessoa e selecione o tempo até a exclusão automática das mensagens.",
                         fontSize = 12.sp,
-                        color = ImmersiveMutedLight
+                        color = RaixTextSecondary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
@@ -674,11 +591,11 @@ fun ChannelListScreen(
                         placeholder = { Text("Ex: Mariana, Carlos, Beatriz...") },
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = ImmersiveOnSurface,
-                            unfocusedTextColor = ImmersiveOnSurface,
-                            focusedBorderColor = ImmersivePrimary,
-                            unfocusedBorderColor = ImmersiveOutline,
-                            focusedLabelColor = ImmersivePrimary
+                            focusedTextColor = RaixTextPrimary,
+                            unfocusedTextColor = RaixTextPrimary,
+                            focusedBorderColor = RaixActionPrimary,
+                            unfocusedBorderColor = RaixBorder,
+                            focusedLabelColor = RaixActionPrimary
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -690,7 +607,7 @@ fun ChannelListScreen(
                         text = "TEMPO ATÉ A EXCLUSÃO:",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
-                        color = ImmersivePrimary,
+                        color = RaixActionPrimary,
                         letterSpacing = 0.5.sp
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -707,10 +624,10 @@ fun ChannelListScreen(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(if (isSelected) ImmersivePrimary else ImmersiveCardVariant)
+                                        .background(if (isSelected) RaixActionPrimary else RaixSurfaceElevated)
                                         .border(
                                             1.dp,
-                                            if (isSelected) ImmersivePrimary else ImmersiveOutline,
+                                            if (isSelected) RaixActionPrimary else RaixBorder,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable { selectedTtlHours = hours }
@@ -721,7 +638,7 @@ fun ChannelListScreen(
                                         text = label,
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
-                                        color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
+                                        color = if (isSelected) RaixBackground else RaixTextPrimary,
                                         maxLines = 1
                                     )
                                 }
@@ -738,10 +655,10 @@ fun ChannelListScreen(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(if (isSelected) ImmersivePrimary else ImmersiveCardVariant)
+                                        .background(if (isSelected) RaixActionPrimary else RaixSurfaceElevated)
                                         .border(
                                             1.dp,
-                                            if (isSelected) ImmersivePrimary else ImmersiveOutline,
+                                            if (isSelected) RaixActionPrimary else RaixBorder,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable { selectedTtlHours = hours }
@@ -752,7 +669,7 @@ fun ChannelListScreen(
                                         text = label,
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Medium,
-                                        color = if (isSelected) ImmersiveOnPrimary else ImmersiveOnSurface,
+                                        color = if (isSelected) RaixBackground else RaixTextPrimary,
                                         maxLines = 1
                                     )
                                 }
@@ -769,16 +686,16 @@ fun ChannelListScreen(
                             showCreateDialog = false
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = ImmersivePrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixActionPrimary),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.testTag("confirm_create_channel_button")
                 ) {
-                    Text("Iniciar Chat", color = ImmersiveOnPrimary, fontWeight = FontWeight.Medium)
+                    Text("Iniciar Chat", color = RaixBackground, fontWeight = FontWeight.Medium)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showCreateDialog = false }) {
-                    Text("Cancelar", color = ImmersiveMutedLight)
+                    Text("Cancelar", color = RaixTextSecondary)
                 }
             }
         )
@@ -788,22 +705,22 @@ fun ChannelListScreen(
     if (showPanicDialog) {
         AlertDialog(
             onDismissRequest = { showPanicDialog = false },
-            containerColor = ImmersiveHeader,
+            containerColor = RaixSurface,
             icon = {
-                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = ImmersiveExpiring, modifier = Modifier.size(36.dp))
+                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = RaixError, modifier = Modifier.size(36.dp))
             },
             title = {
                 Text(
                     text = "🚨 INCINERAÇÃO TOTAL EM PÂNICO",
                     fontWeight = FontWeight.Medium,
-                    color = ImmersiveExpiring,
+                    color = RaixError,
                     fontSize = 16.sp
                 )
             },
             text = {
                 Text(
                     text = "ATENÇÃO: Todas as conversas ativas, contatos vinculados e mensagens armazenadas no Room serão DESTRUÍDAS e sobrescritas de forma permanente. Nenhum dado poderá ser recuperado.",
-                    color = ImmersiveOnSurface,
+                    color = RaixTextPrimary,
                     fontSize = 13.sp,
                     lineHeight = 18.sp
                 )
@@ -814,7 +731,7 @@ fun ChannelListScreen(
                         showPanicDialog = false
                         onPanicWipe()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = ImmersiveExpiring),
+                    colors = ButtonDefaults.buttonColors(containerColor = RaixError),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.testTag("confirm_panic_wipe_button")
                 ) {
@@ -823,7 +740,7 @@ fun ChannelListScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showPanicDialog = false }) {
-                    Text("Cancelar", color = ImmersiveMutedLight)
+                    Text("Cancelar", color = RaixTextSecondary)
                 }
             }
         )
@@ -842,11 +759,11 @@ fun ContactListItem(
             .testTag("contact_item_${contact.id}"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (contact.hasPmsgInstalled) ImmersiveCard else ImmersiveCardVariant.copy(alpha = 0.6f)
+            containerColor = if (contact.hasPmsgInstalled) RaixSurface else RaixSurfaceElevated.copy(alpha = 0.6f)
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = if (contact.hasPmsgInstalled) ImmersivePrimary.copy(alpha = 0.25f) else ImmersiveOutline
+            color = if (contact.hasPmsgInstalled) RaixActionPrimary.copy(alpha = 0.25f) else RaixBorder
         )
     ) {
         Row(
@@ -885,20 +802,20 @@ fun ContactListItem(
                             text = contact.name,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.5.sp,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
                         if (contact.hasPmsgInstalled) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(com.example.ui.theme.SecurityEmerald.copy(alpha = 0.15f))
-                                    .border(0.5.dp, com.example.ui.theme.SecurityEmerald.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                                    .background(RaixActionPrimary.copy(alpha = 0.15f))
+                                    .border(0.5.dp, RaixActionPrimary.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
                                     .padding(horizontal = 6.dp, vertical = 1.dp)
                             ) {
                                 Text(
                                     text = "Pmsg Ativo",
-                                    color = com.example.ui.theme.SecurityEmerald,
+                                    color = RaixActionPrimary,
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -910,14 +827,14 @@ fun ContactListItem(
                     Text(
                         text = contact.phoneNumber,
                         fontSize = 11.5.sp,
-                        color = com.example.ui.theme.TitaniumMuted,
+                        color = RaixTextSecondary,
                         fontFamily = FontFamily.Monospace
                     )
 
                     Text(
                         text = contact.statusDescription,
                         fontSize = 10.5.sp,
-                        color = if (contact.hasPmsgInstalled) com.example.ui.theme.SecurityEmerald else com.example.ui.theme.TitaniumMuted
+                        color = if (contact.hasPmsgInstalled) RaixActionPrimary else RaixTextSecondary
                     )
                 }
             }
@@ -926,8 +843,8 @@ fun ContactListItem(
                 Button(
                     onClick = onStartChat,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = com.example.ui.theme.TitaniumPrimary,
-                        contentColor = com.example.ui.theme.ObsidianBlack
+                        containerColor = RaixActionPrimary,
+                        contentColor = RaixBackground
                     ),
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
@@ -938,13 +855,13 @@ fun ContactListItem(
                     Icon(
                         imageVector = Icons.Default.Lock,
                         contentDescription = null,
-                        tint = com.example.ui.theme.ObsidianBlack,
+                        tint = RaixBackground,
                         modifier = Modifier.size(13.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Conversar",
-                        color = com.example.ui.theme.ObsidianBlack,
+                        color = RaixBackground,
                         fontSize = 11.5.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -953,17 +870,126 @@ fun ContactListItem(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(com.example.ui.theme.ObsidianCardElevated)
+                        .background(RaixSurfaceElevated)
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = "Não possui",
-                        color = com.example.ui.theme.TitaniumMuted,
+                        color = RaixTextSecondary,
                         fontSize = 10.sp
                     )
                 }
             }
         }
+    }
+}
+
+/**
+ * Linha de conversa — spec de pixel v1.10:
+ * 72dp height, avatar 48dp, nome 16sp/500, preview 14sp, timestamp 12sp,
+ * badge 20dp, divisor 1dp indentado 80dp.
+ */
+@Composable
+private fun ConversationRow(
+    channel: BurnerChannel,
+    currentTime: Long,
+    onClick: () -> Unit
+) {
+    val timestamp = remember(channel) {
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        sdf.format(Date(channel.lastMessageTimestamp))
+    }
+
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .clickable { onClick() }
+                .padding(horizontal = 16.dp)
+                .testTag("channel_item_${channel.id}"),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Avatar — circulo 48dp, fundo RaixAvatarBg, inicial
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(RaixAvatarBg),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = channel.name.take(1).uppercase(),
+                    color = RaixTextPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Centro: nome + preview
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = channel.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RaixTextPrimary,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = channel.lastMessagePreview,
+                    fontSize = 14.sp,
+                    color = RaixTextSecondary,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Direita: timestamp + badge
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = timestamp,
+                    fontSize = 12.sp,
+                    color = RaixTextSecondary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                // Badge de nao-lidas (placeholder: mostra se customCode nao vazio)
+                if (channel.customCode.isNotBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+                            .background(RaixBadgeBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "1",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RaixBadgeText
+                        )
+                    }
+                }
+            }
+        }
+
+        // Divisor — 1dp, #8A93A6 a 12%, indentado 80dp (16 padding + 48 avatar + 16 gap)
+        HorizontalDivider(
+            modifier = Modifier.padding(start = 80.dp),
+            thickness = 1.dp,
+            color = RaixTextSecondary.copy(alpha = 0.12f)
+        )
     }
 }
 
@@ -974,169 +1000,190 @@ fun ChannelListItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val remainingMs = channel.remainingTime(currentTime)
-    val isAlmostExpired = remainingMs < 3600000L // less than 1 hour
+    // Retrocompatibilidade: delega para ConversationRow
+    ConversationRow(channel = channel, currentTime = currentTime, onClick = onClick)
+}
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .testTag("channel_item_${channel.id}"),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.ObsidianCard),
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson.copy(alpha = 0.55f) else com.example.ui.theme.ObsidianBorder
-        )
-    ) {
+@Composable
+private fun E2eContactRow(
+    contact: ContactItem,
+    onClick: () -> Unit,
+    onToggleFavorite: () -> Unit = {},
+    onRename: (String) -> Unit = {},
+    onDelete: () -> Unit = {},
+    onBlock: () -> Unit = {}
+) {
+    val displayLabel = contact.nickname ?: contact.displayName
+    var showItemMenu by remember { mutableStateOf(false) }
+    var showRenameDialog by remember { mutableStateOf(false) }
+
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .height(72.dp)
+                .clickable { onClick() }
+                .padding(horizontal = 16.dp)
+                .testTag("e2e_contact_${contact.fingerprint}"),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
-            ) {
-                // Avatar with hardware security badge
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    Box(
-                        modifier = Modifier
-                            .size(46.dp)
-                            .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    listOf(
-                                        if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson.copy(alpha = 0.25f)
-                                        else com.example.ui.theme.SecurityEmerald.copy(alpha = 0.18f),
-                                        com.example.ui.theme.ObsidianCardElevated
-                                    )
-                                )
-                            )
-                            .border(
-                                1.5.dp,
-                                if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson else com.example.ui.theme.SecurityEmerald,
-                                CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = channel.name.take(1).uppercase(),
-                            color = if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson else com.example.ui.theme.TitaniumPrimary,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 17.sp
-                        )
-                    }
-
-                    // Hardware lock dot
-                    Box(
-                        modifier = Modifier
-                            .size(14.dp)
-                            .clip(CircleShape)
-                            .background(com.example.ui.theme.ObsidianBlack)
-                            .padding(1.5.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .background(if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson else com.example.ui.theme.SecurityEmerald),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(7.dp)
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = channel.name,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.5.sp,
-                            color = ImmersiveOnSurface
-                        )
-                        if (channel.customCode.isNotBlank()) {
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(com.example.ui.theme.ObsidianCardElevated)
-                                    .border(0.5.dp, com.example.ui.theme.ObsidianBorder, RoundedCornerShape(4.dp))
-                                    .padding(horizontal = 5.dp, vertical = 1.dp)
-                            ) {
-                                Text(
-                                    text = "#${channel.customCode}",
-                                    color = com.example.ui.theme.TitaniumSecondary,
-                                    fontSize = 9.sp,
-                                    fontFamily = FontFamily.Monospace
-                                )
-                            }
-                        }
-                    }
-
-
-                    Text(
-                        text = channel.lastMessagePreview,
-                        fontSize = 12.sp,
-                        color = com.example.ui.theme.TitaniumSecondary,
-                        maxLines = 1
-                    )
-
-
-                    // Live Expiration Chip
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(
-                                if (isAlmostExpired) com.example.ui.theme.IncinerateCrimsonBg
-                                else com.example.ui.theme.ObsidianCardElevated
-                            )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (isAlmostExpired) Icons.Default.LocalFireDepartment else Icons.Default.Timer,
-                                contentDescription = null,
-                                tint = if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson else com.example.ui.theme.TitaniumSecondary,
-                                modifier = Modifier.size(11.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Expira em ${channel.formattedRemainingTime(currentTime)}",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = FontFamily.Monospace,
-                                color = if (isAlmostExpired) com.example.ui.theme.IncinerateCrimson else com.example.ui.theme.TitaniumSecondary
-                            )
-                        }
-                    }
-                }
-            }
-
-            IconButton(
-                onClick = onDelete,
+            // Avatar -- circulo 48dp, fundo RaixAvatarBg, inicial
+            Box(
                 modifier = Modifier
-                    .size(34.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
-                    .background(com.example.ui.theme.ObsidianCardElevated)
+                    .background(RaixAvatarBg),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = "Apagar Canal",
-                    tint = com.example.ui.theme.TitaniumMuted,
-                    modifier = Modifier.size(16.dp)
+                Text(
+                    text = displayLabel.take(1).uppercase(),
+                    color = RaixTextPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
                 )
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Centro: nome + status
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = displayLabel,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = RaixTextPrimary,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (contact.isFavorite) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Favorito",
+                            tint = RaixActionPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = if (contact.verified) "Verificado - E2E" else "Criptografia de ponta a ponta",
+                    fontSize = 14.sp,
+                    color = if (contact.verified) RaixActionPrimary else RaixTextSecondary,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+            }
+
+            // Menu de 3 pontos por item
+            Box {
+                IconButton(
+                    onClick = { showItemMenu = true },
+                    modifier = Modifier.size(36.dp).testTag("item_menu_${contact.fingerprint}")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Opcoes",
+                        tint = RaixTextSecondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showItemMenu,
+                    onDismissRequest = { showItemMenu = false },
+                    containerColor = RaixSurfaceElevated
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                if (contact.isFavorite) "Remover favorito" else "Favoritar",
+                                color = RaixTextPrimary
+                            )
+                        },
+                        onClick = { showItemMenu = false; onToggleFavorite() },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = if (contact.isFavorite) Icons.Default.CheckCircle else Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = if (contact.isFavorite) RaixActionPrimary else RaixTextSecondary
+                            )
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Renomear", color = RaixTextPrimary) },
+                        onClick = { showItemMenu = false; showRenameDialog = true },
+                        leadingIcon = {
+                            Icon(Icons.Default.Refresh, contentDescription = null, tint = RaixTextSecondary)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Excluir", color = RaixError) },
+                        onClick = { showItemMenu = false; onDelete() },
+                        leadingIcon = {
+                            Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = RaixError)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Bloquear", color = RaixError) },
+                        onClick = { showItemMenu = false; onBlock() },
+                        leadingIcon = {
+                            Icon(Icons.Default.Block, contentDescription = null, tint = RaixError)
+                        }
+                    )
+                }
+            }
         }
+
+        // Divisor
+        HorizontalDivider(
+            modifier = Modifier.padding(start = 80.dp),
+            thickness = 1.dp,
+            color = RaixTextSecondary.copy(alpha = 0.12f)
+        )
+    }
+
+    // Dialog de renomear
+    if (showRenameDialog) {
+        var newName by remember { mutableStateOf(contact.nickname ?: contact.displayName) }
+        AlertDialog(
+            onDismissRequest = { showRenameDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRenameDialog = false
+                    if (newName.isNotBlank()) onRename(newName.trim())
+                }) {
+                    Text("Salvar", color = RaixActionPrimary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRenameDialog = false }) {
+                    Text("Cancelar", color = RaixTextSecondary)
+                }
+            },
+            title = { Text("Renomear contato", color = RaixTextPrimary) },
+            text = {
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = RaixTextPrimary,
+                        unfocusedTextColor = RaixTextPrimary,
+                        focusedBorderColor = RaixActionPrimary,
+                        unfocusedBorderColor = RaixBorder,
+                        focusedContainerColor = RaixSurface,
+                        unfocusedContainerColor = RaixSurface
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            containerColor = RaixSurfaceElevated
+        )
     }
 }

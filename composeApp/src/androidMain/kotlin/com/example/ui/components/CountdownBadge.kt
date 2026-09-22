@@ -37,8 +37,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.ElectricCyan
-import com.example.ui.theme.EmberOrange
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixPremiumGold
 import com.example.ui.theme.IncinerateRed
 import java.util.Locale
 
@@ -80,8 +80,8 @@ fun CountdownBadge(
     val badgeColor by animateColorAsState(
         targetValue = when {
             isUrgent -> IncinerateRed
-            isWarning -> EmberOrange
-            else -> ElectricCyan
+            isWarning -> RaixError
+            else -> RaixPremiumGold
         },
         label = "badgeColor"
     )
@@ -115,14 +115,14 @@ fun CountdownBadge(
                 Icon(
                     imageVector = Icons.Default.HourglassBottom,
                     contentDescription = "Tempo acabando",
-                    tint = EmberOrange,
+                    tint = RaixError,
                     modifier = Modifier.size(13.dp)
                 )
             } else {
                 Icon(
                     imageVector = Icons.Default.Timer,
                     contentDescription = "Temporizador 24h",
-                    tint = ElectricCyan,
+                    tint = RaixPremiumGold,
                     modifier = Modifier.size(13.dp)
                 )
             }

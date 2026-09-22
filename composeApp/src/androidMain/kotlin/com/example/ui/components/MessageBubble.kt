@@ -69,17 +69,18 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.data.model.EphemeralMessage
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersivePrimaryContainer
+import com.example.ui.theme.RaixBubbleSent
+import com.example.ui.theme.RaixBubbleReceived
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixErrorContainer
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixReceiptSent
+import com.example.ui.theme.RaixReceiptRead
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -113,10 +114,10 @@ fun MessageBubble(
                     .clip(RoundedCornerShape(16.dp))
                     .background(
                         Brush.verticalGradient(
-                            listOf(EmberOrange.copy(alpha = 0.22f), ImmersiveCard)
+                            listOf(RaixError.copy(alpha = 0.22f), RaixSurface)
                         )
                     )
-                    .border(1.dp, EmberOrange.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
+                    .border(1.dp, RaixError.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                     .padding(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -128,7 +129,7 @@ fun MessageBubble(
                         modifier = Modifier
                             .size(24.dp)
                             .clip(CircleShape)
-                            .background(EmberOrange),
+                            .background(RaixError),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -143,7 +144,7 @@ fun MessageBubble(
                         text = "ALERTA: CAPTURA DE TELA DETECTADA",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Black,
-                        color = EmberOrange,
+                        color = RaixError,
                         letterSpacing = 0.5.sp
                     )
                 }
@@ -151,7 +152,7 @@ fun MessageBubble(
                 Text(
                     text = message.content,
                     fontSize = 12.sp,
-                    color = ImmersiveOnSurface,
+                    color = RaixTextPrimary,
                     lineHeight = 16.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
@@ -164,7 +165,7 @@ fun MessageBubble(
                     Text(
                         text = "Detectado às $formattedSentTime",
                         fontSize = 10.sp,
-                        color = ImmersiveMutedLight
+                        color = RaixTextSecondary
                     )
                     IconButton(
                         onClick = { onShredMessage(message.id) },
@@ -173,7 +174,7 @@ fun MessageBubble(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Limpar Alerta",
-                            tint = ImmersiveMutedLight,
+                            tint = RaixTextSecondary,
                             modifier = Modifier.size(14.dp)
                         )
                     }
@@ -195,22 +196,23 @@ fun MessageBubble(
 
     val isUrgent = remainingMillis < 60_000L
 
+    // v1.9.0 WhatsApp-style bubble: 8dp radius with tail on sender side
     val bubbleShape = if (isMe) {
-        RoundedCornerShape(topStart = 18.dp, topEnd = 5.dp, bottomStart = 18.dp, bottomEnd = 18.dp)
+        RoundedCornerShape(topStart = 8.dp, topEnd = 2.dp, bottomStart = 8.dp, bottomEnd = 8.dp)
     } else {
-        RoundedCornerShape(topStart = 5.dp, topEnd = 18.dp, bottomStart = 18.dp, bottomEnd = 18.dp)
+        RoundedCornerShape(topStart = 2.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp)
     }
 
     val bubbleBgColor = when {
-        isUrgent -> com.example.ui.theme.IncinerateCrimsonBg
-        isMe -> com.example.ui.theme.BubbleUser
-        else -> com.example.ui.theme.BubbleContact
+        isUrgent -> RaixErrorContainer
+        isMe -> RaixBubbleSent
+        else -> RaixBubbleReceived
     }
 
     val borderStrokeColor = when {
-        isUrgent -> com.example.ui.theme.IncinerateCrimson.copy(alpha = 0.7f)
-        isMe -> com.example.ui.theme.BubbleUserBorder
-        else -> com.example.ui.theme.BubbleContactBorder
+        isUrgent -> RaixError.copy(alpha = 0.7f)
+        isMe -> RaixBubbleSent.copy(alpha = 0.8f)
+        else -> RaixBorder
     }
 
     // Expiry text calculation - accurately shows seconds when < 1 minute (e.g. 30s)
@@ -245,13 +247,13 @@ fun MessageBubble(
                         text = message.senderName,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = ImmersivePrimary
+                        color = RaixActionPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = Icons.Default.Lock,
                         contentDescription = "E2EE",
-                        tint = ImmersivePrimary.copy(alpha = 0.7f),
+                        tint = RaixActionPrimary.copy(alpha = 0.7f),
                         modifier = Modifier.size(10.dp)
                     )
                 }
@@ -290,13 +292,13 @@ fun MessageBubble(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(EmberOrange.copy(alpha = 0.18f), RoundedCornerShape(8.dp))
+                                .background(RaixError.copy(alpha = 0.18f), RoundedCornerShape(8.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.LocalFireDepartment,
                                 contentDescription = "Nota Autodestrutiva",
-                                tint = EmberOrange,
+                                tint = RaixError,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -304,7 +306,7 @@ fun MessageBubble(
                                 text = "NOTA SECRETA",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = EmberOrange,
+                                color = RaixError,
                                 letterSpacing = 0.5.sp
                             )
                         }
@@ -328,8 +330,8 @@ fun MessageBubble(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isLockdownActive) ImmersiveExpiring.copy(alpha = 0.18f) else EmberOrange.copy(alpha = 0.15f))
-                                    .border(1.dp, if (isLockdownActive) ImmersiveExpiring.copy(alpha = 0.8f) else EmberOrange.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                    .background(if (isLockdownActive) RaixError.copy(alpha = 0.18f) else RaixError.copy(alpha = 0.15f))
+                                    .border(1.dp, if (isLockdownActive) RaixError.copy(alpha = 0.8f) else RaixError.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                                     .clickable {
                                         if (isLockdownActive) {
                                             showLockdownOverrideDialog = true
@@ -344,7 +346,7 @@ fun MessageBubble(
                                     modifier = Modifier
                                         .size(36.dp)
                                         .clip(CircleShape)
-                                        .background(if (isLockdownActive) ImmersiveExpiring else EmberOrange),
+                                        .background(if (isLockdownActive) RaixError else RaixError),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     if (isLockdownActive) {
@@ -358,19 +360,19 @@ fun MessageBubble(
                                     Text(
                                         text = if (isLockdownActive) "Foto Bloqueada (Print Detectado)" else "Foto confidencial",
                                         fontWeight = FontWeight.Medium,
-                                        color = if (isLockdownActive) ImmersiveExpiring else EmberOrange,
+                                        color = if (isLockdownActive) RaixError else RaixError,
                                         fontSize = 13.sp
                                     )
                                     Text(
                                         text = if (isLockdownActive) "Toque para verificar segurança" else "Visualização única • Toque para ver",
-                                        color = ImmersiveMutedLight,
+                                        color = RaixTextSecondary,
                                         fontSize = 11.sp
                                     )
                                 }
                                 Icon(
                                     imageVector = if (isLockdownActive) Icons.Default.Shield else Icons.Default.LocalFireDepartment,
                                     contentDescription = null,
-                                    tint = if (isLockdownActive) ImmersiveExpiring else EmberOrange,
+                                    tint = if (isLockdownActive) RaixError else RaixError,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -382,8 +384,8 @@ fun MessageBubble(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isLockdownActive) ImmersiveExpiring.copy(alpha = 0.18f) else EmberOrange.copy(alpha = 0.15f))
-                                    .border(1.dp, if (isLockdownActive) ImmersiveExpiring.copy(alpha = 0.8f) else EmberOrange.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                    .background(if (isLockdownActive) RaixError.copy(alpha = 0.18f) else RaixError.copy(alpha = 0.15f))
+                                    .border(1.dp, if (isLockdownActive) RaixError.copy(alpha = 0.8f) else RaixError.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                                     .clickable {
                                         if (isLockdownActive) {
                                             showLockdownOverrideDialog = true
@@ -398,7 +400,7 @@ fun MessageBubble(
                                     modifier = Modifier
                                         .size(36.dp)
                                         .clip(CircleShape)
-                                        .background(if (isLockdownActive) ImmersiveExpiring else EmberOrange),
+                                        .background(if (isLockdownActive) RaixError else RaixError),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     if (isLockdownActive) {
@@ -412,19 +414,19 @@ fun MessageBubble(
                                     Text(
                                         text = if (isLockdownActive) "Mensagem Bloqueada (Print Detectado)" else "Mensagem confidencial",
                                         fontWeight = FontWeight.Medium,
-                                        color = if (isLockdownActive) ImmersiveExpiring else EmberOrange,
+                                        color = if (isLockdownActive) RaixError else RaixError,
                                         fontSize = 13.sp
                                     )
                                     Text(
                                         text = if (isLockdownActive) "Toque para verificar segurança" else "Visualização única • Toque para abrir",
-                                        color = ImmersiveMutedLight,
+                                        color = RaixTextSecondary,
                                         fontSize = 11.sp
                                     )
                                 }
                                 Icon(
                                     imageVector = if (isLockdownActive) Icons.Default.Shield else Icons.Default.LocalFireDepartment,
                                     contentDescription = null,
-                                    tint = if (isLockdownActive) ImmersiveExpiring else EmberOrange,
+                                    tint = if (isLockdownActive) RaixError else RaixError,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -437,7 +439,7 @@ fun MessageBubble(
                                     .fillMaxWidth()
                                     .height(200.dp)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(ImmersiveCardVariant)
+                                    .background(RaixSurfaceElevated)
                                     .clickable { showFullImageViewer = true }
                             ) {
                                 AsyncImage(
@@ -470,7 +472,7 @@ fun MessageBubble(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = message.content,
-                                    color = if (isMe) Color.White else ImmersiveOnSurface,
+                                    color = if (isMe) Color.White else RaixTextPrimary,
                                     fontSize = 13.sp,
                                     modifier = Modifier.padding(horizontal = 4.dp)
                                 )
@@ -489,7 +491,7 @@ fun MessageBubble(
                                             listOf(Color(0xFF1E293B), Color(0xFF0F172A))
                                         )
                                     )
-                                    .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(12.dp))
+                                    .border(0.8.dp, RaixBorder, RoundedCornerShape(12.dp))
                                     .clickable {
                                         message.mediaUri?.let { uriStr ->
                                             try {
@@ -513,14 +515,14 @@ fun MessageBubble(
                                         modifier = Modifier
                                             .size(48.dp)
                                             .clip(CircleShape)
-                                            .background(ImmersivePrimary.copy(alpha = 0.25f))
-                                            .border(1.dp, ImmersivePrimary, CircleShape),
+                                            .background(RaixActionPrimary.copy(alpha = 0.25f))
+                                            .border(1.dp, RaixActionPrimary, CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.PlayArrow,
                                             contentDescription = "Reproduzir Vídeo",
-                                            tint = ImmersivePrimary,
+                                            tint = RaixActionPrimary,
                                             modifier = Modifier.size(28.dp)
                                         )
                                     }
@@ -535,7 +537,7 @@ fun MessageBubble(
                                     Text(
                                         text = message.fileSize ?: "Vídeo Seguro",
                                         fontSize = 10.sp,
-                                        color = ImmersiveMutedLight
+                                        color = RaixTextSecondary
                                     )
                                 }
                             }
@@ -543,7 +545,7 @@ fun MessageBubble(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = message.content,
-                                    color = if (isMe) Color.White else ImmersiveOnSurface,
+                                    color = if (isMe) Color.White else RaixTextPrimary,
                                     fontSize = 13.sp,
                                     modifier = Modifier.padding(horizontal = 4.dp)
                                 )
@@ -556,8 +558,8 @@ fun MessageBubble(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(ImmersiveCardVariant)
-                                    .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(10.dp))
+                                    .background(RaixSurfaceElevated)
+                                    .border(0.8.dp, RaixBorder, RoundedCornerShape(10.dp))
                                     .clickable {
                                         message.mediaUri?.let { uriStr ->
                                             try {
@@ -578,13 +580,13 @@ fun MessageBubble(
                                     modifier = Modifier
                                         .size(36.dp)
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(ImmersivePrimary.copy(alpha = 0.15f)),
+                                        .background(RaixActionPrimary.copy(alpha = 0.15f)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.InsertDriveFile,
                                         contentDescription = "Arquivo",
-                                        tint = ImmersivePrimary,
+                                        tint = RaixActionPrimary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -594,19 +596,19 @@ fun MessageBubble(
                                         text = message.fileName ?: "Arquivo Seguro",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = ImmersiveOnSurface,
+                                        color = RaixTextPrimary,
                                         maxLines = 1
                                     )
                                     Text(
                                         text = "${message.fileSize ?: "Arquivo"} • Criptografado",
                                         fontSize = 10.sp,
-                                        color = ImmersiveMutedLight
+                                        color = RaixTextSecondary
                                     )
                                 }
                                 Icon(
                                     imageVector = Icons.Default.OpenInNew,
                                     contentDescription = "Abrir",
-                                    tint = ImmersivePrimary,
+                                    tint = RaixActionPrimary,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -614,7 +616,7 @@ fun MessageBubble(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = message.content,
-                                    color = if (isMe) Color.White else ImmersiveOnSurface,
+                                    color = if (isMe) Color.White else RaixTextPrimary,
                                     fontSize = 13.sp,
                                     modifier = Modifier.padding(horizontal = 4.dp)
                                 )
@@ -631,21 +633,21 @@ fun MessageBubble(
                                     Icon(
                                         imageVector = Icons.Default.VisibilityOff,
                                         contentDescription = "Toque para Revelar",
-                                        tint = ImmersivePrimary,
+                                        tint = RaixActionPrimary,
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = "Toque para revelar nota secreta",
                                         fontSize = 13.sp,
-                                        color = ImmersivePrimary,
+                                        color = RaixActionPrimary,
                                         fontWeight = FontWeight.Medium
                                     )
                                 }
                             } else {
                                 Text(
                                     text = message.content,
-                                    color = if (isMe) Color.White else ImmersiveOnSurface,
+                                    color = if (isMe) Color.White else RaixTextPrimary,
                                     fontSize = 14.sp,
                                     lineHeight = 20.sp,
                                     fontWeight = FontWeight.Normal
@@ -676,7 +678,7 @@ fun MessageBubble(
                             Icon(
                                 imageVector = Icons.Default.LocalFireDepartment,
                                 contentDescription = "Triturar",
-                                tint = if (isUrgent) ImmersiveExpiring else ImmersiveMuted,
+                                tint = if (isUrgent) RaixError else RaixTextSecondary,
                                 modifier = Modifier.size(15.dp)
                             )
                         }
@@ -698,23 +700,23 @@ fun MessageBubble(
                         .align(Alignment.BottomStart)
                         .fillMaxWidth(fraction = (1f - progress).coerceIn(0.02f, 1f))
                         .height(2.dp)
-                        .background(if (isMe) Color.White.copy(alpha = 0.35f) else ImmersivePrimary.copy(alpha = 0.45f))
+                        .background(if (isMe) Color.White.copy(alpha = 0.35f) else RaixActionPrimary.copy(alpha = 0.45f))
                 )
 
                 // Dropdown Menu on Long Press
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.background(ImmersiveHeader)
+                    modifier = Modifier.background(RaixSurface)
                 ) {
                     // Simulate Read Receipt trigger
                     if (isMe && !message.isRead && onSimulateRead != null) {
                         DropdownMenuItem(
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.DoneAll, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Default.DoneAll, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Simular Leitura do Destinatário", color = ImmersivePrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                                    Text("Simular Leitura do Destinatário", color = RaixActionPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                                 }
                             },
                             onClick = {
@@ -727,9 +729,9 @@ fun MessageBubble(
                     DropdownMenuItem(
                         text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = ImmersiveExpiring, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = RaixError, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Incinerar Agora (Zero Rastro)", color = ImmersiveExpiring, fontSize = 13.sp)
+                                Text("Incinerar Agora (Zero Rastro)", color = RaixError, fontSize = 13.sp)
                             }
                         },
                         onClick = {
@@ -742,9 +744,9 @@ fun MessageBubble(
                         DropdownMenuItem(
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = ImmersivePrimary, modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = RaixActionPrimary, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Copiar Texto", color = ImmersiveOnSurface, fontSize = 13.sp)
+                                    Text("Copiar Texto", color = RaixTextPrimary, fontSize = 13.sp)
                                 }
                             },
                             onClick = {
@@ -772,7 +774,7 @@ fun MessageBubble(
                         text = "$expiryText •",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
-                        color = if (isUrgent) ImmersiveExpiring else ImmersivePrimary
+                        color = if (isUrgent) RaixError else RaixActionPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     ReadReceiptStatusBadge(
@@ -801,7 +803,7 @@ fun MessageBubble(
                         text = "• $expiryText",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
-                        color = if (isUrgent) ImmersiveExpiring else ImmersivePrimary
+                        color = if (isUrgent) RaixError else RaixActionPrimary
                     )
                 }
             }
@@ -867,8 +869,8 @@ fun MessageBubble(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
-                    .background(ImmersiveCard)
-                    .border(1.dp, ImmersiveExpiring.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
+                    .background(RaixSurface)
+                    .border(1.dp, RaixError.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
                     .padding(20.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -876,13 +878,13 @@ fun MessageBubble(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(CircleShape)
-                            .background(ImmersiveExpiring.copy(alpha = 0.2f)),
+                            .background(RaixError.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Shield,
                             contentDescription = "Bloqueio de Segurança",
-                            tint = ImmersiveExpiring,
+                            tint = RaixError,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -891,13 +893,13 @@ fun MessageBubble(
                         text = "Conteúdo Sensível Bloqueado",
                         fontWeight = FontWeight.Medium,
                         fontSize = 16.sp,
-                        color = ImmersiveOnSurface
+                        color = RaixTextPrimary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Uma captura de tela foi detectada recentemente nesta sala. Para garantir sua privacidade, a visualização única e notas secretas foram protegidas.",
                         fontSize = 12.sp,
-                        color = ImmersiveMutedLight,
+                        color = RaixTextSecondary,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         lineHeight = 16.sp
                     )
@@ -914,9 +916,9 @@ fun MessageBubble(
                             },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, ImmersiveExpiring.copy(alpha = 0.5f))
+                            border = androidx.compose.foundation.BorderStroke(1.dp, RaixError.copy(alpha = 0.5f))
                         ) {
-                            Text("Triturar", color = ImmersiveExpiring, fontSize = 12.sp)
+                            Text("Triturar", color = RaixError, fontSize = 12.sp)
                         }
 
                         androidx.compose.material3.Button(
@@ -931,7 +933,7 @@ fun MessageBubble(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                containerColor = EmberOrange,
+                                containerColor = RaixError,
                                 contentColor = Color.Black
                             )
                         ) {

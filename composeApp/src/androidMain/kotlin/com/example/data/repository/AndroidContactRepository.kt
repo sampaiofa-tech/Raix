@@ -45,18 +45,7 @@ class AndroidContactRepository(
 
     override fun getContacts(): Flow<List<ContactItem>> {
         return contactDao.getAllContacts().map { list ->
-            val now = System.currentTimeMillis()
-            val ttlMillis = 48L * 60 * 60 * 1000L
-            val validList = list.filter { (now - it.addedAt) < ttlMillis }
-
-            val expired = list.filter { (now - it.addedAt) >= ttlMillis }
-            if (expired.isNotEmpty()) {
-                kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
-                    expired.forEach { contactDao.deleteContact(it.fingerprint) }
-                }
-            }
-
-            validList.map { contact ->
+            list.map { contact ->
                 val key = try { IdentityManager.getAddressBookKey() } catch (_: Throwable) { null }
                 val decryptedName = if (key != null) {
                     try {

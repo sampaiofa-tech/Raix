@@ -41,7 +41,7 @@ fun main() = application {
     val isDev = System.getProperty("raix.dev") == "true" || System.getenv("RAIX_DEV") == "true"
     val windowTitle = if (isDev) "Raix [desktop-dev]" else "Raix"
 
-    val windowState = rememberWindowState(size = DpSize(450.dp, 800.dp))
+    val windowState = rememberWindowState(size = DpSize(1200.dp, 800.dp))
     val appIcon = painterResource("icon.png")
     var appWindow: java.awt.Window? by remember { mutableStateOf(null) }
 

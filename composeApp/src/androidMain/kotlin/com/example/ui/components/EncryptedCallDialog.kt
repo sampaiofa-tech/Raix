@@ -59,19 +59,16 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.data.model.BurnerChannel
-import com.example.ui.theme.ElectricCyan
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveAvatarDeep
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOnlineGreen
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
-import com.example.ui.theme.ImmersiveSurface
+import com.example.ui.theme.RaixPremiumGold
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixAvatarBg
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
+import com.example.ui.theme.RaixBackground
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -125,7 +122,7 @@ fun EncryptedCallDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ImmersiveSurface)
+                .background(RaixBackground)
                 .statusBarsPadding()
                 .testTag("encrypted_call_screen")
         ) {
@@ -161,8 +158,8 @@ fun EncryptedCallDialog(
                             .padding(top = 70.dp, end = 16.dp)
                             .size(width = 100.dp, height = 140.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(ImmersiveCardVariant)
-                            .border(1.dp, ImmersivePrimary, RoundedCornerShape(14.dp))
+                            .background(RaixSurfaceElevated)
+                            .border(1.dp, RaixActionPrimary, RoundedCornerShape(14.dp))
                     ) {
                         AsyncImage(
                             model = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80",
@@ -190,9 +187,9 @@ fun EncryptedCallDialog(
                         .background(
                             Brush.verticalGradient(
                                 listOf(
-                                    ImmersivePrimary.copy(alpha = 0.15f),
-                                    ImmersiveSurface,
-                                    ImmersiveSurface
+                                    RaixActionPrimary.copy(alpha = 0.15f),
+                                    RaixBackground,
+                                    RaixBackground
                                 )
                             )
                         ),
@@ -212,7 +209,7 @@ fun EncryptedCallDialog(
                                     .size(160.dp)
                                     .scale(if (isConnecting) 1f else pulseScale)
                                     .clip(CircleShape)
-                                    .background(ImmersivePrimary.copy(alpha = 0.15f))
+                                    .background(RaixActionPrimary.copy(alpha = 0.15f))
                             )
                             Box(
                                 modifier = Modifier
@@ -220,17 +217,17 @@ fun EncryptedCallDialog(
                                     .clip(CircleShape)
                                     .background(
                                         Brush.linearGradient(
-                                            listOf(ImmersivePrimary.copy(alpha = 0.4f), ImmersiveAvatarDeep)
+                                            listOf(RaixActionPrimary.copy(alpha = 0.4f), RaixAvatarBg)
                                         )
                                     )
-                                    .border(2.dp, ImmersivePrimary, CircleShape),
+                                    .border(2.dp, RaixActionPrimary, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = channel.name.take(2).uppercase(Locale.getDefault()),
                                     fontSize = 42.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ImmersivePrimary
+                                    color = RaixActionPrimary
                                 )
                             }
                         }
@@ -241,7 +238,7 @@ fun EncryptedCallDialog(
                             text = channel.name,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
 
                         Spacer(modifier = Modifier.height(6.dp))
@@ -250,7 +247,7 @@ fun EncryptedCallDialog(
                             text = if (isConnecting) "Conectando chamada criptografada..." else timeFormatted,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isConnecting) ImmersivePrimary else ImmersiveOnlineGreen
+                            color = if (isConnecting) RaixActionPrimary else RaixActionPrimary
                         )
                     }
                 }
@@ -268,7 +265,7 @@ fun EncryptedCallDialog(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .background(Color.Black.copy(alpha = 0.65f))
-                        .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(20.dp))
+                        .border(0.8.dp, RaixBorder, RoundedCornerShape(20.dp))
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
                     Row(
@@ -277,7 +274,7 @@ fun EncryptedCallDialog(
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = null,
-                            tint = ImmersivePrimary,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -285,7 +282,7 @@ fun EncryptedCallDialog(
                             text = "Chamada Criptografada de Ponta a Ponta",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
                     }
                 }
@@ -302,7 +299,7 @@ fun EncryptedCallDialog(
                         text = if (isConnecting) "Conectando vídeo..." else timeFormatted,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
-                        color = if (isConnecting) ImmersivePrimary else ImmersiveOnlineGreen
+                        color = if (isConnecting) RaixActionPrimary else RaixActionPrimary
                     )
                 }
             }
@@ -319,7 +316,7 @@ fun EncryptedCallDialog(
                     modifier = Modifier
                         .clip(RoundedCornerShape(32.dp))
                         .background(Color.Black.copy(alpha = 0.8f))
-                        .border(1.dp, ImmersiveOutline, RoundedCornerShape(32.dp))
+                        .border(1.dp, RaixBorder, RoundedCornerShape(32.dp))
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -330,7 +327,7 @@ fun EncryptedCallDialog(
                         modifier = Modifier
                             .size(50.dp)
                             .clip(CircleShape)
-                            .background(if (isMuted) Color.White else ImmersiveCardVariant)
+                            .background(if (isMuted) Color.White else RaixSurfaceElevated)
                     ) {
                         Icon(
                             imageVector = if (isMuted) Icons.Default.MicOff else Icons.Default.Mic,
@@ -346,7 +343,7 @@ fun EncryptedCallDialog(
                         modifier = Modifier
                             .size(50.dp)
                             .clip(CircleShape)
-                            .background(if (!isVideoEnabled && callType == CallType.VIDEO) Color.White else ImmersiveCardVariant)
+                            .background(if (!isVideoEnabled && callType == CallType.VIDEO) Color.White else RaixSurfaceElevated)
                     ) {
                         Icon(
                             imageVector = if (isVideoEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
@@ -362,12 +359,12 @@ fun EncryptedCallDialog(
                         modifier = Modifier
                             .size(50.dp)
                             .clip(CircleShape)
-                            .background(if (isSpeakerOn) ImmersivePrimary.copy(alpha = 0.3f) else ImmersiveCardVariant)
+                            .background(if (isSpeakerOn) RaixActionPrimary.copy(alpha = 0.3f) else RaixSurfaceElevated)
                     ) {
                         Icon(
                             imageVector = Icons.Default.VolumeUp,
                             contentDescription = "Alto-falante",
-                            tint = if (isSpeakerOn) ImmersivePrimary else Color.White,
+                            tint = if (isSpeakerOn) RaixActionPrimary else Color.White,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -378,7 +375,7 @@ fun EncryptedCallDialog(
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(ImmersiveExpiring)
+                            .background(RaixError)
                             .testTag("end_call_button")
                     ) {
                         Icon(
@@ -395,7 +392,7 @@ fun EncryptedCallDialog(
                 Text(
                     text = "Zero registros gravados em servidores",
                     fontSize = 11.sp,
-                    color = ImmersiveMutedLight
+                    color = RaixTextSecondary
                 )
             }
         }

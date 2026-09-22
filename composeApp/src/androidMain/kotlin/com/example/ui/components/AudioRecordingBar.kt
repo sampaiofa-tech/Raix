@@ -52,17 +52,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.EmberOrange
-import com.example.ui.theme.ImmersiveCard
-import com.example.ui.theme.ImmersiveCardVariant
-import com.example.ui.theme.ImmersiveExpiring
-import com.example.ui.theme.ImmersiveHeader
-import com.example.ui.theme.ImmersiveMuted
-import com.example.ui.theme.ImmersiveMutedLight
-import com.example.ui.theme.ImmersiveOnPrimary
-import com.example.ui.theme.ImmersiveOnSurface
-import com.example.ui.theme.ImmersiveOutline
-import com.example.ui.theme.ImmersivePrimary
+import com.example.ui.theme.RaixError
+import com.example.ui.theme.RaixSurface
+import com.example.ui.theme.RaixSurfaceElevated
+import com.example.ui.theme.RaixTextSecondary
+import com.example.ui.theme.RaixTextPrimary
+import com.example.ui.theme.RaixBackground
+import com.example.ui.theme.RaixBorder
+import com.example.ui.theme.RaixActionPrimary
 import com.example.ui.viewmodel.TtlPreset
 import kotlinx.coroutines.delay
 
@@ -106,14 +103,14 @@ fun AudioRecordingBar(
             .background(
                 Brush.horizontalGradient(
                     listOf(
-                        if (isViewOnce) EmberOrange.copy(alpha = 0.18f) else ImmersiveExpiring.copy(alpha = 0.15f),
-                        ImmersiveCard
+                        if (isViewOnce) RaixError.copy(alpha = 0.18f) else RaixError.copy(alpha = 0.15f),
+                        RaixSurface
                     )
                 )
             )
             .border(
                 1.dp,
-                if (isViewOnce) EmberOrange.copy(alpha = 0.6f) else ImmersiveExpiring.copy(alpha = 0.5f),
+                if (isViewOnce) RaixError.copy(alpha = 0.6f) else RaixError.copy(alpha = 0.5f),
                 RoundedCornerShape(20.dp)
             )
             .padding(horizontal = 10.dp, vertical = 6.dp)
@@ -128,13 +125,13 @@ fun AudioRecordingBar(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(ImmersiveCardVariant)
+                    .background(RaixSurfaceElevated)
                     .testTag("cancel_recording_button")
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Cancelar Gravação",
-                    tint = ImmersiveExpiring,
+                    tint = RaixError,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -147,7 +144,7 @@ fun AudioRecordingBar(
                     .size(10.dp)
                     .scale(pulseScale)
                     .clip(CircleShape)
-                    .background(if (isViewOnce) EmberOrange else ImmersiveExpiring)
+                    .background(if (isViewOnce) RaixError else RaixError)
             )
 
             Spacer(modifier = Modifier.width(6.dp))
@@ -159,7 +156,7 @@ fun AudioRecordingBar(
                 text = String.format("%02d:%02d", mins, secs),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isViewOnce) EmberOrange else ImmersiveExpiring
+                color = if (isViewOnce) RaixError else RaixError
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -183,7 +180,7 @@ fun AudioRecordingBar(
                             .weight(1f)
                             .height(dynamicH)
                             .clip(RoundedCornerShape(1.dp))
-                            .background(if (isViewOnce) EmberOrange else ImmersivePrimary)
+                            .background(if (isViewOnce) RaixError else RaixActionPrimary)
                     )
                 }
             }
@@ -195,10 +192,10 @@ fun AudioRecordingBar(
                 modifier = Modifier
                     .size(34.dp)
                     .clip(CircleShape)
-                    .background(if (isViewOnce) EmberOrange else ImmersiveCardVariant)
+                    .background(if (isViewOnce) RaixError else RaixSurfaceElevated)
                     .border(
                         1.dp,
-                        if (isViewOnce) EmberOrange else ImmersiveOutline,
+                        if (isViewOnce) RaixError else RaixBorder,
                         CircleShape
                     )
                     .clickable { isViewOnce = !isViewOnce }
@@ -209,7 +206,7 @@ fun AudioRecordingBar(
                     text = "1x",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Black,
-                    color = if (isViewOnce) Color.Black else ImmersiveMutedLight
+                    color = if (isViewOnce) Color.Black else RaixTextSecondary
                 )
             }
 
@@ -220,8 +217,8 @@ fun AudioRecordingBar(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(ImmersiveCardVariant)
-                        .border(0.8.dp, ImmersiveOutline, RoundedCornerShape(12.dp))
+                        .background(RaixSurfaceElevated)
+                        .border(0.8.dp, RaixBorder, RoundedCornerShape(12.dp))
                         .clickable { showTtlDropdown = true }
                         .padding(horizontal = 7.dp, vertical = 5.dp)
                         .testTag("audio_ttl_dropdown_button")
@@ -230,7 +227,7 @@ fun AudioRecordingBar(
                         Icon(
                             imageVector = Icons.Default.Timer,
                             contentDescription = null,
-                            tint = ImmersivePrimary,
+                            tint = RaixActionPrimary,
                             modifier = Modifier.size(11.dp)
                         )
                         Spacer(modifier = Modifier.width(3.dp))
@@ -238,7 +235,7 @@ fun AudioRecordingBar(
                             text = selectedTtl.label.replace(" Horas", "h").replace(" Minutos", "m").replace(" Min", "m").replace(" Segundos", "s"),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = ImmersiveOnSurface
+                            color = RaixTextPrimary
                         )
                     }
                 }
@@ -246,14 +243,14 @@ fun AudioRecordingBar(
                 DropdownMenu(
                     expanded = showTtlDropdown,
                     onDismissRequest = { showTtlDropdown = false },
-                    modifier = Modifier.background(ImmersiveHeader)
+                    modifier = Modifier.background(RaixSurface)
                 ) {
                     availableTtls.forEach { preset ->
                         DropdownMenuItem(
                             text = {
                                 Text(
                                     text = preset.label,
-                                    color = if (preset == selectedTtl) ImmersivePrimary else ImmersiveOnSurface,
+                                    color = if (preset == selectedTtl) RaixActionPrimary else RaixTextPrimary,
                                     fontSize = 12.sp,
                                     fontWeight = if (preset == selectedTtl) FontWeight.Bold else FontWeight.Normal
                                 )
@@ -278,13 +275,13 @@ fun AudioRecordingBar(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(if (isViewOnce) EmberOrange else ImmersivePrimary)
+                    .background(if (isViewOnce) RaixError else RaixActionPrimary)
                     .testTag("send_audio_button")
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Enviar Áudio",
-                    tint = if (isViewOnce) Color.Black else ImmersiveOnPrimary,
+                    tint = if (isViewOnce) Color.Black else RaixBackground,
                     modifier = Modifier.size(17.dp)
                 )
             }

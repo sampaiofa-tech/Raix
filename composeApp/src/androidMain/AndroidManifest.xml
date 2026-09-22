@@ -46,7 +46,7 @@
         <!-- Configuração para Notificações em Background (FCM) no Android 13+ -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="pmsg_new_conversations_channel" />
+            android:value="pmsg_high_priority_messages_channel_v2" />
     </application>
 
 </manifest>

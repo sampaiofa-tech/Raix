@@ -139,8 +139,17 @@ fun DataPrivacyScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // --- SECTION: SEGURANCA ---
+            Text(
+                text = "SEGURANCA",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 1.5.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+            )
             // Cartão de Destaque: Arquitetura Zero-Knowledge
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF111827)),
@@ -239,6 +248,15 @@ fun DataPrivacyScreen(
                 }
             }
 
+            // --- SECTION: DADOS ---
+            Text(
+                text = "DADOS",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 1.5.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp)
+            )
             // Meu Fingerprint Criptográfico
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF111827)),
@@ -418,6 +436,15 @@ fun DataPrivacyScreen(
                 }
             }
 
+            // --- SECTION: INFRAESTRUTURA ---
+            Text(
+                text = "INFRAESTRUTURA",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 1.5.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp)
+            )
             // Nota da Câmera Local
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF111827)),
@@ -564,6 +591,15 @@ fun DataPrivacyScreen(
                 }
             }
 
+            // --- SECTION: LEGAL ---
+            Text(
+                text = "DOCUMENTOS LEGAIS",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 1.5.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp)
+            )
             // Links para os Documentos Oficiais no GitHub Pages
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF0D1B2A)),

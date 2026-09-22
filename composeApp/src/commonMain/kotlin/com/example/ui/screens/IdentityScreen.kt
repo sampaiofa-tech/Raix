@@ -19,6 +19,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -31,6 +35,8 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -110,6 +116,11 @@ fun IdentityScreen(
     var restoreError by remember { mutableStateOf<String?>(null) }
     var isRestoring by remember { mutableStateOf(false) }
 
+    // Collapsible section states
+    var isFingerprintExpanded by remember { mutableStateOf(true) }
+    var isExchangeExpanded by remember { mutableStateOf(false) }
+    var isMnemonicExpanded by remember { mutableStateOf(false) }
+
     // Auto-generate draft if identity does not exist
     LaunchedEffect(showProvisioningDialog) {
         if (showProvisioningDialog && provisionedDraft == null) {
@@ -156,7 +167,7 @@ fun IdentityScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            // Header Security Badge
+            // Hero Identity Card with Avatar
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1E1B)),
                 modifier = Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
@@ -165,26 +176,57 @@ fun IdentityScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.width(12.dp))
+                    // Avatar circle with fingerprint initial
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Security,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(14.dp))
                     Column {
                         Text(
-                            "Identidade Criptográfica X25519",
+                            "Identidade Criptografica X25519",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            "Protegida em repouso por Hardware KeyVault • Padrão Signal • Zero Rastro",
+                            if (identity != null) "Fingerprint: ${identity!!.safetyNumber?.take(20)}..." else "Nao provisionada",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Text(
+                            "Hardware KeyVault • Padrao Signal • Zero Rastro",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.5f)
                         )
                     }
                 }
             }
 
-            // Fingerprint (60 Digits) Card
             if (identity != null) {
+                // Collapsible: Fingerprint Section
+                CollapsibleSectionHeader(
+                    title = "Numero de Seguranca (Fingerprint)",
+                    icon = Icons.Default.Lock,
+                    isExpanded = isFingerprintExpanded,
+                    onClick = { isFingerprintExpanded = !isFingerprintExpanded }
+                )
+                AnimatedVisibility(
+                    visible = isFingerprintExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -252,8 +294,20 @@ fun IdentityScreen(
                         }
                     }
                 }
+                } // AnimatedVisibility
 
-                // Presencial Exchange Card (Model A)
+                // Collapsible: Presential Exchange Section
+                CollapsibleSectionHeader(
+                    title = "Troca Presencial (Modelo A)",
+                    icon = Icons.Default.QrCode,
+                    isExpanded = isExchangeExpanded,
+                    onClick = { isExchangeExpanded = !isExchangeExpanded }
+                )
+                AnimatedVisibility(
+                    visible = isExchangeExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -301,8 +355,20 @@ fun IdentityScreen(
                         )
                     }
                 }
+                } // AnimatedVisibility
 
-                // Mnemonic Recovery Section
+                // Collapsible: Mnemonic Recovery Section
+                CollapsibleSectionHeader(
+                    title = "Mnemonico de Recuperacao (BIP-39)",
+                    icon = Icons.Default.Key,
+                    isExpanded = isMnemonicExpanded,
+                    onClick = { isMnemonicExpanded = !isMnemonicExpanded }
+                )
+                AnimatedVisibility(
+                    visible = isMnemonicExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -418,6 +484,7 @@ fun IdentityScreen(
                         }
                     }
                 }
+                } // AnimatedVisibility
             } else {
                 // Not provisioned fallback
                 Card(
@@ -909,5 +976,46 @@ fun IdentityScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun CollapsibleSectionHeader(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    isExpanded: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = if (isExpanded) "Recolher" else "Expandir",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
