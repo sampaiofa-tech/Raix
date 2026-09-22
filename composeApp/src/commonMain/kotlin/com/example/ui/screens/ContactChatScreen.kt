@@ -268,13 +268,20 @@ fun ContactChatScreen(
 
                                 val keyResult = KeyStoreClient.getMessageKey(msg.id, myToken)
                                 if (keyResult.success && keyResult.ephemeralPubKey != null && keyResult.wrappedDek != null) {
-                                    val myPrivKey = IdentityManager.getIdentity()?.privateKey
+                                    val myIdentity = IdentityManager.getIdentity()
+                                    val myPrivKey = myIdentity?.privateKey
                                     if (myPrivKey != null) {
                                         val env = SealedBoxEnvelope(
                                             ephemeralPubKeyHex = keyResult.ephemeralPubKey,
-                                            wrappedDekBase64 = keyResult.wrappedDek
+                                            wrappedDekBase64 = keyResult.wrappedDek,
+                                            mlKemCiphertextBase64 = keyResult.mlKemCiphertextBase64
                                         )
-                                        val dek = SealedBox.unseal(env, myPrivKey)
+                                        val dek = SealedBox.unseal(
+                                            envelope = env,
+                                            recipientPrivKey = myPrivKey,
+                                            recipientMlKemPrivKey = myIdentity.mlKemPrivateKey,
+                                            enforceHybrid = myIdentity.mlKemPrivateKey.isNotEmpty()
+                                        )
                                         val cipherBytes = Base64.decode(msg.ciphertext)
                                         val ivBytes = Base64.decode(msg.iv)
                                         val decryptedBytes = AesGcm.decrypt(ciphertext = cipherBytes, key = dek, iv = ivBytes)

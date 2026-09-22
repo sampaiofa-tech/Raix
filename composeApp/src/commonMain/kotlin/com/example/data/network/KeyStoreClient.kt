@@ -43,7 +43,8 @@ object KeyStoreClient {
         ephemeralPubKey: String,
         wrappedDek: String,
         expiresAtMillis: Long,
-        idToken: String
+        idToken: String,
+        mlKemCiphertextBase64: String? = null
     ): StoreKeyResult {
         return try {
             val payload = buildJsonObject {
@@ -54,6 +55,9 @@ object KeyStoreClient {
                     put("ephemeralPubKey", ephemeralPubKey)
                     put("wrappedDek", wrappedDek)
                     put("expiresAtMillis", expiresAtMillis)
+                    if (mlKemCiphertextBase64 != null) {
+                        put("mlKemCiphertextBase64", mlKemCiphertextBase64)
+                    }
                 })
             }
 
@@ -126,6 +130,7 @@ object KeyStoreClient {
                 val ephemeralPubKey = resultObj?.get("ephemeralPubKey")?.jsonPrimitive?.content
                 val wrappedDek = resultObj?.get("wrappedDek")?.jsonPrimitive?.content
                 val returnedExpiresAt = resultObj?.get("expiresAtMillis")?.jsonPrimitive?.content?.toLongOrNull()
+                val mlKemCt = resultObj?.get("mlKemCiphertextBase64")?.jsonPrimitive?.content
 
                 if (ephemeralPubKey != null && wrappedDek != null) {
                     GetKeyResult(
@@ -133,7 +138,8 @@ object KeyStoreClient {
                         messageId = returnedMsgId,
                         ephemeralPubKey = ephemeralPubKey,
                         wrappedDek = wrappedDek,
-                        expiresAtMillis = returnedExpiresAt
+                        expiresAtMillis = returnedExpiresAt,
+                        mlKemCiphertextBase64 = mlKemCt
                     )
                 } else {
                     GetKeyResult(
@@ -171,5 +177,6 @@ data class GetKeyResult(
     val ephemeralPubKey: String? = null,
     val wrappedDek: String? = null,
     val expiresAtMillis: Long? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val mlKemCiphertextBase64: String? = null
 )

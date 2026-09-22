@@ -166,3 +166,11 @@ Todo feedback recebido deve ser classificado em uma das seguintes categorias ant
 | **23** | Deprecation warnings do build | **Nenhum**. | 21 warnings de depreciacao (Icons.Filled.ArrowBack -> AutoMirrored, TabRow -> PrimaryTabRow, LocalClipboardManager -> LocalClipboard, etc.). Nenhum afeta funcionalidade. | v2.0 |
 | **24** | Paridade iOS | **Alto (bloqueado)**. | iOS em homologacao. Privacy overlay (blur no alternador de apps) pendente. Target iosMain compila apenas no CI macOS. | v2.0 |
 | **25** | ChannelListScreen vs ContactsScreen na Home Android | **Baixo**. | A Home Android usa ChannelListScreen (wrapper sobre contatos E2E). Avaliar unificacao com ContactsScreen (commonMain) para eliminar duplicacao. | v2.0 |
+
+## Pendencias v1.9.4 (Adicionado em 2026-09-22)
+
+| # | Item | Impacto Atual | Descricao | Versao-Alvo |
+| --- | --- | --- | --- | --- |
+| **26** | **PQC (ML-KEM) DORMENTE no pipeline de producao (PENDENCIA PRIORITARIA)** | **Alto (Estrategico)**. | Comunicacao real opera em X25519 classico; `enforceHybrid` efetivo = `false`. O pipeline hibrido (ML-KEM-768) esta integrado no fluxo de dados (`SealedBox.unseal`, `E2EMessageListener`, `ContactChatScreen`, `FirestoreMessageSync`, `KeyStoreClient`) mas permanece inativo. **Ativacao exige:** (a) contatos publicarem `mlKemPubKey` no handshake; (b) servidor (`storeMessageKey`/`messageKeys`) armazenar `mlKemCiphertext`; (c) envio selar hibrido (`SealedBox.sealHybrid`); (d) recebimento com `enforceHybrid=true`; (e) compatibilidade retroativa com contatos antigos (graceful degradation). | v2.0 / Ciclo PQC |
+| **27** | Wipe-to-Push Token (janela residual mitigada) | **Baixo**. | `LaunchedEffect` em `VanishApp` registra token FCM imediatamente apos estado `UNLOCKED`, reduzindo a janela de perda de notificacao apos wipe. Janela residual minima (entre o wipe e a chegada ao estado UNLOCKED) e inerente a arquitetura de wipe total. | Aceito (spec do Principal) |
+

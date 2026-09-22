@@ -85,7 +85,8 @@ object FirestoreMessageSync {
         message: FirestoreMessage,
         recipientPrivKey: ByteArray,
         idToken: String,
-        decryptPayload: (ciphertext: String, iv: String, dek: ByteArray) -> String
+        decryptPayload: (ciphertext: String, iv: String, dek: ByteArray) -> String,
+        recipientMlKemPrivKey: ByteArray? = null
     ): Result<String> {
         val keyResult = KeyStoreClient.getMessageKey(message.id, idToken)
         if (!keyResult.success || keyResult.ephemeralPubKey == null || keyResult.wrappedDek == null) {
@@ -97,9 +98,15 @@ object FirestoreMessageSync {
         return try {
             val envelope = SealedBoxEnvelope(
                 ephemeralPubKeyHex = keyResult.ephemeralPubKey,
-                wrappedDekBase64 = keyResult.wrappedDek
+                wrappedDekBase64 = keyResult.wrappedDek,
+                mlKemCiphertextBase64 = keyResult.mlKemCiphertextBase64
             )
-            val dek = SealedBox.unseal(envelope, recipientPrivKey)
+            val dek = SealedBox.unseal(
+                envelope = envelope,
+                recipientPrivKey = recipientPrivKey,
+                recipientMlKemPrivKey = recipientMlKemPrivKey,
+                enforceHybrid = (recipientMlKemPrivKey != null && recipientMlKemPrivKey.isNotEmpty())
+            )
             val decrypted = decryptPayload(message.ciphertext, message.iv, dek)
             Result.success(decrypted)
         } catch (e: Exception) {

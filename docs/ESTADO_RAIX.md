@@ -1,6 +1,6 @@
 # ESTADO_RAIX.md — Documento-Mestre do Projeto
 
-Versão: 2.0 | Atualizado: 2026-09-18 (fuso UTC-03:00, Brasília)
+Versão: 2.1 | Atualizado: 2026-09-22 (fuso UTC-03:00, Brasília)
 Propósito: Preservar o estado do projeto fora da memória de qualquer agente. Fonte única de verdade. Atualizado pelo Analista a cada ciclo.
 
 > **DOCUMENTO-MESTRE:** Fonte única de verdade do projeto RAIX adotada por todos os agentes.
@@ -25,15 +25,15 @@ Propósito: Preservar o estado do projeto fora da memória de qualquer agente. F
 
 ## 2. PRODUTOS (status)
 
-- **RAIX Messaging:** EM OPERACAO (Android, Windows, Web; iOS em homologacao) -- v1.9.3, zero-knowledge de conteudo, pos-quantica hibrida (ML-KEM-768 + ML-DSA-65)
-  - **Versao vigente:** v1.9.3 (versionCode 39), confirmada em `composeApp/build.gradle.kts`.
-  - **Data de referencia do ambiente:** 2026-09-21 (fuso UTC-03:00, Brasilia).
-  - **Binarios autoritativos (build de 2026-09-21):**
-    - APK: `release-artifacts/Raix-1.9.3.apk` -- `DB9ACE89C62B7870112FF97194DC012723EC79B520370AE5AF1EAB9D7B0ECA09`
-    - AAB: `release-artifacts/Raix-1.9.3.aab` -- `E3B64BD51906DF4353831AD3150E2387C0FF22311B8CFB1F0A193D8E62967AB0`
-    - MSI: `release-artifacts/Raix-1.9.3.msi` -- `9D996316278ACFBEB87E526BC280B7D0934753668C71C8DDE160172F79D2F812`
+- **RAIX Messaging:** EM OPERACAO (Android, Windows, Web; iOS em homologacao) -- v1.9.4, zero-knowledge de conteudo, pos-quantica hibrida (ML-KEM-768 + ML-DSA-65)
+  - **Versao vigente:** v1.9.4 (versionCode 40), confirmada em `composeApp/build.gradle.kts`.
+  - **Data de referencia do ambiente:** 2026-09-22 (fuso UTC-03:00, Brasilia).
+  - **Binarios autoritativos (build de 2026-09-22):**
+    - APK: `release-artifacts/Raix-1.9.4.apk` -- `C989D67053DC6B263A0A64AB39794065D5547BBD50B9D8516BEFFEE3EFCB8D69`
+    - AAB: `release-artifacts/Raix-1.9.4.aab` -- `8B1CFF971AF95D8D49402A47DEA24E885287D3570526C09C486ECB34BB6FE0CC`
+    - MSI: `release-artifacts/Raix-1.9.4.msi` -- `3765A1307B88D6449BB30DEEB8DA763E8190E03C47FED2A297F7569E9D0D0612`
   - **Checksums canonicos:** `docs/release-checksums.sha256`
-  - **Changelog v1.7--v1.9.3 (13 correcoes):** home vazia (TTL), abas, QR do menu, insets, busca, deep-link de notificacao, menu Bloquear, icone 3 pontos, permissao POST_NOTIFICATIONS no onboarding, paridade desktop, versionamento unificado.
+  - **Changelog v1.7--v1.9.4 (14 correcoes):** home vazia (TTL), abas, QR do menu, insets, busca, deep-link de notificacao, menu Bloquear, icone 3 pontos, permissao POST_NOTIFICATIONS no onboarding, paridade desktop, versionamento unificado, wipe-to-push token (registro imediato apos onboarding), preparacao enforceHybrid (pipeline PQC dormente).
 - **Cartilhas:** publicadas (Android + iOS + Brasil/LGPD)
 - **Landing page:** publicada (redesign com 8 correções)
 - **Consultoria de privacidade:** registrada (pós-rodada)

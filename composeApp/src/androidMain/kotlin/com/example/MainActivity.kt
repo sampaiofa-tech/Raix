@@ -329,6 +329,22 @@ fun VanishApp(
       (context as? MainActivity)?.trySelectPendingRoom()
     }
   }
+  // Registro imediato do push token apos onboarding (fecha janela wipe x push)
+  LaunchedEffect(Unit) {
+    try {
+      val authManager = com.example.security.DeviceAuthManager
+      val idToken = authManager.getIdToken()
+      if (idToken != null) {
+        val pushToken = com.example.security.notification.PushNotificationManager.getPushToken()
+        if (pushToken != null) {
+          com.example.data.network.IdentityNetworkClient.registerPushToken(pushToken, "android", idToken)
+          println("[DIAGNOSTICO] Push token registrado imediatamente apos onboarding")
+        }
+      }
+    } catch (e: Exception) {
+      println("[DIAGNOSTICO] Falha ao registrar push token imediato: ${e.message}")
+    }
+  }
   val contacts by viewModel.contacts.collectAsStateWithLifecycle()
   val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
   val activeMessages by viewModel.activeMessages.collectAsStateWithLifecycle()
