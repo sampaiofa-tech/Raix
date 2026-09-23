@@ -128,8 +128,11 @@ kotlin {
                 val desktopOutputDir = layout.buildDirectory.dir("generated/source/buildconfig/desktop").get().asFile
                 val outputFile = File(desktopOutputDir, "com/example/DesktopBuildConfig.kt")
                 
-                inputs.file(envFile)
-                inputs.file(exampleFile).optional()
+                if (envFile.exists()) {
+                    inputs.file(envFile)
+                } else if (exampleFile.exists()) {
+                    inputs.file(exampleFile)
+                }
                 outputs.dir(desktopOutputDir)
                 
                 doLast {
