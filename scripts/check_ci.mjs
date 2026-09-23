@@ -27,7 +27,7 @@ if (token) {
 
 function fetch(path) {
   return new Promise((resolve, reject) => {
-    https.get(`https://api.github.com/repos/sampaiofa-tech/Pmsg${path}`, { headers }, (res) => {
+    https.get(`https://api.github.com/repos/sampaiofa-tech/Raix${path}`, { headers }, (res) => {
       let d = '';
       res.on('data', c => d += c);
       res.on('end', () => {

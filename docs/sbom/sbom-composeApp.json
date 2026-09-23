@@ -543,6 +543,13 @@
       "name": "barcode-scanning",
       "version": "17.3.0",
       "purl": "pkg:maven/com.google.mlkit/barcode-scanning@17.3.0"
+    },
+    {
+      "type": "library",
+      "group": "com.google.android.gms",
+      "name": "play-services-code-scanner",
+      "version": "16.1.0",
+      "purl": "pkg:maven/com.google.android.gms/play-services-code-scanner@16.1.0"
     }
   ]
 }
