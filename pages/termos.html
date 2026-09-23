@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Raix — Termos de Uso e Condições Gerais do Serviço (v3.0)">
-  <title>Termos de Uso — Raix (v3.0)</title>
+  <meta name="description" content="Raix — Termos de Uso e Condições Gerais do Serviço (v3.1)">
+  <title>Termos de Uso — Raix (v3.1)</title>
   <style>
     :root {
       --bg: #0b1325;
@@ -108,7 +108,9 @@
       margin-top: 3rem;
       padding-top: 2rem;
     }
+    section a { color: var(--primary); text-decoration: none; }
     footer a { color: var(--primary); text-decoration: none; }
+    .footer-copy { margin-top: 0.5rem; font-size: 0.75rem; color: #64748b; }
     code {
       background: rgba(255, 255, 255, 0.1);
       padding: 0.2rem 0.4rem;
@@ -126,7 +128,7 @@
     <header>
       <img src="logo-empresa.png" alt="Marca da Controladora" class="header-logo">
       <h1>Termos de Uso — Raix</h1>
-      <p class="meta">Versão 3.0 (Conforme arquitetura v1.5) • Última atualização: 05 de setembro de 2026 • Depósito de marca no INPI agendado para 08/09/2026 (guia/protocolo preparatório nº <strong>945109300</strong>)</p>
+      <p class="meta">Versão 3.1 — atualizada conforme a arquitetura em vigor (v1.9.x) e a nota técnica regulatória consolidada (v3.2). • Última atualização: 05 de setembro de 2026 • Depósito de marca no INPI agendado para 08/09/2026 (guia/protocolo preparatório nº <strong>945109300</strong>)</p>
     </header>
 
     <section>
@@ -144,9 +146,9 @@
       <h2>2. Natureza Efêmera e Limitação Técnica do Servidor ("Como Está")</h2>
       <p>O Raix opera sob uma premissa criptográfica estrita:</p>
       <ul>
-        <li><strong>Servidor Cego (Zero-Knowledge):</strong> O operador dos servidores <strong>não possui capacidade matemática ou chaves para decifrar mensagens</strong>. Todo o texto decifrado existe apenas na memória volátil dos dispositivos interlocutores.</li>
+        <li><strong>Servidor Cego (zero-knowledge de conteúdo):</strong> O servidor opera como entidade cega em relação ao conteúdo: as mensagens são cifradas de ponta a ponta no dispositivo do usuário, e o servidor não detém capacidade de ler o conteúdo. Todo o texto decifrado existe apenas na memória volátil dos dispositivos interlocutores.</li>
         <li><strong>Autodestruição (TTL):</strong> As mensagens possuem ciclo de vida máximo de 24 horas e são incineradas atômica e irreversivelmente no consumo (<em>Vanish-After-Read</em>) ou por expiração horária (<em>Crypto-Shredder</em>).</li>
-        <li><strong>Timeout de Não-Entrega (≤ 24h) — Feature Deliberada de Privacidade:</strong> Caso o destinatário permaneça desconectado por mais de 24 horas, a mensagem retida em fila no servidor é definitivamente incinerada pelo <code>scheduledMessageShredder</code>. Esta perda de mensagem após 24h offline é uma <em>feature</em> deliberada de privacidade radical e minimização de dados, impedindo o acúmulo de dados na nuvem.</li>
+        <li><strong>Timeout de Não-Entrega (≤ 24h) — Feature Deliberada de Privacidade:</strong> Caso o destinatário permaneça desconectado por mais de 24 horas, a mensagem retida em fila no servidor é definitivamente eliminada pela rotina automática de expurgo. Esta perda de mensagem após 24h offline é uma <em>feature</em> deliberada de privacidade radical e minimização de dados, impedindo o acúmulo de dados na nuvem.</li>
         <li><strong>Custódia Local das Chaves:</strong> As chaves privadas e a semente de 12 palavras permanecem <strong>custodiadas exclusivamente no dispositivo do Usuário, sob proteção do sistema operacional</strong> (DPAPI no Windows, KeyStore no Android). O operador não possui capacidade de recuperar senhas ou restaurar contas em caso de perda.</li>
       </ul>
 
@@ -155,14 +157,14 @@
 
       <div class="box-danger">
         <strong>Sanção de Moderação — Revogação de Chave Ed25519 (Sem Bloqueio de IP):</strong>
-        <p>Infratores confirmados sofrem <strong>revogação de sua chave pública de roteamento Ed25519</strong> no diretório técnico (<code>identities/{fingerprint}</code> com <code>revoked: true</code>), ficando impedidos de receber ou rotear mensagens na rede. Em respeito à neutralidade e aos usuários legítimos em redes móveis ou faixas de CGNAT, <strong>a aplicação NUNCA adota bloqueio por endereço IP</strong>.</p>
+        <p>Infratores confirmados sofrem <strong>revogação de sua chave pública de roteamento Ed25519</strong> no diretório técnico (identidade anônima marcada como revogada), ficando impedidos de receber ou rotear mensagens na rede. Em respeito à neutralidade e aos usuários legítimos em redes móveis ou faixas de CGNAT, <strong>a aplicação NUNCA adota bloqueio por endereço IP</strong>.</p>
       </div>
 
       <h2>4. Mecanismos de Denúncia de Abuso</h2>
       <p>Disponibilizamos dois mecanismos transparentes de denúncia:</p>
       <ul>
-        <li><strong>Canal Comportamental Padrão (Zero-Knowledge):</strong> Permite sinalizar assédio ou abusos através da função <code>reportAbuse</code> sem exposição de mensagens.</li>
-        <li><strong>Canal Voluntário com Conteúdo:</strong> Caso o usuário sofra ameaça ou conteúdo ilícito e decida voluntariamente submeter a mensagem à análise, o app solicita consentimento formal antes de descriptografar localmente e encaminhar o material (<code>reportAbuseWithContent</code>). O conteúdo é mantido por <strong>no máximo 90 dias após o encerramento da apuração</strong>, sendo submetido a <strong>exclusão definitiva (hard-delete)</strong>.</li>
+        <li><strong>Canal de denúncia comportamental (zero-knowledge de conteúdo, Padrão):</strong> Permite sinalizar assédio ou abusos sem exposição de mensagens.</li>
+        <li><strong>Canal de denúncia com conteúdo voluntário:</strong> Caso o usuário sofra ameaça ou conteúdo ilícito e decida voluntariamente submeter a mensagem à análise, o app solicita consentimento formal antes de descriptografar localmente e encaminhar o material. O conteúdo é mantido por <strong>no máximo 90 dias após o encerramento da apuração</strong>, sendo submetido a <strong>exclusão definitiva (hard-delete)</strong>.</li>
       </ul>
 
       <h2>5. Verificação da Integridade da Conexão Mútua (Safety Number / QR)</h2>
@@ -177,7 +179,7 @@
 
     <footer>
       <p>Operadora: <strong>Cat Tech</strong> (CNPJ 67.497.085/0001-36) • Encarregado de Dados (DPO): Filippe Andrade Sampaio (<a href="mailto:contato@raixtech.com">contato@raixtech.com</a>)</p>
-      <p style="margin-top: 0.5rem; font-size: 0.75rem; color: #64748b;">© 2026 Raix. Todos os direitos reservados. Código livre sob licença AGPL-3.0.</p>
+      <p class="footer-copy">© 2026 Raix. Todos os direitos reservados. Código livre sob licença AGPL-3.0.</p>
     </footer>
   </div>
 </body>
