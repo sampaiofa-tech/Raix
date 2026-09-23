@@ -69,8 +69,9 @@ Regras mandatórias de engenharia. Violação de qualquer uma invalida a entrega
    - Adições cosméticas (ex.: tamanho da janela) são permitidas; remoção ou reestruturação do ciclo de vida são proibidas.
 
 3. **Proibido PowerShell para Editar Fonte**:
-   - Arquivos `.kt`, `.xml`, `.gradle.kts` devem ser editados **exclusivamente** via ferramentas de edição estruturada (tool de edição do agente).
-   - Comandos como `Set-Content`, `Out-File`, `Add-Content`, `echo >` ou qualquer redirecionamento de shell para arquivos de código-fonte são **estritamente proibidos**.
+   - Arquivos `.kt`, `.xml`, `.gradle.kts`, `.html` e `.css` devem ser editados **exclusivamente** via ferramentas de edição estruturada (tool de edição do agente).
+   - Comandos como `Set-Content`, `Out-File`, `Add-Content`, `echo >`, `[IO.File]::WriteAllText`, `[IO.File]::WriteAllBytes`, `[System.IO.File]::WriteAllText` ou qualquer redirecionamento de shell para arquivos de código-fonte são **estritamente proibidos**.
+   - Uso temporário de `ReadAllBytes`/`ReadAllText` para **leitura** e prova por bytes é permitido; **escrita** via esses métodos é vedada.
 
 4. **Proibido Emojis**:
    - Nenhum caractere emoji em código, comentários, mensagens de commit, documentação ou artefatos gerados pelo agente.
