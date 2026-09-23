@@ -108,6 +108,27 @@ jobs:
         continue-on-error: true
         run: ./gradlew :composeApp:testDebugUnitTest --no-daemon --stacktrace
 
+      - name: Diagnose Android Unit Test Failures
+        if: steps.test_android.outcome == 'failure'
+        run: |
+          echo "=== DIAGNOSTICO: testDebugUnitTest saiu com falha ==="
+          echo ""
+          echo "--- Resultados XML dos testes ---"
+          for f in composeApp/build/test-results/testDebugUnitTest/**/*.xml; do
+            if [ -f "$f" ]; then
+              echo ""
+              echo "=== $(basename $f) ==="
+              cat "$f"
+            fi
+          done
+          echo ""
+          echo "--- Relatorio HTML (resumo) ---"
+          if [ -f "composeApp/build/reports/tests/testDebugUnitTest/index.html" ]; then
+            cat composeApp/build/reports/tests/testDebugUnitTest/index.html | grep -E 'class="failures"|FAILED|class="errors"|<td>|Test ' | head -50
+          else
+            echo "Relatorio HTML nao encontrado."
+          fi
+
       - name: Run Integrity Audit (Artifact Hashes, SBOM & Config)
         id: test_integrity
         continue-on-error: true
