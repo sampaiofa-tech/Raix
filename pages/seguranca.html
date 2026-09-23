@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Seguranca e Privacidade do RAIX - Criptografia ponta a ponta, efemeridade, registros de acesso cifrados e nucleo pos-quantico pronto.">
+  <title>Seguranca e Privacidade - RAIX</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <img src="logo-empresa.png" alt="RAIX">
+        <span>RAI<span class="logo-accent">X</span></span>
+      </a>
+      <nav>
+        <ul class="nav-desktop">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="produto.html">Produto</a></li>
+          <li><a href="seguranca.html" class="active">Seguranca e Privacidade</a></li>
+          <li><a href="quem-somos.html">Quem Somos</a></li>
+          <li><a href="contato.html">Contato</a></li>
+        </ul>
+      </nav>
+      <button class="hamburger" aria-label="Menu" onclick="this.classList.toggle('open');document.getElementById('mobile-nav').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <ul class="nav-mobile" id="mobile-nav">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="produto.html">Produto</a></li>
+      <li><a href="seguranca.html" class="active">Seguranca e Privacidade</a></li>
+      <li><a href="quem-somos.html">Quem Somos</a></li>
+      <li><a href="contato.html">Contato</a></li>
+    </ul>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <h1>Seguranca e Privacidade</h1>
+    <p>Cada decisao arquitetural do RAIX existe para proteger o conteudo e a identidade de quem se comunica.</p>
+  </section>
+
+  <!-- Criptografia -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Criptografia ponta a ponta</h2>
+      <div class="prose">
+        <p>
+          As mensagens sao cifradas no dispositivo do remetente e so podem ser decifradas
+          pelo destinatario. O servidor nao detem a capacidade de ler o conteudo das mensagens:
+          atua como deposito cego de dados cifrados, sob retencao estritamente limitada de metadados.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pilares de Seguranca -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Pilares de seguranca</h2>
+      <ul class="feature-list">
+        <li class="feature-item">
+          <span class="feature-bullet"></span>
+          <div>
+            <h4>Efemeridade</h4>
+            <p>
+              As mensagens autodestroem-se apos a leitura; e, na ausencia de leitura,
+              expiram em ate 24 horas.
+            </p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <span class="feature-bullet"></span>
+          <div>
+            <h4>Registros de acesso</h4>
+            <p>
+              Os registros de acesso (incluindo endereco IP) sao mantidos cifrados em repouso,
+              em ambiente isolado e com acesso restrito, pelo prazo legal de 180 dias, sem qualquer
+              associacao ao conteudo das mensagens (LGPD + Marco Civil).
+            </p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <span class="feature-bullet"></span>
+          <div>
+            <h4>Notificacoes discretas</h4>
+            <p>
+              Notificacoes que nao revelam o remetente nem o conteudo.
+            </p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <span class="feature-bullet"></span>
+          <div>
+            <h4>Identidade sem cadastro</h4>
+            <p>
+              A identidade e derivada de uma semente de 12 palavras que so existe no
+              dispositivo do usuario. Sem e-mail, sem telefone, sem cadastro centralizado.
+            </p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <span class="feature-bullet"></span>
+          <div>
+            <h4>Servidor deposito cego</h4>
+            <p>
+              O servidor nao detem a capacidade de ler o conteudo. Atua exclusivamente como
+              intermediario de envelopes cifrados, sob retencao estritamente limitada.
+            </p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PQC -->
+  <section class="section section-alt section-center">
+    <div class="container">
+      <h2 class="section-title">Criptografia pos-quantica</h2>
+      <div class="prose" style="text-align: left;">
+        <p>
+          O RAIX possui um nucleo de criptografia pos-quantica pronto, com pipeline hibrido
+          em ativacao. O objetivo e proteger as comunicacoes contra ameacas futuras de
+          computacao quantica, combinando algoritmos classicos com algoritmos resistentes
+          a ataques quanticos.
+        </p>
+      </div>
+      <div class="pqc-badge">Nucleo de criptografia pos-quantica pronto; hibrido em ativacao</div>
+    </div>
+  </section>
+
+  <!-- Nota de honestidade -->
+  <section class="section">
+    <div class="container">
+      <div class="honesty-note" style="max-width: 720px; margin: 0 auto;">
+        <p>
+          <strong>Nota de honestidade tecnica:</strong> O RAIX nao afirma "rastro zero absoluto"
+          nem "anonimato total". A privacidade e construida por camadas arquiteturais que minimizam
+          a exposicao de dados &mdash; com retencao estritamente limitada de metadados, alinhamento
+          com a LGPD e o Marco Civil da Internet, e transparencia sobre os limites tecnicos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-alt section-center">
+    <div class="container">
+      <h2 class="section-title">Quer saber mais?</h2>
+      <p class="section-subtitle">
+        Converse com a nossa equipe sobre como o RAIX protege as comunicacoes da sua organizacao.
+      </p>
+      <a href="contato.html" class="btn btn-primary">Entre em contato</a>
+    </div>
+  </section>
+
+  <!-- Rodape -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="logo">
+          <img src="logo-empresa.png" alt="RAIX">
+          <span>RAI<span class="logo-accent">X</span></span>
+        </a>
+        <p>Privacidade forte por design, com retencao estritamente limitada de metadados.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navegacao</h4>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="produto.html">Produto</a></li>
+          <li><a href="seguranca.html">Seguranca e Privacidade</a></li>
+          <li><a href="quem-somos.html">Quem Somos</a></li>
+          <li><a href="contato.html">Contato</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="privacidade.html">Politica de Privacidade</a></li>
+          <li><a href="termos.html">Termos de Uso</a></li>
+          <li><a href="dpa.html">DPA</a></li>
+          <li><a href="governanca.html">ROPA / Governanca</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Cat Tech &mdash; CNPJ 67.497.085/0001-36</span>
+      <span>PT-BR &mdash; Politica atualizada em setembro de 2026</span>
+    </div>
+  </footer>
+
+</body>
+</html>
