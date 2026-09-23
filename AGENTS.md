@@ -87,3 +87,8 @@ Regras mandatórias de engenharia. Violação de qualquer uma invalida a entrega
    - Toda entrega deve passar **três verificações**: `compileDebugKotlinAndroid`, `desktopTest` e `testDebugUnitTest`.
    - Resultados com contagens de tasks devem ser colados no chat como evidência.
    - Entrega com build quebrado é automaticamente rejeitada.
+
+8. **Regra de Higiene (pré-fechamento)**:
+   - Antes de declarar QUALQUER entrega concluída, rodar a higiene completa do IDE (diagnostics/lint) e ZERAR todos os apontamentos -- ou justificar por escrito cada apontamento remanescente.
+   - Colar a evidência (lista zerada ou justificativa) no chat.
+   - Vale para todo selo.
