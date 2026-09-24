@@ -1,4 +1,4 @@
-﻿# RAIX: Materiais Executivos para Investimento
+# RAIX: Materiais Executivos para Investimento
 
 > **Aviso Oficial:** Projeto prÃ©-receita, AINDA SEM RECEITA. Baseline de produto congelado.
 > **Posicionamento:** Privacidade forte por design, com retenÃ§Ã£o limitada de metadados.
