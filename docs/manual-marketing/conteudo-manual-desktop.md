@@ -18,7 +18,7 @@ O RAIX foi criado para quem precisa de comunicacao confidencial real: advogados,
 2. Execute o instalador e siga as instrucoes padrao do Windows.
 3. Abra o RAIX pelo atalho criado na area de trabalho ou no menu Iniciar.
 
-> **Nota:** o Windows pode exibir um aviso de "editor desconhecido". Clique em "Mais informacoes" e depois "Executar assim mesmo". O RAIX e software livre e o codigo-fonte e auditavel.
+> **Nota:** o Windows pode exibir um aviso de "editor desconhecido". Clique em "Mais informacoes" e depois "Executar assim mesmo". O RAIX opera sob licenciamento AGPL-3.0 + licenca comercial (open-core); codigo disponivel sob solicitacao para auditoria e due diligence.
 
 ---
 
@@ -132,4 +132,4 @@ R: E a destruicao irreversivel das chaves de criptografia. Mesmo que alguem obte
 
 - Site: raixtech.com
 - E-mail: contato@raixtech.com
-- O RAIX e software livre (AGPL-3.0). Codigo-fonte disponivel em github.com/sampaiofa-tech/Raix.
+- O RAIX opera sob licenciamento AGPL-3.0 + licenca comercial (open-core); o nucleo sera publicado. Codigo disponivel sob solicitacao para auditoria e due diligence.

@@ -19,7 +19,7 @@ O RAIX Ã© uma plataforma B2B de **privacidade forte por design**. Diferente de
 
 - **Arquitetura Zero-Knowledge & Crypto-Shredding:** DestruiÃ§Ã£o ativa de chaves (TTL â‰¤15min) e recurso *vanish-after-read*.
 - **PÃ³s-QuÃ¢ntico (PQ):** PÃ³s-quÃ¢ntica hÃ­brida (roteiro aprovado, auditoria agendada).
-- **CÃ³digo AuditÃ¡vel & Dual Licensing:** LicenÃ§a AGPL-3.0 pÃºblica, combinada com LicenÃ§a Comercial, garantindo transparÃªncia sem abrir mÃ£o do controle corporativo.
+- **Licenciamento AGPL-3.0 + Licença Comercial (open-core):** O núcleo será publicado — hoje, código disponível sob solicitação para auditoria e due diligence. Garante transparência sem abrir mão do controle corporativo.
 - **Infraestrutura Otimizada:** Mensageiro rodando sobre GCP/Firebase com custo operacional atual de **R$ 0,00/mÃªs**.
 
 ### TraÃ§Ã£o Atual & MÃ©tricas
