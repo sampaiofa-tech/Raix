@@ -35,13 +35,13 @@ O RAIX e uma plataforma B2B de **privacidade forte por design**. Diferente de so
 
 | Cenario | Captacao (R$) | Estrategia / Perfil | Pros | Contras |
 | :--- | :--- | :--- | :--- | :--- |
-| **A** | **1,8M -- 2,1M** | **Agressiva** (Expansao rapida de time) | Maior velocidade no roadmap e multiplos produtos. | Alto burn-rate; risco a cultura de seguranca pela entrada simultanea de devs. |
-| **B** | **1,0M -- 1,2M** | **Lean Total** (Foco exclusivo no core) | Extrema disciplina financeira; pista de voo estendida. | Limita a expansao B2B e retarda muito as ferramentas Satelite (Sign, Drop). |
-| **C (Hibrido)** | **1,4M -- 1,6M** | **Equilibrada (Foco no B2B)** | **Pista segura para o B2B; absorve R$ 50k da auditoria; forma time de base.** | **Requer forte gestao financeira para nao assumir os custos de A.** |
+| **A** | **1,8M - 2,1M** | **Agressiva** (Expansao rapida de time) | Maior velocidade no roadmap e multiplos produtos. | Alto burn-rate; risco a cultura de seguranca pela entrada simultanea de devs. |
+| **B** | **1,0M - 1,2M** | **Lean Total** (Foco exclusivo no core) | Extrema disciplina financeira; pista de voo estendida. | Limita a expansao B2B e retarda muito as ferramentas Satelite (Sign, Drop). |
+| **C (Hibrido)** | **1,4M - 1,6M** | **Equilibrada (Foco no B2B)** | **Pista segura para o B2B; absorve R$ 50k da auditoria; forma time de base.** | **Requer forte gestao financeira para nao assumir os custos de A.** |
 
 ### Alocacao Detalhada por Cenario
 
-**CENARIO A -- RODADA MAIOR (R$ 1,8-2,1M; equipe Ano 1: 5 pessoas; custo ~R$ 102k/mes):**
+**CENARIO A - RODADA MAIOR (R$ 1,8-2,1M; equipe Ano 1: 5 pessoas; custo ~R$ 102k/mes):**
 
 - Salarios ~80% (~R$ 1,52M sobre medio R$ 1,9M)
 - Infraestrutura/nuvem ~5% (~R$ 95k)
@@ -51,7 +51,7 @@ O RAIX e uma plataforma B2B de **privacidade forte por design**. Diferente de so
 - Contador/juridico ~3% (~R$ 57k)
 - Reserva operacional ~4% (~R$ 76k)
 
-**CENARIO B -- ESCALONADO (R$ 1,0-1,2M; equipe Ano 1: 3 pessoas; custo ~R$ 56k/mes):**
+**CENARIO B - ESCALONADO (R$ 1,0-1,2M; equipe Ano 1: 3 pessoas; custo ~R$ 56k/mes):**
 
 - Salarios ~80% (~R$ 880k sobre medio R$ 1,1M)
 - Infra/nuvem ~4% (~R$ 44k)
@@ -61,7 +61,7 @@ O RAIX e uma plataforma B2B de **privacidade forte por design**. Diferente de so
 - Contador/juridico ~3% (~R$ 33k)
 - Reserva ~3% (~R$ 33k)
 
-**CENARIO C -- HIBRIDO, RECOMENDADO (R$ 1,4-1,6M; equipe Ano 1: 4 pessoas; custo ~R$ 81k/mes):**
+**CENARIO C - HIBRIDO, RECOMENDADO (R$ 1,4-1,6M; equipe Ano 1: 4 pessoas; custo ~R$ 81k/mes):**
 
 - Salarios ~82% (~R$ 1,23M sobre medio R$ 1,5M)
 - Infra/nuvem ~4% (~R$ 60k)
@@ -125,20 +125,20 @@ Este roadmap de 3 anos nao permite atalhos arquitetonicos. O sistema esta basead
 
 - *T+0 = inicio da execucao apos o aporte (entrada do capital).*
 - *As duracoes sao estimativas sequenciais de cronograma; em equipes paralelas (Cenario A/C) varias fases podem sobrepor-se.*
-- *Base de equipe: Cenario A (equipe maior/paralela), Cenario C (hibrido -- recomendado), Cenario B (enxuta/sequencial).*
+- *Base de equipe: Cenario A (equipe maior/paralela), Cenario C (hibrido - recomendado), Cenario B (enxuta/sequencial).*
 - *Projeto pre-receita, AINDA SEM RECEITA: os prazos nao implicam receita garantida.*
 
 | Fase | Entrega-chave | A | C (rec.) | B |
 | :--- | :--- | :--- | :--- | :--- |
-| **F2 -- Lojas** | Play/Apple no ar | T+1-2 | T+2-3 | T+3-5 |
-| **F3 -- Auditoria (R$ 50k)** | Laudo/atestado | T+2-4 | T+3-5 | T+5-7 |
-| **F4 -- Migracao PQ** | Nucleo PQ homologado | T+4-7 | T+5-8 | T+8-12 |
-| **F5 -- PQ-Vault** | Lancamento comercial | T+7-10 | T+9-13 | T+13-18 |
-| **F6 -- Satelites B2B** | Sign no mercado (Sign/Drop/Lazaro) | T+10-14 | T+13-17 | T+18-24 |
-| **F7 -- Self-hosted** | Drive/NAS + Box (apos parceria) | T+14-18 | T+17-22 | T+24-30 |
-| **F8 -- Track 2 (anonimato)** | Roteamento/Tor-like | T+18-22 | T+22-26 | T+30-36 |
-| **F9 -- Feature premium + Consultoria** | Analise on-device + servico | T+16-20 (paralela) | T+20-24 | T+26-32 |
-| **F10 -- Sentinela (R&D)** | 1o prototipo on-device | T+24-30 | T+28-34 | T+36-42 |
-| **F11 -- Fortaleza completa** | Ecossistema maduro | T+30-36 | T+34-40 | T+42-48 |
+| **F2 - Lojas** | Play/Apple no ar | T+1-2 | T+2-3 | T+3-5 |
+| **F3 - Auditoria (R$ 50k)** | Laudo/atestado | T+2-4 | T+3-5 | T+5-7 |
+| **F4 - Migracao PQ** | Nucleo PQ homologado | T+4-7 | T+5-8 | T+8-12 |
+| **F5 - PQ-Vault** | Lancamento comercial | T+7-10 | T+9-13 | T+13-18 |
+| **F6 - Satelites B2B** | Sign no mercado (Sign/Drop/Lazaro) | T+10-14 | T+13-17 | T+18-24 |
+| **F7 - Self-hosted** | Drive/NAS + Box (apos parceria) | T+14-18 | T+17-22 | T+24-30 |
+| **F8 - Track 2 (anonimato)** | Roteamento/Tor-like | T+18-22 | T+22-26 | T+30-36 |
+| **F9 - Feature premium + Consultoria** | Analise on-device + servico | T+16-20 (paralela) | T+20-24 | T+26-32 |
+| **F10 - Sentinela (R&D)** | 1o prototipo on-device | T+24-30 | T+28-34 | T+36-42 |
+| **F11 - Fortaleza completa** | Ecossistema maduro | T+30-36 | T+34-40 | T+42-48 |
 
-> **Nota de Honestidade:** Prazos sao estimativas de roadmap pos-rodada, sujeitas a contratacao da equipe, auditoria externa e metricas dos pilotos. Nao constituem promessa de receita. *(F0 e F1 sao pre-rodada -- F0 concluida; F1 pilotos em andamento).*
+> **Nota de Honestidade:** Prazos sao estimativas de roadmap pos-rodada, sujeitas a contratacao da equipe, auditoria externa e metricas dos pilotos. Nao constituem promessa de receita. *(F0 e F1 sao pre-rodada - F0 concluida; F1 pilotos em andamento).*
