@@ -129,4 +129,4 @@ R: E a destruicao irreversivel das chaves de criptografia. Mesmo que alguem obte
 
 - Site: raixtech.com
 - E-mail: contato@raixtech.com
-- O RAIX e software livre (AGPL-3.0). Codigo-fonte disponivel em github.com/sampaiofa-tech/Raix.
+- O RAIX opera sob licenciamento AGPL-3.0 + licenca comercial (open-core); o nucleo sera publicado. Codigo disponivel sob solicitacao para auditoria e due diligence.

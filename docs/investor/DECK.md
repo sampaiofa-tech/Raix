@@ -54,7 +54,7 @@ style: |
 
 ## 3. Demonstração Técnica
 
-**Privacidade real, auditável.**
+**Privacidade real, verificável.**
 
 - **E2E DEK v1.2:** Homologada (isolamento adversarial, servidor cego).
 - **Vanish-after-read:** Mensagens destruídas localmente e remotamente.
@@ -187,7 +187,7 @@ p { font-size: 0.65em; }
 - **Desenvolvimento Solo com IA:** Política de agentes rigorosamente versionada, baseline congelado.
 - **Dependência Infra (Firebase/Lojas):** Risco de D-U-N-S e política "Data Safety" já mapeados no `DATA_INVENTORY.md`.
 - **Propriedade e Marca:** Depósito INPI realizado (classes 9 e 42).
-- **Código Aberto:** Dual licensing protege o modelo B2B e garante escrutínio público transparente.
+- **Código disponível sob solicitação para auditoria e due diligence:** Dual licensing (AGPL-3.0 + Comercial) protege o modelo B2B; o núcleo será publicado.
 
 ---
 
