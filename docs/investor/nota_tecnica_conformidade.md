@@ -1,81 +1,81 @@
-﻿# RAIX
+# RAIX
 
 **DATA:** 16 de setembro de 2026
-**VERSÃƒO:** 1.0
-**TÃTULO:** NOTA TÃ‰CNICA: CONFORMIDADE INTERNACIONAL DE PROTEÃ‡ÃƒO DE DADOS
+**VERSAO:** 1.0
+**TITULO:** NOTA TECNICA: CONFORMIDADE INTERNACIONAL DE PROTECAO DE DADOS
 
 ---
 
 ## Resumo Executivo
 
-A presente nota tÃ©cnica tem como objetivo esclarecer o status atual e o *roadmap* de conformidade do RAIX frente Ã s legislaÃ§Ãµes globais de proteÃ§Ã£o de dados.
+A presente nota tecnica tem como objetivo esclarecer o status atual e o *roadmap* de conformidade do RAIX frente as legislacoes globais de protecao de dados.
 
 **Posicionamento de Conformidade:**
-Atualmente, o RAIX encontra-se **plenamente conforme no Brasil** (LGPD e Marco Civil da Internet). Para as demais jurisdiÃ§Ãµes internacionais, nossa arquitetura jÃ¡ se encontra alinhada por princÃ­pio â€” utilizando *zero-knowledge*, minimizaÃ§Ã£o de dados e *privacy by design* â€”, contudo, **nÃ£o possuÃ­mos conformidade formal ainda**. A expansÃ£o internacional seguirÃ¡ um *roadmap* de adequaÃ§Ã£o legal e regulatÃ³ria especÃ­fico por jurisdiÃ§Ã£o.
+Atualmente, o RAIX encontra-se **plenamente conforme no Brasil** (LGPD e Marco Civil da Internet). Para as demais jurisdicoes internacionais, nossa arquitetura ja se encontra alinhada por principio - utilizando *zero-knowledge*, minimizacao de dados e *privacy by design* -, contudo, **nao possuimos conformidade formal ainda**. A expansao internacional seguira um *roadmap* de adequacao legal e regulatoria especifico por jurisdicao.
 
-A essÃªncia do RAIX nÃ£o se negocia: **o conteÃºdo pertence ao usuÃ¡rio, nunca ao Estado nem a terceiros**. Este princÃ­pio define de forma inegociÃ¡vel como atuamos em cada paÃ­s.
-
----
-
-## A. BRASIL â€” LGPD + Marco Civil (JÃ CONFORME)
-
-O RAIX possui conformidade completa e verificÃ¡vel no Brasil.
-
-* **Passo 0 (ConcluÃ­do):** PublicaÃ§Ã£o de PolÃ­ticas de Privacidade (PP), Termos de Uso (ToU), Data Processing Agreement (DPA) e Registro de OperaÃ§Ãµes de Tratamento (ROPA).
-* **Passo 1 (ConcluÃ­do):** Resposta a requisiÃ§Ãµes de titulares de dados (DSR) em atÃ© 15 dias, com *runbook* ativo.
-* **Passo 2 (ConcluÃ­do):** Logs de conexÃ£o isolados pelo perÃ­odo legal de 180 dias (Marco Civil da Internet, Art. 15).
+A essencia do RAIX nao se negocia: **o conteudo pertence ao usuario, nunca ao Estado nem a terceiros**. Este principio define de forma inegociavel como atuamos em cada pais.
 
 ---
 
-## B. EUROPA â€” GDPR (RGPD) â€” Roadmap
+## A. BRASIL - LGPD + Marco Civil (JA CONFORME)
 
-A adequaÃ§Ã£o ao mercado europeu exigirÃ¡ um esforÃ§o burocrÃ¡tico, com custo estimado de baixo a mÃ©dio, sem perda da essÃªncia arquitetural do RAIX. A adequaÃ§Ã£o ocorrerÃ¡ em 6 passos:
+O RAIX possui conformidade completa e verificavel no Brasil.
 
-* **Passo 1:** Nomear representante na UE (obrigatÃ³rio para fornecimento relevante na regiÃ£o).
-* **Passo 2:** Estabelecer contrato de transferÃªncia internacional (*Standard Contractual Clauses* - SCCs da ComissÃ£o Europeia) com o suboperador (Google/Firebase).
-* **Passo 3:** Realizar AvaliaÃ§Ã£o de Impacto sobre a ProteÃ§Ã£o de Dados (DPIA), que serÃ¡ amplamente facilitada por nossa arquitetura *zero-knowledge*.
-* **Passo 4:** Implementar processo de atendimento a titulares compatÃ­vel com a GDPR. O "direito ao esquecimento" jÃ¡ Ã© atendido por construÃ§Ã£o na plataforma via *crypto-shredding*.
-* **Passo 5:** Alinhar polÃ­tica de retenÃ§Ã£o (metadados mÃ­nimos e logs isolados).
-* **Passo 6:** Produzir documentaÃ§Ã£o formal de conformidade e definir ponto de contato oficial.
+* **Passo 0 (Concluido):** Publicacao de Politicas de Privacidade (PP), Termos de Uso (ToU), Data Processing Agreement (DPA) e Registro de Operacoes de Tratamento (ROPA).
+* **Passo 1 (Concluido):** Resposta a requisicoes de titulares de dados (DSR) em ate 15 dias, com *runbook* ativo.
+* **Passo 2 (Concluido):** Logs de conexao isolados pelo periodo legal de 180 dias (Marco Civil da Internet, Art. 15).
 
 ---
 
-## C. ESTADOS UNIDOS â€” Mosaico Estadual â€” Roadmap
+## B. EUROPA - GDPR (RGPD) - Roadmap
 
-Devido Ã  ausÃªncia de uma lei federal unificada nos EUA, a adequaÃ§Ã£o serÃ¡ um esforÃ§o administrativo e fragmentado, executado em 4 passos:
+A adequacao ao mercado europeu exigira um esforco burocratico, com custo estimado de baixo a medio, sem perda da essencia arquitetural do RAIX. A adequacao ocorrera em 6 passos:
 
-* **Passo 1:** Mapear os estados com leis de privacidade relevantes ao pÃºblico-alvo (CalifÃ³rnia - CCPA/CPRA, Colorado, VirgÃ­nia, Utah, Connecticut, entre outros).
-* **Passo 2:** Ajustar avisos de privacidade e termos para atender aos requisitos especÃ­ficos de cada estado aplicÃ¡vel.
-* **Passo 3:** Estabelecer mecanismo de atendimento a titulares (ex: *opt-out* de venda/compartilhamento de dados). Este passo Ã© facilitado pelo fato de o RAIX nÃ£o realizar qualquer tipo de coleta para venda de dados.
-* **Passo 4:** Realizar avaliaÃ§Ã£o jurÃ­dica estado a estado antes de iniciar as operaÃ§Ãµes em cada um.
+* **Passo 1:** Nomear representante na UE (obrigatorio para fornecimento relevante na regiao).
+* **Passo 2:** Estabelecer contrato de transferencia internacional (*Standard Contractual Clauses* - SCCs da Comissao Europeia) com o suboperador (Google/Firebase).
+* **Passo 3:** Realizar Avaliacao de Impacto sobre a Protecao de Dados (DPIA), que sera amplamente facilitada por nossa arquitetura *zero-knowledge*.
+* **Passo 4:** Implementar processo de atendimento a titulares compativel com a GDPR. O "direito ao esquecimento" ja e atendido por construcao na plataforma via *crypto-shredding*.
+* **Passo 5:** Alinhar politica de retencao (metadados minimos e logs isolados).
+* **Passo 6:** Produzir documentacao formal de conformidade e definir ponto de contato oficial.
 
 ---
 
-## D. AMÃ‰RICA LATINA â€” Roadmap
+## C. ESTADOS UNIDOS - Mosaico Estadual - Roadmap
 
-Para os mercados latino-americanos com legislaÃ§Ãµes de privacidade alinhadas (na maioria dos casos, derivadas da matriz da GDPR europeia), o esforÃ§o de adequaÃ§Ã£o Ã© considerado baixo e envolverÃ¡ 3 passos:
+Devido a ausencia de uma lei federal unificada nos EUA, a adequacao sera um esforco administrativo e fragmentado, executado em 4 passos:
 
-* **Passo 1:** Mapear os requisitos de cada paÃ­s alvo (ex.: MÃ©xico, ColÃ´mbia, Argentina, Uruguai).
-* **Passo 2:** Adequar a documentaÃ§Ã£o local conforme as obrigaÃ§Ãµes especÃ­ficas de cada jurisdiÃ§Ã£o.
+* **Passo 1:** Mapear os estados com leis de privacidade relevantes ao publico-alvo (California - CCPA/CPRA, Colorado, Virginia, Utah, Connecticut, entre outros).
+* **Passo 2:** Ajustar avisos de privacidade e termos para atender aos requisitos especificos de cada estado aplicavel.
+* **Passo 3:** Estabelecer mecanismo de atendimento a titulares (ex: *opt-out* de venda/compartilhamento de dados). Este passo e facilitado pelo fato de o RAIX nao realizar qualquer tipo de coleta para venda de dados.
+* **Passo 4:** Realizar avaliacao juridica estado a estado antes de iniciar as operacoes em cada um.
+
+---
+
+## D. AMERICA LATINA - Roadmap
+
+Para os mercados latino-americanos com legislacoes de privacidade alinhadas (na maioria dos casos, derivadas da matriz da GDPR europeia), o esforco de adequacao e considerado baixo e envolvera 3 passos:
+
+* **Passo 1:** Mapear os requisitos de cada pais alvo (ex.: Mexico, Colombia, Argentina, Uruguai).
+* **Passo 2:** Adequar a documentacao local conforme as obrigacoes especificas de cada jurisdicao.
 * **Passo 3:** Estabelecer processos de atendimento a titulares com validade local.
 
 ---
 
-## E. RÃšSSIA E CHINA â€” ExclusÃ£o e AtuaÃ§Ã£o Soberana
+## E. RUSSIA E CHINA - Exclusao e Atuacao Soberana
 
-**ExclusÃ£o da Conformidade OrdinÃ¡ria:**
-As legislaÃ§Ãµes de jurisdiÃ§Ãµes como RÃºssia e China exigem localizaÃ§Ã£o forÃ§ada de dados em seus territÃ³rios e, em alguns casos (como na RÃºssia), mecanismos de acesso estatal garantido. Tais exigÃªncias **conflitam frontalmente com a essÃªncia do RAIX** (onde o conteÃºdo pertence exclusivamente ao usuÃ¡rio, e nunca ao Estado). Adequar o sistema a esses termos significaria abandonar a promessa central do nosso produto.
+**Exclusao da Conformidade Ordinaria:**
+As legislacoes de jurisdicoes como Russia e China exigem localizacao forcada de dados em seus territorios e, em alguns casos (como na Russia), mecanismos de acesso estatal garantido. Tais exigencias **conflitam frontalmente com a essencia do RAIX** (onde o conteudo pertence exclusivamente ao usuario, e nunca ao Estado). Adequar o sistema a esses termos significaria abandonar a promessa central do nosso produto.
 
 **Como Atuamos (Modelo Soberano):**
-O RAIX **nÃ£o** operarÃ¡ nestes mercados atravÃ©s da nossa conformidade interna ordinÃ¡ria (plataforma SaaS padrÃ£o). O atendimento para essas regiÃµes se darÃ¡ **apenas via modelo PRIVATE / SELF-HOSTED soberano**.
+O RAIX **nao** operara nestes mercados atraves da nossa conformidade interna ordinaria (plataforma SaaS padrao). O atendimento para essas regioes se dara **apenas via modelo PRIVATE / SELF-HOSTED soberano**.
 
-Neste modelo, a prÃ³pria organizaÃ§Ã£o ou cliente licencia o sistema e mantÃ©m os dados e servidores em seu territÃ³rio, sob as leis que o cliente escolher. A plataforma RAIX permanecerÃ¡ tecnicamente cega e nÃ£o deterÃ¡ nenhuma chave de criptografia, por construÃ§Ã£o. NÃ£o ofereceremos, em nenhuma hipÃ³tese, qualquer mecanismo de acesso estatal ou *backdoor* no nosso cÃ³digo, tampouco prometeremos "conformidade local" que contradiga nossos princÃ­pios.
+Neste modelo, a propria organizacao ou cliente licencia o sistema e mantem os dados e servidores em seu territorio, sob as leis que o cliente escolher. A plataforma RAIX permanecera tecnicamente cega e nao detera nenhuma chave de criptografia, por construcao. Nao ofereceremos, em nenhuma hipotese, qualquer mecanismo de acesso estatal ou *backdoor* no nosso codigo, tampouco prometeremos "conformidade local" que contradiga nossos principios.
 
 ---
 
 ## Posicionamento Final
 
-> *"Queremos ser o padrÃ£o mundial de privacidade â€” nÃ£o o padrÃ£o de um mundo que pede para abrir a porta. Nos mercados que valorizam privacidade, adequaÃ§Ã£o Ã© burocracia avenida. Nos regimes de controle, atuamos apenas por modelo soberano â€” nunca cedendo a promessa de que o conteÃºdo pertence ao usuÃ¡rio."*
+> *"Queremos ser o padrao mundial de privacidade - nao o padrao de um mundo que pede para abrir a porta. Nos mercados que valorizam privacidade, adequacao e burocracia avenida. Nos regimes de controle, atuamos apenas por modelo soberano - nunca cedendo a promessa de que o conteudo pertence ao usuario."*
 
 ---
-**Nota de Honestidade:** Reitera-se que, na data desta publicaÃ§Ã£o, a **conformidade completa e formalizada do RAIX existe apenas no BRASIL**. As demais jurisdiÃ§Ãµes aqui citadas representam exclusivamente nosso *roadmap* de adequaÃ§Ã£o. NÃ£o afirmamos que o sistema Ã© "GDPR-ready" ou legalmente adequado nos EUA/Europa/AmÃ©rica Latina atÃ© que as avaliaÃ§Ãµes jurÃ­dicas e passos burocrÃ¡ticos formais tenham sido integralmente concluÃ­dos.
+**Nota de Honestidade:** Reitera-se que, na data desta publicacao, a **conformidade completa e formalizada do RAIX existe apenas no BRASIL**. As demais jurisdicoes aqui citadas representam exclusivamente nosso *roadmap* de adequacao. Nao afirmamos que o sistema e "GDPR-ready" ou legalmente adequado nos EUA/Europa/America Latina ate que as avaliacoes juridicas e passos burocraticos formais tenham sido integralmente concluidos.
