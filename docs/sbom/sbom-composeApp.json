@@ -521,12 +521,12 @@
       "type": "library",
       "group": "org.bouncycastle",
       "name": "bcprov-jdk18on",
-      "version": "1.79",
-      "purl": "pkg:maven/org.bouncycastle/bcprov-jdk18on@1.79",
+      "version": "1.85",
+      "purl": "pkg:maven/org.bouncycastle/bcprov-jdk18on@1.85",
       "hashes": [
         {
           "alg": "SHA-256",
-          "content": "0d81ecc3124536b539bce9aa3fe9621b7f84c9cee371b635a5b31c78b79ab1da"
+          "content": "20af26bf6060bb8005cc2389916812c1e0e998dc48d2ced7131b89461b54cff7"
         }
       ]
     },

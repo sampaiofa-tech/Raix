@@ -179,11 +179,11 @@ function buildComposeAppSbom() {
       purl: `pkg:maven/${lib.group}/${lib.name}@${lib.version}`,
     };
 
-    if (lib.group === "org.bouncycastle" && lib.version === "1.79") {
+    if (lib.group === "org.bouncycastle" && lib.version === "1.85") {
       component.hashes = [
         {
           alg: "SHA-256",
-          content: "0d81ecc3124536b539bce9aa3fe9621b7f84c9cee371b635a5b31c78b79ab1da",
+          content: "20af26bf6060bb8005cc2389916812c1e0e998dc48d2ced7131b89461b54cff7",
         },
       ];
     }

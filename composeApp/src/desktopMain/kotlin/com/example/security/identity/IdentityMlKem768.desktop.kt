@@ -9,17 +9,25 @@ import org.bouncycastle.pqc.crypto.mlkem.MLKEMPrivateKeyParameters
 import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters
 import java.security.SecureRandom
 
-actual object IdentityMlKem768 {
+private class MlKemFixedRandom(private val seed: ByteArray) : SecureRandom() {
+    private var offset = 0
+    override fun nextBytes(bytes: ByteArray) {
+        for (i in bytes.indices) {
+            bytes[i] = seed[offset % seed.size]
+            offset++
+        }
+    }
+}
 
-    private val secureRandom = SecureRandom()
+actual object IdentityMlKem768 {
 
     actual fun generateKeyPair(seed32: ByteArray): MlKemKeyPair {
         require(seed32.isNotEmpty()) { "ML-KEM-768 seed cannot be empty" }
         val d = Sha256Digest.digest(seed32 + "raix-mlkem-d".encodeToByteArray())
         val z = Sha256Digest.digest(seed32 + "raix-mlkem-z".encodeToByteArray())
         val generator = MLKEMKeyPairGenerator()
-        generator.init(MLKEMKeyGenerationParameters(secureRandom, MLKEMParameters.ml_kem_768))
-        val keyPair = generator.internalGenerateKeyPair(d, z)
+        generator.init(MLKEMKeyGenerationParameters(MlKemFixedRandom(d + z), MLKEMParameters.ml_kem_768))
+        val keyPair = generator.generateKeyPair()
         val privParams = keyPair.private as MLKEMPrivateKeyParameters
         val pubParams = keyPair.public as MLKEMPublicKeyParameters
         return MlKemKeyPair(
@@ -30,7 +38,7 @@ actual object IdentityMlKem768 {
 
     actual fun encapsulate(recipientPublicKey: ByteArray, customRandom: ByteArray?): KemEncapsulation {
         val pubParams = MLKEMPublicKeyParameters(MLKEMParameters.ml_kem_768, recipientPublicKey)
-        val generator = MLKEMGenerator(secureRandom)
+        val generator = MLKEMGenerator(SecureRandom())
         val secretWithEncapsulation = generator.generateEncapsulated(pubParams)
         return KemEncapsulation(
             ciphertext = secretWithEncapsulation.encapsulation,

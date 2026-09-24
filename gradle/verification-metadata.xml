@@ -8,15 +8,15 @@
       </trusted-artifacts>
    </configuration>
    <components>
-      <!-- Cryptographic verification of Post-Quantum & Security dependencies (Bouncy Castle 1.79) -->
-      <component group="org.bouncycastle" name="bcprov-jdk18on" version="1.79">
-         <artifact name="bcprov-jdk18on-1.79.jar">
-            <sha256 value="0d81ecc3124536b539bce9aa3fe9621b7f84c9cee371b635a5b31c78b79ab1da" origin="Maven Central verified artifact"/>
+      <!-- Cryptographic verification of Post-Quantum & Security dependencies (Bouncy Castle 1.85) -->
+      <component group="org.bouncycastle" name="bcprov-jdk18on" version="1.85">
+         <artifact name="bcprov-jdk18on-1.85.jar">
+            <sha256 value="20af26bf6060bb8005cc2389916812c1e0e998dc48d2ced7131b89461b54cff7" origin="Maven Central verified artifact"/>
          </artifact>
       </component>
-      <component group="org.bouncycastle" name="bcpkix-jdk18on" version="1.79">
-         <artifact name="bcpkix-jdk18on-1.79.jar">
-            <sha256 value="3639a24ddf9ba4b7eba0659b44770e91eba816421888e571f285aadefe532cd6" origin="Maven Central verified artifact"/>
+      <component group="org.bouncycastle" name="bcpkix-jdk18on" version="1.85">
+         <artifact name="bcpkix-jdk18on-1.85.jar">
+            <sha256 value="c9f82b2d4e99c4bbdfccf684e52cc06ea06a0b567bfd0d08f9c5a3f417055996" origin="Maven Central verified artifact"/>
          </artifact>
       </component>
    </components>
