@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew *)",
+      "Bash(gradlew *)",
+      "Bash(./gradlew.bat *)",
+      "Bash(gradlew.bat *)",
+      "PowerShell(.\\gradlew *)",
+      "PowerShell(gradlew *)",
+      "PowerShell(.\\gradlew.bat *)",
+      "PowerShell(gradlew.bat *)",
+      "Bash(node scripts/*)",
+      "PowerShell(node scripts/*)",
+      "Bash(npm *)",
+      "PowerShell(npm *)",
+      "Bash(git *)",
+      "PowerShell(git *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./keystore.properties)",
+      "Read(./**/*.keystore)",
+      "Read(./**/google-services.json)",
+      "Bash(git clean *)",
+      "PowerShell(git clean *)",
+      "Bash(git reset --hard *)",
+      "PowerShell(git reset --hard *)",
+      "Bash(git push --force *)",
+      "PowerShell(git push --force *)",
+      "Bash(git push -f *)",
+      "PowerShell(git push -f *)"
+    ]
+  }
+}
