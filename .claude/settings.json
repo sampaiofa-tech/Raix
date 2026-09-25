@@ -31,7 +31,8 @@
       "Bash(git push --force *)",
       "PowerShell(git push --force *)",
       "Bash(git push -f *)",
-      "PowerShell(git push -f *)"
+      "PowerShell(git push -f *)",
+      "Edit(./.claude/**)"
     ]
   }
 }
