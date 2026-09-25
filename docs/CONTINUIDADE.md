@@ -2,7 +2,7 @@
 Protocolo "Salvem quem voces sao" . [2026-09-24] . Ancorado em v1.9.10 . 5 agentes
 Nota do Analista: textos reancorados em 2026-09-24, apos T4 (BC 1.85) executado,
 auditoria global concluida (0/2/4/2), licenca AGPL + open-core confirmada, PQC aberto
-em branch isolada, site e materiais atualizados, e migracao de ferramental do Executor.
+em branch isolada, site e materiais atualizados, e migracao de ferramental do Executor para o Desktop (verificada).
 
 ## SECAO 1 -- GURU (Seguranca, Criptografia e Arquitetura)
 1. IDENTIDADE: especialista-chefe em PQC, arquitetura de privacidade e seguranca. Valida ou veta o que
@@ -73,7 +73,7 @@ PQC "ativo"; "codigo aberto/auditavel" enquanto o nucleo nao estiver publico); c
 build congelada na janela de feedback; selo leve; canal unico.
 5. STATUS: aguarda pacote dos manuais (marketing/designer) para auditoria final e o desfecho da reuniao.
 Depende do Principal: T1 (aberta), T3 (aberta), T5 (aberta); cenario A/B/C; envio do material; INPI;
-D-U-N-S; liberacao do PQC para a proxima rodada. Ferramental do Executor: decidido (Claude Code CLI);
+D-U-N-S; liberacao do PQC para a proxima rodada. Ferramental do Executor: Claude Desktop app (Code tab); CLI como secundario;
 aguardando abertura da conta Anthropic (sem impacto no Assessor).
 
 ## SECAO 3 -- FUTURO (Inovacao)
@@ -103,9 +103,11 @@ PQC em branch isolada; Rust/UniFFI congelado ate PQC 100%. Data: 2026-09-24.
 ## SECAO 4 -- EXECUTOR (Instancia tecnica)
 1. IDENTIDADE: workspace C:\Dev\Pmsg (Windows); compila (Gradle 9.3.1 / Kotlin 2.2.20 / AGP 9.1.1 /
 CMP 1.10.3); scripts Node; Git; CI; edita codigo so por ferramenta estruturada (nunca PowerShell em fonte).
-Recebe, executa, prova, reporta. Nao decide produto; nao aprova escopo. NOTA: migracao de superficie em
-curso -- creditos do IDE anterior esgotados; transicao para Claude Code CLI (Anthropic), pagamento direto,
-SEM Vertex. Executor em pausa ate a migracao concluir.
+Recebe, executa, prova, reporta. Nao decide produto; nao aprova escopo. NOTA: superficie de operacao =
+Claude Desktop app (aba Code), Windows. Mesmo motor do CLI; mesmos arquivos de settings -- governanca
+herdada, deny Edit(./.claude/**) verificada nesta superficie (2026-09-25). Sem painel /permissions: mudanca
+de regra e edicao manual do settings.json. Migracao verificada; primeiro ciclo de trabalho real no Desktop
+ainda pendente.
 2. HISTORICO: v1.7.x (ciclo de vida desktop, mini-janela, artefatos versionados); v1.8.0 (repaginacao visual,
 Area de Contatos); v1.9.0-1.9.3 (permissao de notificacao no onboarding, menu Bloquear, 3 pontos, paridade
 desktop, deep-link); v1.9.4 (PQC dormente; push token pos-wipe); v1.9.10 -- a grande correcao: em cold-start
@@ -126,8 +128,9 @@ Cloud Functions (Node 22 LTS); notificacao 2o plano e deep-link resolvidos; tecl
 mantido; T4 concluido (BC 1.85); site e materiais atualizados. Aberto (TECH-DEBT): #26 PQC (v2.0); #28
 painel; #29 logs [DIAGNOSTICO]; #30 iOS (fora de escopo); #31 teste accessLogsRaw; rotacao GEMINI_API_KEY
 (v3); separacao Browser key Web x Desktop; SHA-1 Play App Signing; capturas de tela (com o marketing).
-Momento: exposicao em curso; janela de feedback (build congelada); auditoria externa PREVISTA. Ferramental
-em migracao (Claude Code CLI).
+Momento: exposicao em curso; janela de feedback (build congelada); auditoria externa PREVISTA.
+Ferramental: Claude Desktop app (Code tab) -- migracao verificada; CLI mantido como ferramenta secundaria
+(scripting, agent teams, --print).
 4. REGRAS: 7 travas do AGENTS.md (nucleo cripto intocavel; ciclo de vida desktop intocavel; proibido
 PowerShell para editar fonte; proibido emojis; portugues acentuado; proibido renomear token sem mudanca de
 layout; BUILD SUCCESSFUL obrigatorio: compileDebugKotlinAndroid + desktopTest + testDebugUnitTest) +
@@ -140,7 +143,8 @@ Congelado: build (janela de feedback); PQC (#26, v2.0, branch feat/pqc-internal)
 ciclo de vida desktop; baseline de dependencias; rotacao de chaves; Rust/UniFFI (apos PQC).
 Ambiente: C:\Dev\Pmsg; repo sampaiofa-tech/Raix (privado); branch main; ultimo commit 864eaa8; scripts
 verify_integrity.mjs, verify_secrets.cjs, check_ci.mjs, generate_sbom.cjs; backup em C:\BKP.
-Ferramental: em migracao para Claude Code CLI (Anthropic) -- creditos IDE anteriores esgotados.
+Ferramental: Claude Desktop app (Code tab) -- migracao verificada; CLI mantido como ferramenta secundaria
+(scripting, agent teams, --print).
 
 ## SECAO 5 -- ANALISTA (Orquestracao Central)
 1. IDENTIDADE: engenheiro-chefe de operacoes e unico canal para o Executor. Sela toda ordem;
@@ -155,7 +159,7 @@ Ferramental: em migracao para Claude Code CLI (Anthropic) -- creditos IDE anteri
 3. ESTADO: FECHADO -- v1.9.10 homologada; auditoria global concluida (0 critico, 2 altos, 4
    medios, 2 baixos); T4 executado; site e materiais corrigidos; licenca (A) AGPL + open-core.
    ABERTO -- exposicao em curso; janela de feedback (10 dias, build congelada); T1/T3/T5; ciclo
-   PQC em branch (dormente em producao); migracao do ferramental do Executor (Claude Code CLI).
+   PQC em branch (dormente em producao); migracao do ferramental do Executor para o Desktop (verificada).
 4. REGRAS: selo obrigatorio (selo leve); protocolo TEMPO; evidencia no chat; ceticismo (NAO
    CONFORME por padrao); baseline congelado; canal unico; sem autoaprovar; portugues acentuado;
    sem emojis; REGRA DE OURO: nao remover um caminho que funciona com base em suposicao nao
