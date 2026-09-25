@@ -29,6 +29,7 @@ hosting_table.html
 hosting_table.txt
 .backups/
 .agents/
+.claude/settings.local.json
 kotlin-js-store/
 node_modules/
 functions/node_modules/
