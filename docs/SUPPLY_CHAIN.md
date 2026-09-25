@@ -27,7 +27,7 @@ Para neutralizar esse vetor, o **Raix** implementa controles em quatro camadas:
 ### 2.1 Ecossistema Kotlin Multiplatform / Gradle
 - **Arquivo de Configuração:** [`gradle/verification-metadata.xml`](file:///c:/Dev/Pmsg/gradle/verification-metadata.xml)
 - **Mecanismo:** *Gradle Dependency Verification*.
-- **Padrão de Hashes:** SHA-256 obrigatório para dependências críticas de segurança (ex.: Bouncy Castle `bcprov-jdk18on` e `bcpkix-jdk18on` versão 1.79).
+- **Padrão de Hashes:** SHA-256 obrigatório para dependências críticas de segurança (ex.: Bouncy Castle `bcprov-jdk18on` e `bcpkix-jdk18on` versão 1.85).
 - **Comportamento em Ataques:** Se um atacante alterar um único byte de qualquer dependência ou se um repositório remoto for comprometido, o build é abortado imediatamente com código de erro não-zero (`Dependency verification failed`).
 
 ### 2.2 Ecossistema Node.js / Cloud Functions
